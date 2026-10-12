@@ -132,6 +132,7 @@ export function AlternativesPanel({ productId, initialPreference = "balanced" }:
                           <Link href={`/products/${pick.product_id}`} className="mt-1 block font-medium text-ink hover:underline">
                             {pick.name ?? nameOf(pick.product_id, state.data)}
                           </Link>
+                          {pick.is_synthetic ? <div className="mt-1"><SyntheticBadge /></div> : null}
                           {pick.reason || pick.rationale ? (
                             <p className="mt-1 text-xs text-slate-700">{pick.reason ?? pick.rationale}</p>
                           ) : null}

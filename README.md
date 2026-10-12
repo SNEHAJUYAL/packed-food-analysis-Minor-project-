@@ -28,9 +28,10 @@ docker compose up --build        # web http://localhost:3000, API docs http://lo
 Without Docker: `./run.sh setup && ./run.sh migrate && ./run.sh seed`, then `./run.sh api` and
 `./run.sh web`. Details, the offline URL demo and production notes: [docs/deployment.md](docs/deployment.md).
 
-**About the sample data.** The repository ships 40 **synthetic** demo products (`data/sample/`), labelled
-as such in the database, API and UI, because the build environment could not reach Open Food Facts.
-Load real Open Food Facts India records with `./run.sh off` where the network allows it.
+**About the sample data.** Seeding loads 466 **real Open Food Facts India records** (ODbL, no prices,
+`data/sample/off_india_subset.jsonl`) plus 40 **synthetic** demo products with made-up prices so
+value-for-money can be shown; the synthetic ones are labelled in the database, API and UI. The full India
+extract (2,692 records) is reproducible with `./run.sh off-export`. See [data/sample/README.md](data/sample/README.md).
 
 ## What it does
 
@@ -75,8 +76,9 @@ docs/                      architecture, methodology, data sources, regulatory r
 ## Open items for the team
 
 1. **Protein RDA reference:** claims use 54 g/day (ICMR-NIN 2020, sedentary adult man). Confirm with the guides.
-2. **Real data:** run `./run.sh off` to load Open Food Facts India records, then build the 100–200 product
-   verified set (`data/verified/`) and rerun the notebook.
+2. **Verified set:** check 100–200 real products against their pack labels (`data/verified/`) and rerun
+   the notebook. Real OFF India data is loaded, but OFF is crowdsourced and 83 % of its India records in
+   these categories lack a usable nutrition panel.
 3. **Front-of-pack warning thresholds** (`fop_warning.csv`) stay TODO until FSSAI publishes them; the red
    bounds in `thresholds.csv` are UK FSA 2016 placeholders.
 4. Verify `ins_codes.csv` and `allergens.csv` (status `seed_verify`), and the FSSAI regulation's

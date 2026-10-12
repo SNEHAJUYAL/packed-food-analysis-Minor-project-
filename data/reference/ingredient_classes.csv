@@ -30,3 +30,8 @@ non_nutritive_sweetener,Additive: sweetener (non-sugar),"A non-sugar sweetener."
 polyol,Additive: sweetener (polyol),"A sugar alcohol such as sorbitol.",Codex CXG 36-1989 functional classes
 carbonating_agent,Additive: carbonating agent,"Provides carbonation.",Codex CXG 36-1989 functional classes
 anticaking_agent,Additive: anticaking agent,"Stops particles from sticking together.",Codex CXG 36-1989 functional classes
+common_ingredient,Food ingredient,A recognised food ingredient with no specific scoring signal.,Team definition (methodology v0.1.0)
+micronutrient,Added vitamin or mineral,A vitamin or mineral added to the product.,Team definition (methodology v0.1.0)
+grain_unspecified,Grain (refinement not stated),A cereal flour such as 'wheat flour' where the label does not say whether it is whole grain or refined.,Team definition (methodology v0.1.0)
+carbohydrate_additive,Carbohydrate ingredient,A processed carbohydrate such as maltodextrin.,Team definition (methodology v0.1.0)
+caffeine,Caffeine,Caffeine added as an ingredient.,Team definition (methodology v0.1.0)

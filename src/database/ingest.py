@@ -128,7 +128,7 @@ def purge_synthetic(s: Session) -> int:
 
 def main(argv: Optional[list[str]] = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("path", nargs="?", type=Path)
+    ap.add_argument("paths", nargs="*", type=Path, help="one or more JSONL files")
     ap.add_argument("--purge-synthetic", action="store_true", help="delete the synthetic demo records first")
     ap.add_argument("--rules-only", action="store_true", help="only load regulatory rules")
     ap.add_argument("--rescore", action="store_true", help="only recompute every stored analysis")
@@ -146,10 +146,11 @@ def main(argv: Optional[list[str]] = None) -> int:
             print(f"{repo.count_products(s)} products already stored; nothing loaded")
             repo.seed_rules(s)
             return 0
-        if args.rules_only or args.path is None:
+        if args.rules_only or not args.paths:
             print(f"loaded {repo.seed_rules(s)} regulatory rules")
             return 0
-        stats = ingest_records(s, read_jsonl(args.path))
+        records = [r for path in args.paths for r in read_jsonl(path)]
+        stats = ingest_records(s, records)
     print(json.dumps(stats))
     return 0
 

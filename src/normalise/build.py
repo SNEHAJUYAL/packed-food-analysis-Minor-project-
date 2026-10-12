@@ -17,7 +17,9 @@ from core.schema import NUTRIENTS, Evidence, EvidenceLabel, Product
 from normalise.ingredients import normalise_ingredients
 from normalise.units import nutrient_to_unit, parse_pack_size, parse_quantity, salt_g_to_sodium_mg, to_base
 
-CONFLICT_TOLERANCE = 0.02  # doc section 10: values within +/-2 % count as matching
+CONFLICT_TOLERANCE = 0.02
+_TRAILING_SIZE_RE = re.compile(r"[\s,|\-–(]*\d+(?:\.\d+)?\s*(?:x\s*\d+(?:\.\d+)?\s*)?(?:g|gm|gms|grams?|kg|ml|l|ltr|litres?)\)?\s*$",
+                               re.IGNORECASE)  # doc section 10: values within +/-2 % count as matching
 
 
 def _price(text: Optional[str]) -> Optional[float]:
@@ -122,6 +124,12 @@ def build_product(extractions: list[dict], url: Optional[str] = None,
             setattr(p, field, Evidence.declared(chosen[0], chosen[1]))
 
     take("name", "name")
+    if p.name.known:
+        # "Butter Cookies 200 g" -> "Butter Cookies": the size belongs in pack_size, not the name.
+        trimmed = _TRAILING_SIZE_RE.sub("", p.name.value).strip()
+        if trimmed and trimmed != p.name.value:
+            p.name.note = f"pack size removed from name (was '{p.name.value}')"
+            p.name.value = trimmed
     take("brand", "brand")
     take("price_inr", "price", _price, compare_numeric=True)
     take("ingredients_raw", "ingredients_text")

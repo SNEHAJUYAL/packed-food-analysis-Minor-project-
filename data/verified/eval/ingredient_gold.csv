@@ -42,10 +42,17 @@ Acidity Regulator (INS 330),acidity_regulator
 Raising Agent (INS 500(ii)),raising_agent
 Antioxidant (INS 320),synthetic_antioxidant
 Thickener (INS 412),thickener
-Potato,uncertain
-Gram Flour (Besan),uncertain
-Corn Grits,uncertain
-Carbonated Water,uncertain
-Mango Pulp (19%),uncertain
-Malt Extract,uncertain
-Toned Milk,uncertain
+Potato,common_ingredient
+Gram Flour (Besan),common_ingredient
+Corn Grits,common_ingredient
+Carbonated Water,common_ingredient
+Mango Pulp (19%),common_ingredient
+Malt Extract,carbohydrate_additive
+Toned Milk,common_ingredient
+Kokum,uncertain
+Quinoa Puffs,uncertain
+Amchur,uncertain
+Sago Pearls,uncertain
+Wheat Flour,grain_unspecified
+Maltodextrin,carbohydrate_additive
+Vitamins,micronutrient

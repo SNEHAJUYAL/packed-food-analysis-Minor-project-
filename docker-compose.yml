@@ -19,8 +19,8 @@ services:
       db: {condition: service_healthy}
     environment:
       DATABASE_URL: postgresql://fdi:${POSTGRES_PASSWORD:-change_me_locally}@db:5432/fdi
-    # Schema migrations, then the labelled synthetic sample (only into an empty database)
-    command: ["sh", "-c", "alembic upgrade head && python -m database.ingest data/sample/synthetic_products.jsonl --if-empty"]
+    # Schema migrations, then the real OFF subset and the labelled synthetic sample (only into an empty database)
+    command: ["sh", "-c", "alembic upgrade head && python -m database.ingest data/sample/off_india_subset.jsonl data/sample/synthetic_products.jsonl --if-empty"]
   api:
     build: .
     depends_on:

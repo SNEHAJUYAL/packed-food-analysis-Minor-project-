@@ -1,6 +1,6 @@
 # Food Decision Intelligence: build report
 
-12 October 2026 · methodology v0.1.0 · Minor project, MSIT (GGSIPU). Idea by Sneha Juyal; team Sneha
+12 October 2026 (updated the same evening with real Open Food Facts data) · methodology v0.1.0 · Minor project, MSIT (GGSIPU). Idea by Sneha Juyal; team Sneha
 Juyal, Radhika, Shinjini; guides Dr. Sudesh Pahal, Dr. Neeru Rathee.
 
 ## 1. Implemented
@@ -15,7 +15,7 @@ rendered report in the Next.js app.
 | Backend | FastAPI with the 7 spec endpoints plus a product list; typed response models; one error shape with codes; request size limit; per-client rate limit; request logging; OpenAPI docs at `/docs` |
 | Fetch safety | http(s) only, no credentials, ports 80/443, DNS-resolved addresses must be public, redirects re-validated (max 5), timeout, streaming size limit, HTML only, robots.txt, per-host spacing, cache |
 | Database | SQLAlchemy models for all 10 spec entities, Alembic migration `0001` (upgrade, downgrade and `alembic check` verified on PostgreSQL 16), CHECK constraints (evidence labels, categories, claim statuses, grades, unknown ⇒ NULL) |
-| Data | OFF ingestion (`scripts/fetch_off_india.py` + `python -m database.ingest`), category map, regulatory rules loaded into `regulatory_rule`; 40 labelled synthetic demo records |
+| Data | **2,692 real Open Food Facts India records** in the five categories, streamed from the official OFF CSV export (`./run.sh off-export`); 466 with usable nutrition committed under ODbL (`data/sample/off_india_subset.jsonl`) and seeded by default; 40 labelled synthetic records with made-up prices for value-for-money demos; regulatory rules loaded into `regulatory_rule` |
 | Normalisation | Original printed values kept beside normalised ones; salt kept distinct from sodium; per-serving scaling labelled derived; conflicts over 2 % flagged; complete / partial / insufficient-data status |
 | Ingredients | Label order kept; declared percentages only; matched / fuzzy_match / uncertain status; functional categories and neutral explanations with references |
 | Claims | 18 FSSAI rules with exact criteria, clause, source URL, jurisdiction and check date; four statuses; missing information listed; extraction, rule selection, comparison and status kept separate |
@@ -28,33 +28,38 @@ rendered report in the Next.js app.
 
 | Check | Result |
 | --- | --- |
-| `pytest` (SQLite for DB tests) | **140 passed** |
+| `pytest` (SQLite for DB tests) | **141 passed** |
 | `pytest tests/test_api_db.py` with `TEST_DATABASE_URL` (PostgreSQL 16, Alembic migration) | **18 passed** |
 | `npm test` (Vitest + Testing Library) | **33 passed** (6 files) |
 | `npm run lint`, `npm run typecheck`, `npm run build` | all exit 0 |
-| Live run: API + Next.js + PostgreSQL in this environment | URL analysis, report, alternatives, compare, methodology, blocked-URL error and insufficient-data report all rendered; screenshots in `docs/screenshots/` |
+| Live run: API + Next.js + PostgreSQL in this environment, seeded from scratch (466 real + 40 synthetic) | URL analysis, report, alternatives (now real OFF products), compare, methodology, blocked-URL error and insufficient-data report all rendered; screenshots in `docs/screenshots/` |
 | `docker compose config` | valid. **`docker compose up` was not run**: no Docker daemon in the build environment |
 
-### Evaluation (small, team-labelled, partly synthetic sets; not accuracy claims)
+### Evaluation (read the sample sizes; these are not accuracy claims)
 
 | Evaluation | n | Result |
 | --- | --- | --- |
-| Extraction, field level, deterministic extractors | 4 synthetic pages, 60 fields | precision 0.97, recall 0.79, exact match 0.83. Misses: the unstructured page (needs the LLM fallback, no key set) and a product name that kept its pack size |
-| Ingredient classification | 50 phrases | P = R = F1 = 1.00. Labels and dictionary come from the same team, so this checks consistency, not generalisation |
+| **Nutrition score vs Nutri-Score** (Spearman, real OFF India records with both) | 379 products | **ρ = 0.73**: our nutrition score and the independent Nutri-Score grade rank products in broadly the same order |
+| Real-data coverage | 2,692 OFF India records | 83 % have no usable nutrition panel (insufficient data, no grade given); 1,519 have an ingredient list (11,461 items), of which 14.5 % stay *uncertain*. That share was 42.5 % before the dictionary was expanded from the most frequent unclassified terms in this same data, so 14.5 % is in-sample. 139 claims detected: 31 consistent, 16 requires context, 15 potential inconsistency, 77 cannot be verified |
+| Extraction, field level, deterministic extractors | 4 synthetic pages, 60 fields | precision 1.00, recall 0.81, exact match 0.85. Remaining misses are the unstructured page, which needs the LLM fallback (no key set). The evaluation found pack sizes left in product names; fixed |
+| Ingredient classification | 57 team-labelled phrases | P = R = F1 = 1.00. Labels and dictionary come from the same team: a consistency check, not generalisation |
 | Claim checks (positive = potential inconsistency) | 22 hand-worked FSSAI cases | status accuracy 1.00, FPR 0.00. Tests that the rules are implemented as written |
 | Product matching | 90 perturbed queries on the synthetic sample | correct-match rate 0.99 (one typo case wrong) |
 | Conflict detection | 6 constructed source pairs | 3/3 flagged, 0 false flags |
-| Weight sensitivity (±20 % per dimension) | 38 scored sample products | grade changed for 0–5 products per perturbation; mean score change 0.4–1.3 points |
+| Weight sensitivity (±20 % per dimension) | 38 scored synthetic products | grade changed for 0–5 products per perturbation; mean score change 0.4–1.3 points |
 | Missing-field ablation | 26–38 products per nutrient | removing sugars stopped scoring for 10 of 37 (coverage below 50 %), by design |
-| Nutri-Score rank correlation | – | **not run**: needs OFF records with `nutriscore_grade` |
 | Expert rankings, Precision@3, NDCG@5 | – | **not run**: no expert rankings or relevance judgements yet (metric code ready and tested) |
 
 ## 3. Limitations
 
-* **No real product data yet.** Open Food Facts was blocked by the build environment's network policy, so
-  the stored products are 40 synthetic records plus synthetic test pages. All comparison, alternative and
-  value results shown are therefore illustrative.
-* Spec targets **not met**: 500–1,000 OFF India records; 100–200 product verified set.
+* **Open Food Facts data is crowdsourced and sparse for India:** most records lack nutrition, none have
+  prices, and category tags such as `en:beverages` are broad. Value for money is therefore only shown for
+  URL-analysed and synthetic products.
+* Products with fewer scored dimensions have the remaining weights renormalised, so a real OFF product with
+  no price and no claims can reach 100 on nutrition, ingredients and transparency alone (the report lists the
+  unscored dimensions).
+* Spec target **not met**: the 100–200 product verified set checked against pack labels. The 500–1,000
+  record OFF target is met (2,692 loaded; 466 committed).
 * Methodology v0.1.0 weights and curves are prototype choices. Red nutrient bounds are UK FSA 2016
   placeholders; FSSAI front-of-pack thresholds are unpublished; energy has no benchmark.
 * Protein claim grams depend on the 54 g/day RDA choice (to confirm). The per-serving claim route is not

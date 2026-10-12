@@ -29,7 +29,9 @@ from score.scorer import overall_score
 EVAL = ROOT / "data" / "verified" / "eval"
 FIX = ROOT / "tests" / "fixtures"
 SAMPLE = ROOT / "data" / "sample" / "synthetic_products.jsonl"
-OFF_RAW = ROOT / "data" / "raw" / "off_india.jsonl"
+# Full India extract if downloaded (git-ignored), else the committed 466-record subset.
+OFF_RAW = next((p for p in (ROOT / "data" / "raw" / "off_india.jsonl", ROOT / "data" / "sample" / "off_india_subset.jsonl")
+                if p.exists()), ROOT / "data" / "raw" / "off_india.jsonl")
 FIELDS = ["name", "brand", "pack_size", "pack_unit", "price_inr", "energy", "protein", "carbohydrate",
           "total_sugars", "added_sugars", "total_fat", "saturated_fat", "trans_fat", "fibre", "sodium"]
 
@@ -258,6 +260,50 @@ def robustness_conflicts() -> dict:
             "detection": binary_rates([c[0] for c in cases], [c[1] for c in cases])}
 
 
+def _off_products() -> list:
+    out = []
+    for rec in read_jsonl(OFF_RAW):
+        cat = category_for(rec.get("categories_tags") or [])
+        if not cat or not rec.get("product_name"):
+            continue
+        p = build_product([to_extraction(rec)], url=None)
+        p.category = Evidence(value=cat, label=EvidenceLabel.INTERPRETED)
+        p.product_id = rec.get("code")
+        out.append((rec, p))
+    return out
+
+
+def evaluate_real_data_coverage() -> dict:
+    """What the pipeline can do with real Open Food Facts records. Coverage, not accuracy."""
+    if not OFF_RAW.exists():
+        return {"status": "not run", "reason": "data/raw/off_india.jsonl not present"}
+    pairs = _off_products()
+    from collections import Counter
+    status, cats, claims = Counter(), Counter(), Counter()
+    ing_items = ing_uncertain = with_ing = 0
+    missing = Counter()
+    for rec, p in pairs:
+        r = analyse_product(p)
+        status[r["status"]] += 1
+        cats[p.category.value] += 1
+        for f in r["missing_fields"]:
+            missing[f] += 1
+        for c in r["dimensions"]["claims"]["claims"]:
+            claims[c["status"]] += 1
+        items = (r["ingredients_normalised"] or {}).get("items") or []
+        if items:
+            with_ing += 1
+            ing_items += len(items)
+            ing_uncertain += sum(1 for i in items if i.get("status") == "uncertain")
+    n = len(pairs)
+    return {"status": "run", "data": f"Open Food Facts India records (ODbL) from the official CSV export: {OFF_RAW.relative_to(ROOT)}",
+            "n_products": n, "by_category": dict(cats), "report_status": dict(status),
+            "share_missing_by_field": {k: round(v / n, 3) for k, v in missing.most_common()},
+            "products_with_ingredient_list": with_ing, "ingredient_items": ing_items,
+            "share_ingredients_uncertain": round(ing_uncertain / ing_items, 3) if ing_items else None,
+            "claim_statuses": dict(claims)}
+
+
 def run_all(write: bool = True) -> dict:
     products = _sample_products()
     results = {
@@ -267,14 +313,16 @@ def run_all(write: bool = True) -> dict:
         "claims": evaluate_claims(),
         "product_matching": evaluate_matching(),
         "scoring_vs_nutriscore": evaluate_nutriscore(),
+        "real_data_coverage": evaluate_real_data_coverage(),
         "expert_ranking": {"status": "not run", "reason": "no expert rankings collected yet"},
         "recommendations": {"status": "not run",
                             "reason": "Precision@3 and NDCG@5 need relevance judgements for alternatives; "
                                       "none collected yet (metric code: evaluation/metrics.py)"},
         "robustness": {"weights": robustness_weights(products), "missing_fields": robustness_missing(products),
                        "conflicting_sources": robustness_conflicts()},
-        "targets_not_yet_met": ["verified evaluation set of 100-200 real products (build spec target)",
-                                "500-1,000 Open Food Facts India records (needs ./run.sh off with network access)"],
+        "targets_not_yet_met": ["verified evaluation set of 100-200 real products checked against pack labels "
+                                "(build spec target)",
+                                "expert rankings and relevance judgements for recommendations"],
     }
     if write:
         out = ROOT / "reports" / "evaluation_results.json"

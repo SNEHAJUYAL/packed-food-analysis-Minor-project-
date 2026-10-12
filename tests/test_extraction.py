@@ -86,3 +86,10 @@ def test_panel_without_basis_is_not_used():
     p = build_product([{"source": "json-ld", "nutrition": {"total_sugars": "10 g"}}])
     assert p.nutrition_basis is None and p.nutrition["total_sugars"].value is None
     assert any("basis" in w for w in p.warnings)
+
+
+def test_pack_size_is_removed_from_name():
+    from normalise.build import build_product
+    p = build_product([{"source": "html", "name": "Sample Bakes Butter Cookies 200 g", "pack_size_text": "200 g"}])
+    assert p.name.value == "Sample Bakes Butter Cookies" and "pack size removed" in p.name.note
+    assert build_product([{"source": "html", "name": "7 Grain Cereal"}]).name.value == "7 Grain Cereal"

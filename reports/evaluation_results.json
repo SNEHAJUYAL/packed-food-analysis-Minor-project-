@@ -5,12 +5,12 @@
     "n_pages": 4,
     "overall": {
       "n_fields": 60,
-      "tp": 38,
-      "fp": 1,
-      "fn": 10,
-      "precision": 0.9743589743589743,
-      "recall": 0.7916666666666666,
-      "exact_match_accuracy": 0.8333333333333334
+      "tp": 39,
+      "fp": 0,
+      "fn": 9,
+      "precision": 1.0,
+      "recall": 0.8125,
+      "exact_match_accuracy": 0.85
     },
     "per_page": {
       "cereal_jsonld.html": {
@@ -24,12 +24,12 @@
       },
       "biscuit_html_only.html": {
         "n_fields": 15,
-        "tp": 13,
-        "fp": 1,
-        "fn": 1,
-        "precision": 0.9285714285714286,
-        "recall": 0.9285714285714286,
-        "exact_match_accuracy": 0.9333333333333333
+        "tp": 14,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_match_accuracy": 1.0
       },
       "noodles_per_serving.html": {
         "n_fields": 15,
@@ -53,12 +53,12 @@
     "per_field": {
       "name": {
         "n_fields": 4,
-        "tp": 2,
-        "fp": 1,
-        "fn": 2,
-        "precision": 0.6666666666666666,
-        "recall": 0.5,
-        "exact_match_accuracy": 0.5
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.75,
+        "exact_match_accuracy": 0.75
       },
       "brand": {
         "n_fields": 4,
@@ -190,9 +190,9 @@
   },
   "ingredients": {
     "data": "team-labelled ingredient phrases (data/verified/eval/ingredient_gold.csv)",
-    "n_items": 50,
+    "n_items": 57,
     "classification": {
-      "tp": 43,
+      "tp": 53,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
@@ -200,13 +200,13 @@
       "f1": 1.0
     },
     "uncertainty_flag": {
-      "tp": 7,
+      "tp": 4,
       "fp": 0,
       "fn": 0,
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0,
-      "tn": 43,
+      "tn": 53,
       "false_positive_rate": 0.0
     },
     "errors": []
@@ -247,8 +247,51 @@
     }
   },
   "scoring_vs_nutriscore": {
-    "status": "not run",
-    "reason": "needs Open Food Facts records with nutriscore_grade (data/raw/off_india.jsonl from ./run.sh off); the OFF API was not reachable from the build environment"
+    "status": "run",
+    "data": "data/raw/off_india.jsonl",
+    "n_products": 379,
+    "spearman_nutrition_vs_nutriscore": 0.7321110184983323
+  },
+  "real_data_coverage": {
+    "status": "run",
+    "data": "Open Food Facts India records (ODbL) from the official CSV export",
+    "n_products": 2692,
+    "by_category": {
+      "beverages": 1172,
+      "breakfast_cereals": 250,
+      "biscuits_cookies": 735,
+      "namkeen_chips": 400,
+      "instant_noodles": 135
+    },
+    "report_status": {
+      "insufficient_data": 2234,
+      "partial": 458
+    },
+    "share_missing_by_field": {
+      "price_inr": 1.0,
+      "trans_fat": 0.952,
+      "fibre": 0.912,
+      "saturated_fat": 0.846,
+      "added_sugars": 0.84,
+      "sodium": 0.833,
+      "total_sugars": 0.828,
+      "protein": 0.825,
+      "carbohydrate": 0.825,
+      "total_fat": 0.824,
+      "energy": 0.822,
+      "ingredients_raw": 0.436,
+      "pack_size": 0.408,
+      "brand": 0.071
+    },
+    "products_with_ingredient_list": 1519,
+    "ingredient_items": 11461,
+    "share_ingredients_uncertain": 0.145,
+    "claim_statuses": {
+      "potential inconsistency for review": 15,
+      "consistent with available evidence": 31,
+      "cannot be verified from available information": 77,
+      "requires context": 16
+    }
   },
   "expert_ranking": {
     "status": "not run",
