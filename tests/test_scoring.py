@@ -80,13 +80,15 @@ def test_weights_must_sum_to_one():
 
 
 def test_traffic_lights_for_worked_example():
-    # Sourced generic thresholds (thresholds.csv): sugar red, sat fat yellow, sodium yellow, fibre green.
+    # Doc 8.4 lights: sugar red, sat fat yellow, sodium yellow, fibre green, protein green.
     assert traffic_light("total_sugars", 28, "breakfast_cereals", "per_100g") == "red"
     assert traffic_light("saturated_fat", 5, "breakfast_cereals", "per_100g") == "yellow"
     assert traffic_light("sodium", 400, "breakfast_cereals", "per_100g") == "yellow"
     assert traffic_light("fibre", 4, "breakfast_cereals", "per_100g") == "green"
-    # Protein has no sourced benchmark yet, so no light rather than a guess.
-    assert traffic_light("protein", 7, "breakfast_cereals", "per_100g") is None
+    # Protein: FSSAI "source of protein" (10% of the ICMR-NIN RDA, 5.4 g per 100 g).
+    assert traffic_light("protein", 7, "breakfast_cereals", "per_100g") == "green"
+    # Energy has no sourced benchmark, so no light rather than a guess.
+    assert traffic_light("energy", 410, "breakfast_cereals", "per_100g") is None
 
 
 def test_subscore_curve():

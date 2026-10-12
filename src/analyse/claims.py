@@ -1,8 +1,9 @@
 """Claim extraction and evidence checks (doc sections 6 and 8.4).
 
 Outcomes are evidence statuses, not accusations. Conditions come only from
-data/reference/fssai_claims.csv; while a threshold is TODO the outcome is
-"cannot be verified from available information", with the derived facts shown.
+data/reference/fssai_claims.csv (FSSAI Advertising and Claims Regulations 2018,
+Schedule I, reg. 6 and Schedule V); a missing condition gives "cannot be verified
+from available information", with the derived facts shown.
 """
 from __future__ import annotations
 
@@ -11,7 +12,6 @@ from typing import Iterable, Optional
 
 from core.config import claim_rules, scoring_config
 from core.schema import Product
-from score.category_rules import traffic_light
 
 CONSISTENT = "consistent with available evidence"
 CONTEXT = "requires context"
@@ -22,15 +22,25 @@ NATURAL_CONFLICT_GROUPS = {"synthetic_colour", "artificial_sweetener", "flavour_
 
 
 def extract_claims(texts: Iterable[str]) -> list[dict]:
-    """Find claim phrases in listing text (name, description, bullet points)."""
+    """Find claim phrases in listing text (name, description, bullet points).
+
+    A match inside a longer match is dropped, so "very low sodium" is not also
+    "low sodium" and "saturated fat free" is not also "fat free".
+    """
     found: dict[str, dict] = {}
     for text in texts:
         if not text:
             continue
+        spans = []
         for rule in claim_rules():
             m = re.search(rule["patterns"], text, re.IGNORECASE)
-            if m and rule["claim_id"] not in found:
-                found[rule["claim_id"]] = {"claim_id": rule["claim_id"], "matched_text": m.group(0).strip()}
+            if m:
+                spans.append((m.start(), m.end(), rule["claim_id"], m.group(0).strip()))
+        for a in spans:
+            inside = any(b is not a and b[0] <= a[0] and a[1] <= b[1] and (b[1] - b[0]) > (a[1] - a[0])
+                         for b in spans)
+            if not inside and a[2] not in found:
+                found[a[2]] = {"claim_id": a[2], "matched_text": a[3]}
     return list(found.values())
 
 
@@ -41,46 +51,67 @@ def _rule(claim_id: str, overrides: Optional[dict]) -> dict:
     return rule
 
 
+def _per(liquid: bool) -> str:
+    return "100 ml" if liquid else "100 g"
+
+
 def check_claim(claim_id: str, product: Product, ingredient_groups: dict | None,
-                overrides: Optional[dict] = None) -> dict:
-    """Check one claim. ``overrides`` lets tests or a confirmed rule set supply thresholds."""
+                overrides: Optional[dict] = None, ingredient_count: Optional[int] = None) -> dict:
+    """Check one claim against its FSSAI condition. ``overrides`` replaces rule fields (tests, rule updates)."""
     rule = _rule(claim_id, overrides)
     liquid = product.is_liquid
     threshold = rule["threshold_liquid"] if liquid else rule["threshold_solid"]
-    cite = f"{rule['regulation']}, clause {rule['clause']}"
     out = {"claim_id": claim_id, "claim": rule["claim_label"], "status": UNVERIFIABLE,
-           "facts": [], "reason": "", "rule": cite, "rule_status": rule["status"]}
-    nutrient = rule["nutrient"]
-    cond = rule["condition"]
+           "facts": [], "reason": "", "rule": f"{rule['regulation']}, {rule['clause']}",
+           "rule_status": rule["status"]}
+    nutrient, cond = rule["nutrient"], rule["condition"]
 
-    if cond in ("max", "min"):
+    if cond in ("max", "min", "lt"):
         v = product.nutrient(nutrient)
         if v is None:
             out["reason"] = f"{nutrient} is not declared."
             return out
-        out["facts"].append(f"{nutrient} = {v:g} per 100 {'ml' if liquid else 'g'} (declared)")
-        if threshold is None:
-            out["reason"] = "FSSAI condition not yet copied into fssai_claims.csv (TODO)."
+        if product.nutrition_basis is None:
+            out["reason"] = "Nutrition basis is unknown."
             return out
-        ok = v <= threshold if cond == "max" else v >= threshold
+        unit = "mg" if nutrient == "sodium" else ("kcal" if nutrient == "energy" else "g")
+        out["facts"].append(f"{nutrient} = {v:g} {unit} per {_per(liquid)} (declared)")
+        energy = product.nutrient("energy")
+        if nutrient == "protein" and energy:
+            kcal = scoring_config()["energy_per_gram"]["protein"]
+            out["facts"].append(f"protein supplies {v * kcal / energy * 100:.1f}% of energy "
+                                f"({v:g} g × {kcal} kcal ÷ {energy:g} kcal, derived)")
+        if threshold is None:
+            out["reason"] = "No condition recorded for this claim in fssai_claims.csv."
+            return out
+        if cond == "min":
+            ok = v >= threshold
+            why = f"needs at least {threshold:g} {unit} per {_per(liquid)}"
+            per_kcal = rule.get("threshold_per_100kcal")
+            if not ok and per_kcal is not None and energy:
+                v_kcal = v / energy * 100.0
+                out["facts"].append(f"{v_kcal:.2f} {unit} per 100 kcal (derived)")
+                ok = v_kcal >= per_kcal
+                why += f" or {per_kcal:g} {unit} per 100 kcal"
+        elif cond == "lt":
+            ok, why = v < threshold, f"needs less than {threshold:g} {unit} per {_per(liquid)}"
+        else:
+            ok, why = v <= threshold, f"allows at most {threshold:g} {unit} per {_per(liquid)}"
+        pct_max = rule.get("energy_pct_max")
+        if ok and pct_max is not None:
+            if energy:
+                kcal = scoring_config()["energy_per_gram"]["fat"]
+                pct = v * kcal / energy * 100.0
+                out["facts"].append(f"{nutrient} supplies {pct:.1f}% of energy (derived)")
+                ok = pct <= pct_max
+                why += f" and at most {pct_max:g}% of energy"
+            else:
+                out["reason"] = f"Condition also limits % of energy, but energy is not declared."
+                return out
         out["status"] = CONSISTENT if ok else INCONSISTENT
-        out["reason"] = f"Condition: {nutrient} {'<=' if cond == 'max' else '>='} {threshold:g}."
-        return out
-
-    if cond == "energy_pct_min":
-        p, e = product.nutrient("protein"), product.nutrient("energy")
-        if p is None or e is None or e <= 0:
-            out["reason"] = "Protein or energy is not declared."
-            return out
-        kcal_per_g = scoring_config()["energy_per_gram"]["protein"]
-        pct = p * kcal_per_g / e * 100.0
-        out["facts"].append(f"protein supplies {pct:.1f}% of energy "
-                            f"({p:g} g × {kcal_per_g} kcal ÷ {e:g} kcal, derived)")
-        if threshold is None:
-            out["reason"] = "FSSAI condition not yet copied into fssai_claims.csv (TODO)."
-            return out
-        out["status"] = CONSISTENT if pct >= threshold else INCONSISTENT
-        out["reason"] = f"Condition: at least {threshold:g}% of energy from protein."
+        out["reason"] = f"FSSAI condition {why}."
+        if not ok and rule["claim_id"] in ("high_protein", "source_of_protein"):
+            out["reason"] += " A per-serving route also exists and was not checked (serving size unknown)."
         return out
 
     if cond == "no_added_ingredient_class":
@@ -90,30 +121,39 @@ def check_claim(claim_id: str, product: Product, ingredient_groups: dict | None,
         sugars = ingredient_groups.get("added_sugar", [])
         if sugars:
             out["status"] = INCONSISTENT
-            out["facts"].append("sugar-class ingredient listed: " + ", ".join(sugars))
-            out["reason"] = "Claim says no added sugar, but the ingredient list names a sugar."
+            out["facts"].append("sugar-type ingredient listed: " + ", ".join(sugars))
+            out["reason"] = "Reg. 6(1)(a)(i): no sugars of any type may be added, but the ingredient list names one."
             return out
         out["status"] = CONSISTENT
-        out["reason"] = "No sugar-class ingredient found in the list."
+        out["reason"] = "No sugar-type ingredient found in the list (only 6(1)(a)(i) can be checked from a listing)."
         ts = product.nutrient("total_sugars")
         if ts is not None and product.nutrition_basis:
-            light = traffic_light("total_sugars", ts, product.category.value, product.nutrition_basis)
-            out["facts"].append(f"total sugars = {ts:g} g per 100 {'ml' if liquid else 'g'}")
-            if light == "red":
+            out["facts"].append(f"total sugars = {ts:g} g per {_per(liquid)}")
+            if ts > 0.5:
                 out["status"] = CONTEXT
-                out["reason"] = "No sugar is added, but total sugars are high against the benchmark."
+                out["reason"] = ("No sugar is added, but the product contains sugars; reg. 6(1)(b) requires "
+                                 "'CONTAINS NATURALLY OCCURRING SUGARS' on the label.")
         return out
 
-    if cond == "context":
+    if cond in ("natural", "natural_ingredients"):
         groups = set(ingredient_groups or {})
         conflicts = sorted(groups & NATURAL_CONFLICT_GROUPS)
         if conflicts:
             out["status"] = INCONSISTENT
             out["facts"].append("listed: " + ", ".join(c.replace("_", " ") for c in conflicts))
-            out["reason"] = "'Natural' claim alongside synthetic or artificial additives."
-        else:
-            out["status"] = CONTEXT
-            out["reason"] = "'Natural' has no numeric test in this MVP; read with the ingredient list."
+            out["reason"] = "Schedule V: a 'natural' food has nothing added; synthetic or artificial additives are listed."
+            return out
+        if cond == "natural" and ingredient_count and ingredient_count > 1:
+            out["status"] = INCONSISTENT
+            out["facts"].append(f"{ingredient_count} ingredients listed")
+            out["reason"] = ("Schedule V: composite foods may not be called 'natural'; "
+                             "'made from natural ingredients' is the permitted wording.")
+            return out
+        if ingredient_groups is None:
+            out["reason"] = "Ingredient list not available."
+            return out
+        out["status"] = CONTEXT
+        out["reason"] = "No synthetic additives found; Schedule V criteria for each ingredient cannot be fully checked from a listing."
         return out
 
     out["reason"] = f"Unknown condition type '{cond}'."
@@ -121,11 +161,11 @@ def check_claim(claim_id: str, product: Product, ingredient_groups: dict | None,
 
 
 def analyse_claims(product: Product, ingredient_groups: dict | None,
-                   overrides: Optional[dict] = None) -> dict:
+                   overrides: Optional[dict] = None, ingredient_count: Optional[int] = None) -> dict:
     claims = extract_claims(product.claims_raw)
     results = []
     for c in claims:
-        r = check_claim(c["claim_id"], product, ingredient_groups, overrides)
+        r = check_claim(c["claim_id"], product, ingredient_groups, overrides, ingredient_count)
         r["matched_text"] = c["matched_text"]
         results.append(r)
     if not results:

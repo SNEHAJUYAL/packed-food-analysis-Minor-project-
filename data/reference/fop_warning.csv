@@ -1,5 +1,5 @@
 nutrient,basis,high_threshold,unit,source,status,date_checked,notes
-total_sugars,per_100g,TODO,g,"FSSAI front-of-pack labelling draft (red hexagonal warning), under Supreme Court supervision",todo,,"Draft, not final. The Aug 2026 proposal covers added sugar, fat and salt; Sept 2026 FSSAI said it would consider a warning for a single high nutrient (doc section 13.1). Recheck before the demo"
+total_sugars,per_100g,TODO,g,"FSSAI front-of-pack labelling draft (red hexagonal warning), under Supreme Court supervision",todo,,"Draft, not final; checked 2026-10-12. Reports say FSSAI will use ICMR-NIN Dietary Guidelines 2024 'nutrient of concern' thresholds (ThePrint, 14 Jun 2025: fat >15% of energy from added fats; sugar >5% of daily energy; salt 5 g/day), but no per-100 g label cut-offs have been published. Sept 2026: FSSAI told the Supreme Court it would consider a warning for a single high nutrient. Fill when the notified text is out"
 total_fat,per_100g,TODO,g,FSSAI front-of-pack labelling draft,todo,,
 sodium,per_100g,TODO,mg,FSSAI front-of-pack labelling draft,todo,,
 total_sugars,per_100ml,TODO,g,FSSAI front-of-pack labelling draft,todo,,

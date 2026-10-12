@@ -24,11 +24,11 @@ def test_end_to_end_cereal_report():
     assert p["category"]["value"] == "breakfast_cereals" and p["category"]["label"] == "interpreted"
     n = r["dimensions"]["nutrition"]
     assert n["traffic_lights"] == {"total_sugars": "red", "saturated_fat": "yellow", "total_fat": "yellow",
-                                   "sodium": "yellow", "fibre": "green"}
-    assert set(n["detail"]["missing"]) == {"energy", "protein"}  # no sourced benchmark yet
+                                   "sodium": "yellow", "fibre": "green", "protein": "green"}
+    assert n["detail"]["missing"] == ["energy"]  # no sourced benchmark yet
     assert n["score"] is not None
     claim = r["dimensions"]["claims"]["claims"][0]
-    assert claim["claim_id"] == "high_protein" and "6.8% of energy" in claim["facts"][0]
+    assert claim["claim_id"] == "high_protein" and claim["status"] == "potential inconsistency for review"
     assert r["dimensions"]["value"]["price_per_100"] == 48.0  # ₹180 / 375 g
     assert r["dimensions"]["value"]["score"] is None  # no comparison set
     assert r["overall"]["grade"] in "ABCDE"
@@ -86,3 +86,26 @@ def test_api_product_with_partial_nutrition():
     assert d["product"]["nutrition"]["protein"]["label"] == "unknown"
     assert d["dimensions"]["nutrition"]["score"] is not None
     assert client.post("/analyse/product", json={"nutrition": {"vitamin_x": {"value": 1}}}).status_code == 422
+
+
+def test_save_report_to_postgres():
+    import os
+
+    import pytest
+    url = os.environ.get("TEST_DATABASE_URL")
+    if not url:
+        pytest.skip("set TEST_DATABASE_URL to a database loaded with db/schema.sql")
+    import psycopg
+
+    from store import save_report
+    r = analyse_html(page("cereal_jsonld.html"), "https://example.test/cereal")
+    pid = save_report(r, url)
+    with psycopg.connect(url) as conn:
+        row = conn.execute("SELECT overall, grade FROM analyses WHERE product_id = %s", (pid,)).fetchone()
+        sugar = conn.execute("SELECT value, evidence FROM nutrient_values WHERE product_id = %s "
+                             "AND nutrient = 'total_sugars'", (pid,)).fetchone()
+        missing = conn.execute("SELECT value, evidence FROM nutrient_values WHERE product_id = %s "
+                               "AND nutrient = 'added_sugars'", (pid,)).fetchone()
+    assert row == (r["overall"]["score"], r["overall"]["grade"])
+    assert float(sugar[0]) == 28 and sugar[1] == "declared"
+    assert missing == (None, "unknown")  # missing stays NULL, never 0

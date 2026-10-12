@@ -14,17 +14,27 @@ dimension scores, an overall score and A–E grade, and price per 100 g compared
 ## Run it
 
 ```bash
-python3.11 -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt
-pytest                                           # 80 tests
-uvicorn api.main:app --app-dir src --reload      # API on :8000, docs at /docs
-streamlit run web/streamlit_app.py               # demo UI on :8501
-python scripts/fetch_off_india.py                # Open Food Facts India subset -> data/raw/
-docker compose up                                # PostgreSQL + API + demo
+./run.sh setup                                   # .venv + requirements (Python 3.11+)
+./run.sh test                                    # 88 tests
+./run.sh demo                                    # Streamlit UI on :8501 (sample pages or a URL)
+./run.sh analyse https://brand.example/product   # report in the terminal (--json, --category X)
+./run.sh analyse tests/fixtures/cereal_jsonld.html
+./run.sh compare a.html b.html --category biscuits_cookies
+./run.sh api                                     # FastAPI on :8000, docs at /docs
+./run.sh db                                      # PostgreSQL with db/schema.sql via Docker
+DATABASE_URL=... ./run.sh analyse <url> --save   # store product, evidence and scores
+./run.sh off                                     # Open Food Facts India subset -> data/raw/
+docker compose up                                # PostgreSQL + API + demo together
 ```
 
-API: `POST /analyse/url`, `POST /analyse/html`, `POST /analyse/product`, `POST /compare`,
-`GET /methodology`.
+API: `POST /analyse/url` (`"save": true` stores it), `POST /analyse/html`, `POST /analyse/product`,
+`POST /compare`, `GET /methodology`.
+
+**LLM fallback.** Pages with no structured metadata, table or "Ingredients:" label are sent to
+Claude (`claude-opus-5-5`, schema-constrained output) when `ANTHROPIC_API_KEY` is set. Every value it
+returns must appear literally in the page text or it is dropped, so it can locate data but not
+invent it. Server-side refusal fallback is on (`fallbacks: "default"`). Without a key the step is
+skipped and the fields stay unknown.
 
 ## Never invent data
 
@@ -54,14 +64,15 @@ tests/                   pytest, incl. the doc's worked example (58, grade C)
 
 ## Open items for the team
 
-1. Copy exact FSSAI claim conditions and clause numbers into `data/reference/fssai_claims.csv`
-   (Advertising and Claims Regulations 2018, gazette PDF on fssai.gov.in).
-2. Replace the UK placeholder thresholds with FSSAI / ICMR-NIN / WHO values per category, and add
-   protein and energy benchmarks (`thresholds.csv`).
-3. Fill `fop_warning.csv` once the FSSAI front-of-pack rule text is final; recheck before the demo.
-4. Verify `ins_codes.csv` and `allergens.csv` against Codex and FSSAI texts (status `seed_verify`).
+1. **Front-of-pack warning thresholds** (`fop_warning.csv`): still TODO; FSSAI has not published
+   per-100 g cut-offs. Fill them when the notified text is out and recheck before the demo.
+2. **"High" (red) nutrient bounds** in `thresholds.csv` use the UK FSA 2016 scheme as a labelled
+   placeholder; green bounds are FSSAI Schedule I values. Energy has no benchmark.
+3. **Protein RDA reference**: claims use 54 g/day (ICMR-NIN 2020, sedentary adult man). Confirm with
+   the guides; the woman's value is 45.7 g.
+4. Verify `ins_codes.csv` and `allergens.csv` (status `seed_verify`) against Codex and FSSAI texts.
 5. Build the verified evaluation set (`data/verified/`), then measure the metrics in doc section 10.
-6. Wire the LLM fallback and PostgreSQL persistence; build the Next.js frontend.
+6. Next.js frontend (Streamlit is the first demo).
 
 ## Data and licence
 

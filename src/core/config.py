@@ -55,6 +55,8 @@ def claim_rules() -> list[dict]:
         r = dict(r)
         r["threshold_solid"] = to_number(r["threshold_solid"])
         r["threshold_liquid"] = to_number(r["threshold_liquid"])
+        r["threshold_per_100kcal"] = to_number(r.get("threshold_per_100kcal"))
+        r["energy_pct_max"] = to_number(r.get("energy_pct_max"))
         rows.append(r)
     return rows
 

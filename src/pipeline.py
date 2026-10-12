@@ -37,7 +37,8 @@ def analyse_product(product: Product, peer_unit_prices: Optional[list[float]] = 
     nutrition = analyse_nutrition(product)
     ingredients = analyse_ingredients(normalised)
     transparency = analyse_transparency(product, normalised)
-    claims = analyse_claims(product, ingredients["groups"] if normalised else None, claim_overrides)
+    claims = analyse_claims(product, ingredients["groups"] if normalised else None, claim_overrides,
+                            len(normalised["items"]) if normalised else None)
     value = analyse_value(product, peer_unit_prices)
     dims = {"nutrition": nutrition["score"], "ingredients": ingredients["score"],
             "transparency": transparency["score"], "claims": claims["score"], "value": value["score"]}

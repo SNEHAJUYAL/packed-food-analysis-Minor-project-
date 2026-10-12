@@ -19,6 +19,7 @@ class UrlRequest(BaseModel):
     url: HttpUrl
     category: Optional[str] = None
     use_cache: bool = True
+    save: bool = False  # store in PostgreSQL when DATABASE_URL is set
 
 
 class HtmlRequest(BaseModel):
@@ -53,11 +54,18 @@ def methodology() -> dict:
 def analyse_from_url(req: UrlRequest) -> dict:
     _check_category(req.category)
     try:
-        return analyse_url(str(req.url), req.category, req.use_cache)
+        report = analyse_url(str(req.url), req.category, req.use_cache)
     except FetchBlocked as e:
         raise HTTPException(403, str(e))
     except Exception as e:  # network or HTTP errors from the target site
         raise HTTPException(502, f"could not fetch the page: {e}")
+    if req.save:
+        from store import save_report
+        try:
+            report["saved_product_id"] = save_report(report)
+        except RuntimeError as e:
+            raise HTTPException(503, str(e))
+    return report
 
 
 @app.post("/analyse/html")

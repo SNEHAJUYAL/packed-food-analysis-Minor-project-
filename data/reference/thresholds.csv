@@ -1,12 +1,14 @@
 parameter,category,basis,direction,green_bound,red_bound,unit,source,status,date_checked,notes
-total_fat,all_foods,per_100g,lower_better,3,17.5,g,"UK DH/FSA, Guide to creating a front of pack (FoP) nutrition label for pre-packed products sold through retail outlets (2016), Table: per 100 g criteria",provisional_non_india,2026-10-12,"Generic placeholder until FSSAI/ICMR-NIN category thresholds are copied in. green = value <= green_bound; red = value > red_bound"
-saturated_fat,all_foods,per_100g,lower_better,1.5,5,g,"UK DH/FSA FoP guide (2016), per 100 g criteria",provisional_non_india,2026-10-12,
-total_sugars,all_foods,per_100g,lower_better,5,22.5,g,"UK DH/FSA FoP guide (2016), per 100 g criteria",provisional_non_india,2026-10-12,UK criteria apply to total sugars
-salt,all_foods,per_100g,lower_better,0.3,1.5,g,"UK DH/FSA FoP guide (2016), per 100 g criteria",provisional_non_india,2026-10-12,Sodium is compared after converting to salt (salt = sodium x 2.5)
-total_fat,all_drinks,per_100ml,lower_better,1.5,8.75,g,"UK DH/FSA FoP guide (2016), per 100 ml criteria",provisional_non_india,2026-10-12,
-saturated_fat,all_drinks,per_100ml,lower_better,0.75,2.5,g,"UK DH/FSA FoP guide (2016), per 100 ml criteria",provisional_non_india,2026-10-12,
-total_sugars,all_drinks,per_100ml,lower_better,2.5,11.25,g,"UK DH/FSA FoP guide (2016), per 100 ml criteria",provisional_non_india,2026-10-12,
-salt,all_drinks,per_100ml,lower_better,0.3,0.75,g,"UK DH/FSA FoP guide (2016), per 100 ml criteria",provisional_non_india,2026-10-12,
-fibre,all_foods,per_100g,higher_better,3,,g,"Codex CXG 23-1997 Guidelines for Use of Nutrition and Health Claims, 'source of' dietary fibre condition (3 g per 100 g)",provisional_claim_condition,2026-10-12,"Claim condition reused as a benchmark; no published 'red' bound, so fibre is never shown red. Confirm against FSSAI Advertising and Claims Regs 2018"
-protein,all_foods,per_100g,higher_better,TODO,,g,"TODO: copy from FSSAI / ICMR-NIN",todo,,No benchmark until a source is copied in; protein sub-score stays unknown
-energy,all_foods,per_100g,lower_better,TODO,TODO,kcal,"TODO: copy from FSSAI / ICMR-NIN / WHO",todo,,No benchmark until a source is copied in; energy sub-score stays unknown
+total_fat,all_foods,per_100g,lower_better,3,17.5,g,"green: FSSAI Advertising and Claims Regs 2018, Schedule I Sl. 2 'low fat' (<=3 g/100 g); red: UK DH/FSA front-of-pack guide 2016 'high' (>17.5 g/100 g)",green_official_red_provisional,2026-10-12,"green = value <= green_bound; red = value > red_bound. No Indian 'high' cut-off is final yet (FSSAI front-of-pack rule is a draft), so red bounds use the UK scheme until it is"
+saturated_fat,all_foods,per_100g,lower_better,1.5,5,g,"green: FSSAI Schedule I Sl. 4 'low saturated fat' (<=1.5 g/100 g); red: UK DH/FSA 2016 (>5 g/100 g)",green_official_red_provisional,2026-10-12,
+total_sugars,all_foods,per_100g,lower_better,5,22.5,g,"green: FSSAI Schedule I Sl. 10 'low sugar' (<=5 g/100 g); red: UK DH/FSA 2016 (>22.5 g/100 g)",green_official_red_provisional,2026-10-12,
+salt,all_foods,per_100g,lower_better,0.3,1.5,g,"green: FSSAI Schedule I Sl. 13 'low sodium' (<=0.12 g sodium = 0.3 g salt per 100 g); red: UK DH/FSA 2016 (>1.5 g salt/100 g)",green_official_red_provisional,2026-10-12,Sodium is compared after converting to salt (salt = sodium x 2.5)
+total_fat,all_drinks,per_100ml,lower_better,1.5,8.75,g,"green: FSSAI Schedule I Sl. 2 (<=1.5 g/100 ml); red: UK DH/FSA 2016 (>8.75 g/100 ml)",green_official_red_provisional,2026-10-12,
+saturated_fat,all_drinks,per_100ml,lower_better,0.75,2.5,g,"green: FSSAI Schedule I Sl. 4 (<=0.75 g/100 ml); red: UK DH/FSA 2016 (>2.5 g/100 ml)",green_official_red_provisional,2026-10-12,
+total_sugars,all_drinks,per_100ml,lower_better,2.5,11.25,g,"green: FSSAI Schedule I Sl. 10 (<=2.5 g/100 ml); red: UK DH/FSA 2016 (>11.25 g/100 ml)",green_official_red_provisional,2026-10-12,
+salt,all_drinks,per_100ml,lower_better,0.3,0.75,g,"green: FSSAI Schedule I Sl. 13 (<=0.12 g sodium/100 ml); red: UK DH/FSA 2016 (>0.75 g salt/100 ml)",green_official_red_provisional,2026-10-12,
+fibre,all_foods,per_100g,higher_better,3,,g,"FSSAI Schedule I Sl. 14 'source of dietary fibre' (>=3 g/100 g)",official,2026-10-12,No published 'red' bound: fibre is never shown red
+fibre,all_drinks,per_100ml,higher_better,1.5,,g,"FSSAI Schedule I Sl. 14 'source of dietary fibre' (>=1.5 g/100 ml)",official,2026-10-12,
+protein,all_foods,per_100g,higher_better,5.4,,g,"FSSAI Schedule I Sl. 11 'source of protein' (10% RDA per 100 g) x ICMR-NIN 2020 RDA 54 g/day (sedentary adult man)",derived_from_official,2026-10-12,No published 'red' bound
+protein,all_drinks,per_100ml,higher_better,2.7,,g,"FSSAI Schedule I Sl. 11 'source of protein' (5% RDA per 100 ml) x ICMR-NIN 2020 RDA 54 g/day",derived_from_official,2026-10-12,
+energy,all_foods,per_100g,lower_better,TODO,TODO,kcal,"TODO: no category energy benchmark found in FSSAI / ICMR-NIN texts",todo,2026-10-12,"FSSAI 'low energy' (<=40 kcal/100 g) exists but is a claim condition, not a useful benchmark for cereals or biscuits; energy stays unscored"
