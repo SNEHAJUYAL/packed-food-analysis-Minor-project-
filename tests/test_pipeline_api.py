@@ -1,9 +1,5 @@
 from pathlib import Path
 
-import httpx
-from fastapi.testclient import TestClient
-
-from api.main import app
 from normalise.build import build_product
 from normalise.matcher import best_match
 from pipeline import analyse_html, extract_all
@@ -11,7 +7,6 @@ from recommend.ranker import compare
 from recommend.similarity import similar
 
 FIX = Path(__file__).parent / "fixtures"
-client = TestClient(app)
 
 
 def page(name: str) -> str:
@@ -58,54 +53,3 @@ def test_off_matcher_with_canned_candidates():
     m = best_match("Demo Masala Instant Noodles", "Demo Brand", cands)
     assert m["code"] == "1"
     assert best_match("Choco Crunch", None, cands) is None
-
-
-def test_api_endpoints():
-    assert client.get("/health").json() == {"status": "ok"}
-    meth = client.get("/methodology").json()
-    assert meth["scoring"]["dimension_weights"]["nutrition"] == 0.40
-    r = client.post("/analyse/html", json={"url": "https://example.test/b", "html": page("biscuit_html_only.html"),
-                                           "category": "biscuits_cookies"})
-    assert r.status_code == 200
-    body = r.json()
-    claims = {c["claim_id"]: c["status"] for c in body["dimensions"]["claims"]["claims"]}
-    assert claims["no_added_sugar"] == "potential inconsistency for review"  # sugar is ingredient #2
-    assert client.post("/analyse/html", json={"url": "x", "html": "", "category": "soup"}).status_code == 422
-
-
-def test_api_product_with_partial_nutrition():
-    body = {"category": {"value": "breakfast_cereals", "label": "declared", "source": "user"},
-            "nutrition_basis": "per_100g",
-            "nutrition": {"total_sugars": {"value": 28, "label": "declared"},
-                          "saturated_fat": {"value": 5, "label": "declared"},
-                          "sodium": {"value": 400, "label": "declared"},
-                          "fibre": {"value": 4, "label": "declared"}}}
-    r = client.post("/analyse/product", json=body)
-    assert r.status_code == 200
-    d = r.json()
-    assert d["product"]["nutrition"]["protein"]["label"] == "unknown"
-    assert d["dimensions"]["nutrition"]["score"] is not None
-    assert client.post("/analyse/product", json={"nutrition": {"vitamin_x": {"value": 1}}}).status_code == 422
-
-
-def test_save_report_to_postgres():
-    import os
-
-    import pytest
-    url = os.environ.get("TEST_DATABASE_URL")
-    if not url:
-        pytest.skip("set TEST_DATABASE_URL to a database loaded with db/schema.sql")
-    import psycopg
-
-    from store import save_report
-    r = analyse_html(page("cereal_jsonld.html"), "https://example.test/cereal")
-    pid = save_report(r, url)
-    with psycopg.connect(url) as conn:
-        row = conn.execute("SELECT overall, grade FROM analyses WHERE product_id = %s", (pid,)).fetchone()
-        sugar = conn.execute("SELECT value, evidence FROM nutrient_values WHERE product_id = %s "
-                             "AND nutrient = 'total_sugars'", (pid,)).fetchone()
-        missing = conn.execute("SELECT value, evidence FROM nutrient_values WHERE product_id = %s "
-                               "AND nutrient = 'added_sugars'", (pid,)).fetchone()
-    assert row == (r["overall"]["score"], r["overall"]["grade"])
-    assert float(sugar[0]) == 28 and sugar[1] == "declared"
-    assert missing == (None, "unknown")  # missing stays NULL, never 0

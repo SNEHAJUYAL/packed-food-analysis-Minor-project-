@@ -9,3 +9,7 @@ data/cache/*
 !data/cache/.gitkeep
 .env
 web/node_modules/
+web/.next/
+web/next-env.d.ts
+web/*.tsbuildinfo
+web/.env.local

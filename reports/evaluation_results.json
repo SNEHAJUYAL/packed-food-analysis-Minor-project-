@@ -1,0 +1,371 @@
+{
+  "methodology_version": "0.1.0",
+  "extraction": {
+    "data": "4 synthetic test pages (tests/fixtures), hand-labelled; deterministic extractors only (no LLM key)",
+    "n_pages": 4,
+    "overall": {
+      "n_fields": 60,
+      "tp": 38,
+      "fp": 1,
+      "fn": 10,
+      "precision": 0.9743589743589743,
+      "recall": 0.7916666666666666,
+      "exact_match_accuracy": 0.8333333333333334
+    },
+    "per_page": {
+      "cereal_jsonld.html": {
+        "n_fields": 15,
+        "tp": 13,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_match_accuracy": 1.0
+      },
+      "biscuit_html_only.html": {
+        "n_fields": 15,
+        "tp": 13,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.9285714285714286,
+        "recall": 0.9285714285714286,
+        "exact_match_accuracy": 0.9333333333333333
+      },
+      "noodles_per_serving.html": {
+        "n_fields": 15,
+        "tp": 12,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_match_accuracy": 1.0
+      },
+      "beverage_unstructured.html": {
+        "n_fields": 15,
+        "tp": 0,
+        "fp": 0,
+        "fn": 9,
+        "precision": null,
+        "recall": 0.0,
+        "exact_match_accuracy": 0.4
+      }
+    },
+    "per_field": {
+      "name": {
+        "n_fields": 4,
+        "tp": 2,
+        "fp": 1,
+        "fn": 2,
+        "precision": 0.6666666666666666,
+        "recall": 0.5,
+        "exact_match_accuracy": 0.5
+      },
+      "brand": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.75,
+        "exact_match_accuracy": 0.75
+      },
+      "pack_size": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.75,
+        "exact_match_accuracy": 0.75
+      },
+      "pack_unit": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.75,
+        "exact_match_accuracy": 0.75
+      },
+      "price_inr": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.75,
+        "exact_match_accuracy": 0.75
+      },
+      "energy": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.75,
+        "exact_match_accuracy": 0.75
+      },
+      "protein": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.75,
+        "exact_match_accuracy": 0.75
+      },
+      "carbohydrate": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_match_accuracy": 1.0
+      },
+      "total_sugars": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.75,
+        "exact_match_accuracy": 0.75
+      },
+      "added_sugars": {
+        "n_fields": 4,
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_match_accuracy": 1.0
+      },
+      "total_fat": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.75,
+        "exact_match_accuracy": 0.75
+      },
+      "saturated_fat": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_match_accuracy": 1.0
+      },
+      "trans_fat": {
+        "n_fields": 4,
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_match_accuracy": 1.0
+      },
+      "fibre": {
+        "n_fields": 4,
+        "tp": 1,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_match_accuracy": 1.0
+      },
+      "sodium": {
+        "n_fields": 4,
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_match_accuracy": 1.0
+      }
+    }
+  },
+  "ingredients": {
+    "data": "team-labelled ingredient phrases (data/verified/eval/ingredient_gold.csv)",
+    "n_items": 50,
+    "classification": {
+      "tp": 43,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "uncertainty_flag": {
+      "tp": 7,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tn": 43,
+      "false_positive_rate": 0.0
+    },
+    "errors": []
+  },
+  "claims": {
+    "data": "hand-worked cases from FSSAI Schedule I, reg. 6 and Schedule V (data/verified/eval/claim_gold.csv)",
+    "n_cases": 22,
+    "status_accuracy": 1.0,
+    "inconsistency_detection": {
+      "tp": 8,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tn": 14,
+      "false_positive_rate": 0.0
+    },
+    "disagreements": []
+  },
+  "product_matching": {
+    "data": "40 synthetic sample records with generated name perturbations; near-identical names ('Sample Cereal A' vs 'B') make this a hard case",
+    "n_queries": 90,
+    "correct_match_rate": 0.9888888888888889,
+    "by_perturbation": {
+      "case and order": {
+        "n": 40,
+        "correct_rate": 1.0
+      },
+      "typo": {
+        "n": 40,
+        "correct_rate": 0.975
+      },
+      "absent product": {
+        "n": 10,
+        "correct_rate": 1.0
+      }
+    }
+  },
+  "scoring_vs_nutriscore": {
+    "status": "not run",
+    "reason": "needs Open Food Facts records with nutriscore_grade (data/raw/off_india.jsonl from ./run.sh off); the OFF API was not reachable from the build environment"
+  },
+  "expert_ranking": {
+    "status": "not run",
+    "reason": "no expert rankings collected yet"
+  },
+  "recommendations": {
+    "status": "not run",
+    "reason": "Precision@3 and NDCG@5 need relevance judgements for alternatives; none collected yet (metric code: evaluation/metrics.py)"
+  },
+  "robustness": {
+    "weights": {
+      "data": "40 synthetic sample records",
+      "perturbations": {
+        "nutrition x0.8": {
+          "n": 38,
+          "grade_changed": 4,
+          "mean_abs_score_change": 1.34
+        },
+        "nutrition x1.2": {
+          "n": 38,
+          "grade_changed": 3,
+          "mean_abs_score_change": 1.18
+        },
+        "ingredients x0.8": {
+          "n": 38,
+          "grade_changed": 4,
+          "mean_abs_score_change": 0.71
+        },
+        "ingredients x1.2": {
+          "n": 38,
+          "grade_changed": 0,
+          "mean_abs_score_change": 0.63
+        },
+        "transparency x0.8": {
+          "n": 38,
+          "grade_changed": 5,
+          "mean_abs_score_change": 1.05
+        },
+        "transparency x1.2": {
+          "n": 38,
+          "grade_changed": 2,
+          "mean_abs_score_change": 0.92
+        },
+        "claims x0.8": {
+          "n": 38,
+          "grade_changed": 0,
+          "mean_abs_score_change": 0.74
+        },
+        "claims x1.2": {
+          "n": 38,
+          "grade_changed": 2,
+          "mean_abs_score_change": 0.76
+        },
+        "value x0.8": {
+          "n": 38,
+          "grade_changed": 1,
+          "mean_abs_score_change": 0.37
+        },
+        "value x1.2": {
+          "n": 38,
+          "grade_changed": 2,
+          "mean_abs_score_change": 0.37
+        }
+      }
+    },
+    "missing_fields": {
+      "data": "40 synthetic sample records; one nutrient removed at a time",
+      "by_nutrient": {
+        "total_sugars": {
+          "n": 37,
+          "overall_not_computed": 10,
+          "mean_abs_score_change": 2.41
+        },
+        "saturated_fat": {
+          "n": 36,
+          "overall_not_computed": 7,
+          "mean_abs_score_change": 3.41
+        },
+        "sodium": {
+          "n": 38,
+          "overall_not_computed": 6,
+          "mean_abs_score_change": 2.12
+        },
+        "fibre": {
+          "n": 26,
+          "overall_not_computed": 1,
+          "mean_abs_score_change": 3.48
+        },
+        "protein": {
+          "n": 38,
+          "overall_not_computed": 0,
+          "mean_abs_score_change": 3.63
+        },
+        "total_fat": {
+          "n": 38,
+          "overall_not_computed": 0,
+          "mean_abs_score_change": 1.61
+        }
+      }
+    },
+    "conflicting_sources": {
+      "data": "cereal test page with a second, modified source",
+      "n_cases": 6,
+      "detection": {
+        "tp": 3,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "tn": 3,
+        "false_positive_rate": 0.0
+      }
+    }
+  },
+  "targets_not_yet_met": [
+    "verified evaluation set of 100-200 real products (build spec target)",
+    "500-1,000 Open Food Facts India records (needs ./run.sh off with network access)"
+  ]
+}

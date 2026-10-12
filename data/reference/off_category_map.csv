@@ -1,0 +1,11 @@
+off_tag,category,notes
+en:breakfast-cereals,breakfast_cereals,Open Food Facts categories taxonomy
+en:mueslis,breakfast_cereals,
+en:biscuits,biscuits_cookies,
+en:cookies,biscuits_cookies,
+en:biscuits-and-cakes,biscuits_cookies,Broad parent tag; may include cakes. Review mapped records
+en:instant-noodles,instant_noodles,
+en:beverages,beverages,Broad tag; includes juices and soft drinks
+en:chips-and-fries,namkeen_chips,
+en:crisps,namkeen_chips,
+en:salty-snacks,namkeen_chips,Broad tag; includes namkeen

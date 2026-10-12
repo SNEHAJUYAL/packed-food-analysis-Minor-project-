@@ -92,6 +92,9 @@ class Product(BaseModel):
         default_factory=lambda: {k: Evidence() for k in NUTRIENTS}
     )
 
+    # Values as printed before normalisation: {nutrient or "salt": {value, basis_text, source}}.
+    nutrition_original: dict[str, dict] = Field(default_factory=dict)
+
     ingredients_raw: Evidence = Field(default_factory=_unknown)
     ingredients_normalised: list[dict] = Field(default_factory=list)
     additives_ins: list[str] = Field(default_factory=list)

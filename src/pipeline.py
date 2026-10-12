@@ -31,6 +31,25 @@ def extract_all(html: str, url: str) -> list[dict]:
     return [f for f in found if f]
 
 
+def data_status(product: Product, overall: dict) -> tuple[str, list[str]]:
+    """complete / partial / insufficient_data, and the fields that are missing."""
+    cfg = scoring_config()["transparency"]
+    missing = []
+    for f in cfg["core_fields"] + cfg["bonus_fields"]:
+        ev = product.nutrition.get(f) if f in product.nutrition else getattr(product, f)
+        if ev is None or not ev.known:
+            missing.append(f)
+    for f in ("name", "brand", "category"):
+        if not getattr(product, f).known:
+            missing.append(f)
+    if overall["score"] is None:
+        return "insufficient_data", missing
+    core_missing = [f for f in missing if f in cfg["core_fields"] or f in ("name", "category")]
+    if core_missing or overall["missing"] or product.conflict_flag:
+        return "partial", missing
+    return "complete", missing
+
+
 def analyse_product(product: Product, peer_unit_prices: Optional[list[float]] = None,
                     claim_overrides: Optional[dict] = None) -> dict:
     normalised = normalise_ingredients(product.ingredients_raw.value) if product.ingredients_raw.known else None
@@ -49,7 +68,13 @@ def analyse_product(product: Product, peer_unit_prices: Optional[list[float]] = 
     elif overall["missing"]:
         notes.append("Not scored: " + ", ".join(overall["missing"])
                      + ". The other dimension weights were renormalised.")
+    status, missing = data_status(product, overall)
+    if status == "insufficient_data":
+        notes.append("Insufficient data: the report shows what is known, but no overall grade.")
     return {
+        "status": status,
+        "missing_fields": missing,
+        "methodology_version": scoring_config()["methodology_version"],
         "product": product.model_dump(mode="json"),
         "dimensions": {
             "nutrition": nutrition, "ingredients": ingredients, "transparency": transparency,

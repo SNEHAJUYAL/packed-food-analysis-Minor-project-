@@ -12,7 +12,7 @@ from typing import Optional
 from rapidfuzz import fuzz, process
 
 from core.config import allergens as allergen_table
-from core.config import ingredient_terms, ins_codes
+from core.config import ingredient_classes, ingredient_terms, ins_codes
 
 FUZZY_CUTOFF = 90
 
@@ -20,6 +20,7 @@ _PERCENT_RE = re.compile(r"\(?\s*\d+(?:\.\d+)?\s*%\s*\)?")
 # INS 322, INS322(i), E322, E 150d, bare codes inside an additive bracket like (322, 471)
 _INS_RE = re.compile(r"\b(?:INS|E)\s*[-.]?\s*(\d{3,4}[a-f]?)(?:\s*\((?:i{1,3}|iv|v)\))?", re.IGNORECASE)
 _BARE_CODE_RE = re.compile(r"^\s*(\d{3,4}[a-f]?)(?:\s*\((?:i{1,3}|iv|v)\))?\s*$", re.IGNORECASE)
+_ONLY_PERCENT_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s*%\s*$")
 _LEAD_RE = re.compile(r"^\s*(?:ingredients?\s*[:\-]\s*)", re.IGNORECASE)
 
 
@@ -84,8 +85,42 @@ def lookup_ins(code: str) -> Optional[dict]:
     return table.get(base.group(0)) if base else None
 
 
+def _declared_percent(parent: str, children: list[str]) -> Optional[float]:
+    """A percentage printed with the ingredient ("Wheat (62%)", "Sugar 12%"); never estimated."""
+    for child in children:
+        m = _ONLY_PERCENT_RE.match(child)
+        if m:
+            return float(m.group(1))
+    m = re.search(r"(\d+(?:\.\d+)?)\s*%", parent)
+    return float(m.group(1)) if m else None
+
+
+def _status(method: str, has_additives: bool) -> tuple[str, Optional[float]]:
+    """matched / fuzzy_match / uncertain, with the fuzzy score when there is one."""
+    if method in ("exact", "contains"):
+        return "matched", 100.0
+    if method.startswith("fuzzy:"):
+        return "fuzzy_match", float(method.split(":")[1])
+    return ("matched", None) if has_additives else ("uncertain", None)
+
+
+def _describe(classes: list[str], additives: list[dict]) -> tuple[Optional[str], Optional[str], Optional[str]]:
+    """Functional category, explanation and reference for the first described class."""
+    table = ingredient_classes()
+    for c in classes:
+        if c in table:
+            row = table[c]
+            ref = row["reference_source"]
+            if additives and any(a["group"] == c for a in additives):
+                ref = "INS " + ", ".join(a["ins"] for a in additives if a["group"] == c) + f" in ins_codes.csv; {ref}"
+            return row["functional_category"], row["explanation"], ref
+    return None, None, None
+
+
 def normalise_ingredient(item: str, position: int) -> dict:
     parent, children = _split_parent_children(item)
+    percent = _declared_percent(parent, children)
+    children = [c for c in children if not _ONLY_PERCENT_RE.match(c)]
     name = _clean(parent)
     term, classes, method = _lookup_term(name)
     classes = list(classes)
@@ -127,12 +162,22 @@ def normalise_ingredient(item: str, position: int) -> dict:
         if a["group"] and a["group"] not in classes:
             classes.append(a["group"])
 
+    status, match_score = _status(method, bool(additives))
+    functional_category, explanation, reference = _describe(classes, additives)
+    if status == "uncertain":
+        explanation = "Not in the ingredient dictionary or INS table, so it is not classified."
     return {
         "position": position,
         "text": item,
         "name": name,
         "term": term,
-        "match": method,
+        "match": method.split(":")[0],
+        "match_score": match_score,
+        "status": status,
+        "percent": percent,
+        "functional_category": functional_category,
+        "explanation": explanation,
+        "reference_source": reference,
         "classes": classes,
         "additives": additives,
         "sub_ingredients": sub,

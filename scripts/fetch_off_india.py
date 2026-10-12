@@ -2,14 +2,14 @@
 
     python scripts/fetch_off_india.py --per-category 200
 
-Writes data/raw/off_india.csv (git-ignored). Open Food Facts data is under the
+Writes data/raw/off_india.jsonl (git-ignored), loaded by `python -m database.ingest`. Open Food Facts data is under the
 Open Database License: credit it and share-alike any derived database. It is
 reference data, not ground truth.
 """
 from __future__ import annotations
 
 import argparse
-import csv
+import json
 import sys
 import time
 from pathlib import Path
@@ -17,7 +17,7 @@ from pathlib import Path
 import httpx
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "data" / "raw" / "off_india.csv"
+OUT = ROOT / "data" / "raw" / "off_india.jsonl"
 API = "https://world.openfoodfacts.org/api/v2/search"
 USER_AGENT = "FoodDecisionIntelligence/0.1 (academic project, MSIT GGSIPU)"
 
@@ -29,14 +29,8 @@ CATEGORIES = {
     "beverages": "en:beverages",
     "namkeen_chips": "en:chips-and-fries",
 }
-NUTRIMENTS = {
-    "energy": "energy-kcal_100g", "protein": "proteins_100g", "carbohydrate": "carbohydrates_100g",
-    "total_sugars": "sugars_100g", "added_sugars": "added-sugars_100g", "total_fat": "fat_100g",
-    "saturated_fat": "saturated-fat_100g", "trans_fat": "trans-fat_100g", "fibre": "fiber_100g",
-    "sodium_g": "sodium_100g", "salt_g": "salt_100g",
-}
-FIELDS = ["code", "product_name", "brands", "quantity", "categories_tags", "ingredients_text",
-          "additives_tags", "allergens_tags", "nutriscore_grade", "nutriments", "last_modified_t"]
+FIELDS = ["code", "product_name", "brands", "quantity", "categories_tags", "countries_tags", "ingredients_text",
+          "labels", "nutriments", "nutrition_data_per", "nutriscore_grade", "last_modified_t"]
 
 
 def fetch_category(client: httpx.Client, tag: str, limit: int) -> list[dict]:
@@ -59,31 +53,17 @@ def main() -> int:
     ap.add_argument("--per-category", type=int, default=200)
     args = ap.parse_args()
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    cols = ["category", "code", "product_name", "brands", "quantity", "ingredients_text", "additives",
-            "allergens", "nutriscore_grade", *NUTRIMENTS, "last_modified_t"]
     n = 0
     with httpx.Client(headers={"User-Agent": USER_AGENT}, timeout=60) as client, \
-            open(OUT, "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=cols)
-        w.writeheader()
+            open(OUT, "w", encoding="utf-8") as fh:
         for cat, tag in CATEGORIES.items():
             rows = fetch_category(client, tag, args.per_category)
             for p in rows:
-                nm = p.get("nutriments") or {}
-                w.writerow({
-                    "category": cat, "code": p.get("code"), "product_name": p.get("product_name"),
-                    "brands": p.get("brands"), "quantity": p.get("quantity"),
-                    "ingredients_text": p.get("ingredients_text"),
-                    "additives": "|".join(p.get("additives_tags") or []),
-                    "allergens": "|".join(p.get("allergens_tags") or []),
-                    "nutriscore_grade": p.get("nutriscore_grade"),
-                    # Missing stays empty, never 0.
-                    **{k: nm.get(v, "") for k, v in NUTRIMENTS.items()},
-                    "last_modified_t": p.get("last_modified_t"),
-                })
+                # Raw OFF JSON, one product per line; missing values stay missing (never 0).
+                fh.write(json.dumps(p, ensure_ascii=False) + "\n")
             n += len(rows)
             print(f"{cat}: {len(rows)} products", file=sys.stderr)
-    print(f"wrote {n} rows to {OUT}", file=sys.stderr)
+    print(f"wrote {n} products to {OUT} (load with: python -m database.ingest {OUT})", file=sys.stderr)
     return 0
 
 

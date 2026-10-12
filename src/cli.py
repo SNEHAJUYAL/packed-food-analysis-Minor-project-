@@ -78,11 +78,19 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     if args.cmd == "analyse":
-        html, url = load(args.source)
-        r = analyse_html(html, url, args.category)
-        if args.save:
-            from store import save_report
-            print(f"saved as product_id {save_report(r)}", file=sys.stderr)
+        if args.save:  # store in the database and score against stored products of the category
+            import services
+            from database.session import session_scope
+            if Path(args.source).exists():
+                print("--save needs a URL (stored products keep their source URL)", file=sys.stderr)
+                return 2
+            with session_scope() as s:
+                out = services.analyze_url(s, args.source, args.category)
+            r = out["report"]
+            print(f"saved as product_id {out['product_id']}", file=sys.stderr)
+        else:
+            html, url = load(args.source)
+            r = analyse_html(html, url, args.category)
         if args.json:
             print(json.dumps(r, indent=2, default=str))
         else:

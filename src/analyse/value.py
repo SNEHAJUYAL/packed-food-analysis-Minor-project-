@@ -22,14 +22,14 @@ def value_score(unit: Optional[float], category_median: Optional[float]) -> Opti
         return None
     at_median = scoring_config()["value_curve"]["at_median"]
     s = at_median - at_median * math.log2(unit / category_median)
-    return max(0.0, min(100.0, s))
+    return round(max(0.0, min(100.0, s)), 2)
 
 
 def analyse_value(product: Product, peer_unit_prices: list[float] | None = None) -> dict:
     unit = unit_price(product)
     per = "100 ml" if product.is_liquid else "100 g"
     if unit is None:
-        return {"price_per_100": None, "category_median": None, "score": None,
+        return {"price_per_100": None, "category_median": None, "score": None, "peer_count": 0,
                 "explanation": ["Price or pack size missing, so price per unit is unknown."]}
     peers = [p for p in (peer_unit_prices or []) if p is not None]
     med = median(peers) if peers else None
@@ -40,4 +40,5 @@ def analyse_value(product: Product, peer_unit_prices: list[float] | None = None)
         why.append("No comparison set yet, so value for money is not scored.")
     else:
         why.append(f"Category median ₹{med:.2f} per {per} across {len(peers)} product(s).")
-    return {"price_per_100": unit, "category_median": med, "score": score, "explanation": why}
+    return {"price_per_100": unit, "category_median": med, "score": score, "peer_count": len(peers),
+            "explanation": why}

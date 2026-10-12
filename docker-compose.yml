@@ -1,23 +1,41 @@
+# docker compose up --build   ->  web on http://localhost:3000, API docs on http://localhost:8000/docs
 services:
   db:
     image: postgres:16
     environment:
       POSTGRES_DB: fdi
       POSTGRES_USER: fdi
-      POSTGRES_PASSWORD: fdi_local_only
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_locally}
     volumes:
-      - ./db/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
       - pgdata:/var/lib/postgresql/data
     ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fdi -d fdi"]
+      interval: 3s
+      retries: 20
+  migrate:
+    build: .
+    depends_on:
+      db: {condition: service_healthy}
+    environment:
+      DATABASE_URL: postgresql://fdi:${POSTGRES_PASSWORD:-change_me_locally}@db:5432/fdi
+    # Schema migrations, then the labelled synthetic sample (only into an empty database)
+    command: ["sh", "-c", "alembic upgrade head && python -m database.ingest data/sample/synthetic_products.jsonl --if-empty"]
   api:
     build: .
-    depends_on: [db]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
     environment:
-      DATABASE_URL: postgresql://fdi:fdi_local_only@db:5432/fdi
+      DATABASE_URL: postgresql://fdi:${POSTGRES_PASSWORD:-change_me_locally}@db:5432/fdi
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CORS_ORIGINS: http://localhost:3000
     ports: ["8000:8000"]
-  demo:
-    build: .
-    command: ["streamlit", "run", "web/streamlit_app.py", "--server.address=0.0.0.0", "--server.port=8501"]
-    ports: ["8501:8501"]
+  web:
+    build:
+      context: ./web
+      args:
+        API_BASE_URL: http://api:8000
+    depends_on: [api]
+    ports: ["3000:3000"]
 volumes:
   pgdata:

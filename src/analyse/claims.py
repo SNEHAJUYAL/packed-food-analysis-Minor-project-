@@ -63,16 +63,19 @@ def check_claim(claim_id: str, product: Product, ingredient_groups: dict | None,
     threshold = rule["threshold_liquid"] if liquid else rule["threshold_solid"]
     out = {"claim_id": claim_id, "claim": rule["claim_label"], "status": UNVERIFIABLE,
            "facts": [], "reason": "", "rule": f"{rule['regulation']}, {rule['clause']}",
-           "rule_status": rule["status"]}
+           "rule_status": rule["status"], "source_url": rule.get("source_url") or None,
+           "jurisdiction": rule.get("jurisdiction") or None, "missing_information": []}
     nutrient, cond = rule["nutrient"], rule["condition"]
 
     if cond in ("max", "min", "lt"):
         v = product.nutrient(nutrient)
         if v is None:
             out["reason"] = f"{nutrient} is not declared."
+            out["missing_information"].append(f"{nutrient} per 100 g/ml")
             return out
         if product.nutrition_basis is None:
             out["reason"] = "Nutrition basis is unknown."
+            out["missing_information"].append("nutrition basis (per 100 g / 100 ml)")
             return out
         unit = "mg" if nutrient == "sodium" else ("kcal" if nutrient == "energy" else "g")
         out["facts"].append(f"{nutrient} = {v:g} {unit} per {_per(liquid)} (declared)")
@@ -83,6 +86,7 @@ def check_claim(claim_id: str, product: Product, ingredient_groups: dict | None,
                                 f"({v:g} g × {kcal} kcal ÷ {energy:g} kcal, derived)")
         if threshold is None:
             out["reason"] = "No condition recorded for this claim in fssai_claims.csv."
+            out["missing_information"].append("regulatory condition for this claim")
             return out
         if cond == "min":
             ok = v >= threshold
@@ -106,17 +110,20 @@ def check_claim(claim_id: str, product: Product, ingredient_groups: dict | None,
                 ok = pct <= pct_max
                 why += f" and at most {pct_max:g}% of energy"
             else:
-                out["reason"] = f"Condition also limits % of energy, but energy is not declared."
+                out["reason"] = "Condition also limits % of energy, but energy is not declared."
+                out["missing_information"].append("energy (kcal) per 100 g/ml")
                 return out
         out["status"] = CONSISTENT if ok else INCONSISTENT
         out["reason"] = f"FSSAI condition {why}."
         if not ok and rule["claim_id"] in ("high_protein", "source_of_protein"):
             out["reason"] += " A per-serving route also exists and was not checked (serving size unknown)."
+            out["missing_information"].append("serving size (for the per-serving route)")
         return out
 
     if cond == "no_added_ingredient_class":
         if ingredient_groups is None:
             out["reason"] = "Ingredient list not available."
+            out["missing_information"].append("ingredient list")
             return out
         sugars = ingredient_groups.get("added_sugar", [])
         if sugars:
@@ -126,6 +133,7 @@ def check_claim(claim_id: str, product: Product, ingredient_groups: dict | None,
             return out
         out["status"] = CONSISTENT
         out["reason"] = "No sugar-type ingredient found in the list (only 6(1)(a)(i) can be checked from a listing)."
+        out["missing_information"].append("conditions 6(1)(a)(ii)-(iv), which need manufacturer information")
         ts = product.nutrient("total_sugars")
         if ts is not None and product.nutrition_basis:
             out["facts"].append(f"total sugars = {ts:g} g per {_per(liquid)}")
@@ -151,9 +159,11 @@ def check_claim(claim_id: str, product: Product, ingredient_groups: dict | None,
             return out
         if ingredient_groups is None:
             out["reason"] = "Ingredient list not available."
+            out["missing_information"].append("ingredient list")
             return out
         out["status"] = CONTEXT
         out["reason"] = "No synthetic additives found; Schedule V criteria for each ingredient cannot be fully checked from a listing."
+        out["missing_information"].append("processing details for each ingredient (Schedule V)")
         return out
 
     out["reason"] = f"Unknown condition type '{cond}'."

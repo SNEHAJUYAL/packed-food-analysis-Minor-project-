@@ -148,6 +148,10 @@ def build_product(extractions: list[dict], url: Optional[str] = None,
         p.warnings.extend(notes)
         if not values:
             continue
+        for key, raw in (ex.get("nutrition") or {}).items():
+            if key not in p.nutrition_original:
+                p.nutrition_original[key] = {"value": str(raw), "basis_text": ex.get("nutrition_basis_text"),
+                                             "source": ex["source"]}
         derived = abs((_basis(ex.get("nutrition_basis_text"))[1] or 100.0) - 100.0) > 1e-9
         if chosen_basis is None:
             chosen_basis = basis

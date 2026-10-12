@@ -83,6 +83,12 @@ def ingredient_terms() -> dict[str, list[str]]:
 
 
 @lru_cache(maxsize=None)
+def ingredient_classes() -> dict[str, dict]:
+    """Functional category, plain explanation and reference for each ingredient class."""
+    return {r["class"]: dict(r) for r in read_csv("ingredient_classes.csv")}
+
+
+@lru_cache(maxsize=None)
 def allergens() -> dict[str, list[str]]:
     return {r["allergen"]: r["keywords"].split("|") for r in read_csv("allergens.csv")}
 
