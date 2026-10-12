@@ -1,0 +1,10 @@
+allergen,keywords,source,status
+gluten_cereals,wheat|barley|rye|oats|oat|spelt|gluten|maida|atta|semolina|suji|rava,"FSS (Labelling and Display) Regulations, 2020: declaration of food allergens (cereals containing gluten)",seed_verify
+crustacean,crustacean|shrimp|prawn|crab|lobster,"FSS (Labelling and Display) Regulations, 2020",seed_verify
+milk,milk|milk solids|milk powder|whey|casein|butter|ghee|cheese|cream|lactose|curd|paneer,"FSS (Labelling and Display) Regulations, 2020",seed_verify
+egg,egg|eggs|egg powder|albumen,"FSS (Labelling and Display) Regulations, 2020",seed_verify
+fish,fish|anchovy|tuna,"FSS (Labelling and Display) Regulations, 2020",seed_verify
+peanut,peanut|peanuts|groundnut|groundnuts,"FSS (Labelling and Display) Regulations, 2020",seed_verify
+tree_nuts,nuts|tree nuts|almond|almonds|cashew|cashews|walnut|walnuts|pistachio|pistachios|hazelnut|hazelnuts,"FSS (Labelling and Display) Regulations, 2020",seed_verify
+soy,soy|soya|soybean|soyabean|soy lecithin|soya lecithin,"FSS (Labelling and Display) Regulations, 2020",seed_verify
+sulphite,sulphite|sulfite|metabisulphite|metabisulfite|sulphur dioxide|sulfur dioxide,"FSS (Labelling and Display) Regulations, 2020 (sulphite at 10 mg/kg or more)",seed_verify

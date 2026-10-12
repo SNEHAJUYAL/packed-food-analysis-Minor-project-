@@ -1,0 +1,12 @@
+parameter,category,basis,direction,green_bound,red_bound,unit,source,status,date_checked,notes
+total_fat,all_foods,per_100g,lower_better,3,17.5,g,"UK DH/FSA, Guide to creating a front of pack (FoP) nutrition label for pre-packed products sold through retail outlets (2016), Table: per 100 g criteria",provisional_non_india,2026-10-12,"Generic placeholder until FSSAI/ICMR-NIN category thresholds are copied in. green = value <= green_bound; red = value > red_bound"
+saturated_fat,all_foods,per_100g,lower_better,1.5,5,g,"UK DH/FSA FoP guide (2016), per 100 g criteria",provisional_non_india,2026-10-12,
+total_sugars,all_foods,per_100g,lower_better,5,22.5,g,"UK DH/FSA FoP guide (2016), per 100 g criteria",provisional_non_india,2026-10-12,UK criteria apply to total sugars
+salt,all_foods,per_100g,lower_better,0.3,1.5,g,"UK DH/FSA FoP guide (2016), per 100 g criteria",provisional_non_india,2026-10-12,Sodium is compared after converting to salt (salt = sodium x 2.5)
+total_fat,all_drinks,per_100ml,lower_better,1.5,8.75,g,"UK DH/FSA FoP guide (2016), per 100 ml criteria",provisional_non_india,2026-10-12,
+saturated_fat,all_drinks,per_100ml,lower_better,0.75,2.5,g,"UK DH/FSA FoP guide (2016), per 100 ml criteria",provisional_non_india,2026-10-12,
+total_sugars,all_drinks,per_100ml,lower_better,2.5,11.25,g,"UK DH/FSA FoP guide (2016), per 100 ml criteria",provisional_non_india,2026-10-12,
+salt,all_drinks,per_100ml,lower_better,0.3,0.75,g,"UK DH/FSA FoP guide (2016), per 100 ml criteria",provisional_non_india,2026-10-12,
+fibre,all_foods,per_100g,higher_better,3,,g,"Codex CXG 23-1997 Guidelines for Use of Nutrition and Health Claims, 'source of' dietary fibre condition (3 g per 100 g)",provisional_claim_condition,2026-10-12,"Claim condition reused as a benchmark; no published 'red' bound, so fibre is never shown red. Confirm against FSSAI Advertising and Claims Regs 2018"
+protein,all_foods,per_100g,higher_better,TODO,,g,"TODO: copy from FSSAI / ICMR-NIN",todo,,No benchmark until a source is copied in; protein sub-score stays unknown
+energy,all_foods,per_100g,lower_better,TODO,TODO,kcal,"TODO: copy from FSSAI / ICMR-NIN / WHO",todo,,No benchmark until a source is copied in; energy sub-score stays unknown

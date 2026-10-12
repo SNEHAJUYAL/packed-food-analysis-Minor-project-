@@ -1,0 +1,26 @@
+[project]
+name = "food-decision-intelligence"
+version = "0.1.0"
+description = "AI-Based Multimodal Packaged Food Analysis and Consumer Decision Support System (URL-first MVP)"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.110",
+  "uvicorn>=0.29",
+  "pydantic>=2.6",
+  "httpx>=0.27",
+  "beautifulsoup4>=4.12",
+  "lxml>=5.0",
+  "extruct>=0.17",
+  "rapidfuzz>=3.6",
+  "scikit-learn>=1.4",
+  "pandas>=2.2",
+  "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+db = ["psycopg[binary]>=3.1"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

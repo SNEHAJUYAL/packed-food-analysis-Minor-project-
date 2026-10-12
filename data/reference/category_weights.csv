@@ -1,0 +1,21 @@
+category,nutrient,weight,source,notes
+breakfast_cereals,total_sugars,0.25,Master doc section 8.4 worked example,Illustrative prototype weight; calibrate per section 8.6
+breakfast_cereals,saturated_fat,0.20,Master doc section 8.4 worked example,
+breakfast_cereals,sodium,0.15,Master doc section 8.4 worked example,
+breakfast_cereals,energy,0.10,Master doc section 8.4 worked example,
+breakfast_cereals,fibre,0.15,Master doc section 8.4 worked example,
+breakfast_cereals,protein,0.15,Master doc section 8.4 worked example,
+biscuits_cookies,total_sugars,0.25,Master doc section 8.2 nutrient list; equal weights,Prototype default: equal weights over the nutrients the doc lists
+biscuits_cookies,saturated_fat,0.25,Master doc section 8.2 nutrient list; equal weights,
+biscuits_cookies,energy,0.25,Master doc section 8.2 nutrient list; equal weights,
+biscuits_cookies,fibre,0.25,Master doc section 8.2 nutrient list; equal weights,
+instant_noodles,sodium,0.20,Master doc section 8.2 nutrient list; equal weights,
+instant_noodles,saturated_fat,0.20,Master doc section 8.2 nutrient list; equal weights,
+instant_noodles,total_fat,0.20,Master doc section 8.2 nutrient list; equal weights,
+instant_noodles,fibre,0.20,Master doc section 8.2 nutrient list; equal weights,
+instant_noodles,protein,0.20,Master doc section 8.2 nutrient list; equal weights,
+beverages,total_sugars,0.50,Master doc section 8.2 nutrient list; equal weights,Sweeteners are handled in the ingredient score
+beverages,energy,0.50,Master doc section 8.2 nutrient list; equal weights,
+namkeen_chips,sodium,0.3333,Master doc section 8.2 nutrient list; equal weights,
+namkeen_chips,saturated_fat,0.3333,Master doc section 8.2 nutrient list; equal weights,
+namkeen_chips,energy,0.3334,Master doc section 8.2 nutrient list; equal weights,
