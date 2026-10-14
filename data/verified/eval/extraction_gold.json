@@ -1,0 +1,11 @@
+{
+  "_note": "Gold values read by hand from tests/fixtures (synthetic pages), including meta tags (the biscuit price is in product:price:amount). Nutrients per 100 g/ml; energy kcal, sodium mg. null = not on the page.",
+  "cereal_jsonld.html": {"name": "Choco Crunch Whole Grain Cereal - High Protein", "brand": "Example Foods", "pack_size": 375, "pack_unit": "g", "price_inr": 180,
+    "energy": 410, "protein": 7, "carbohydrate": 72, "total_sugars": 28, "added_sugars": null, "total_fat": 10, "saturated_fat": 5, "trans_fat": null, "fibre": 4, "sodium": 400},
+  "biscuit_html_only.html": {"name": "Sample Bakes Butter Cookies", "brand": "Sample Bakes", "pack_size": 200, "pack_unit": "g", "price_inr": 120,
+    "energy": 495, "protein": 6.2, "carbohydrate": 66.0, "total_sugars": 24.5, "added_sugars": 22.0, "total_fat": 22.8, "saturated_fat": 11.2, "trans_fat": 0.1, "fibre": null, "sodium": 310},
+  "noodles_per_serving.html": {"name": "Demo Masala Instant Noodles", "brand": "Demo Brand", "pack_size": 280, "pack_unit": "g", "price_inr": 56,
+    "energy": 440.4, "protein": 8.0, "carbohydrate": 60.0, "total_sugars": 2.0, "added_sugars": null, "total_fat": 13.0, "saturated_fat": 6.0, "trans_fat": null, "fibre": null, "sodium": 1200},
+  "beverage_unstructured.html": {"name": "Demo Mango Drink", "brand": "Demo Beverages", "pack_size": 250, "pack_unit": "ml", "price_inr": 40,
+    "energy": 60, "protein": 0.1, "carbohydrate": null, "total_sugars": 14.5, "added_sugars": null, "total_fat": 0, "saturated_fat": null, "trans_fat": null, "fibre": null, "sodium": null}
+}

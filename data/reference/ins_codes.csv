@@ -1,0 +1,65 @@
+ins,name,functional_class,group,source,status
+100,Curcumin,colour,natural_colour,Codex CXG 36-1989 (INS),seed_verify
+101,Riboflavins,colour,natural_colour,Codex CXG 36-1989 (INS),seed_verify
+102,Tartrazine,colour,synthetic_colour,Codex CXG 36-1989 (INS),seed_verify
+110,Sunset yellow FCF,colour,synthetic_colour,Codex CXG 36-1989 (INS),seed_verify
+122,Azorubine (Carmoisine),colour,synthetic_colour,Codex CXG 36-1989 (INS),seed_verify
+124,Ponceau 4R,colour,synthetic_colour,Codex CXG 36-1989 (INS),seed_verify
+129,Allura red AC,colour,synthetic_colour,Codex CXG 36-1989 (INS),seed_verify
+133,Brilliant blue FCF,colour,synthetic_colour,Codex CXG 36-1989 (INS),seed_verify
+150a,Caramel I - plain caramel,colour,caramel_colour,Codex CXG 36-1989 (INS),seed_verify
+150c,Caramel III - ammonia caramel,colour,caramel_colour,Codex CXG 36-1989 (INS),seed_verify
+150d,Caramel IV - sulfite ammonia caramel,colour,caramel_colour,Codex CXG 36-1989 (INS),seed_verify
+160b,Annatto extracts,colour,natural_colour,Codex CXG 36-1989 (INS),seed_verify
+160c,Paprika extract,colour,natural_colour,Codex CXG 36-1989 (INS),seed_verify
+171,Titanium dioxide,colour,colour,Codex CXG 36-1989 (INS),seed_verify
+200,Sorbic acid,preservative,preservative,Codex CXG 36-1989 (INS),seed_verify
+202,Potassium sorbate,preservative,preservative,Codex CXG 36-1989 (INS),seed_verify
+210,Benzoic acid,preservative,preservative,Codex CXG 36-1989 (INS),seed_verify
+211,Sodium benzoate,preservative,preservative,Codex CXG 36-1989 (INS),seed_verify
+220,Sulfur dioxide,preservative,preservative,Codex CXG 36-1989 (INS),seed_verify
+223,Sodium metabisulfite,preservative,preservative,Codex CXG 36-1989 (INS),seed_verify
+260,Acetic acid,acidity regulator,acidity_regulator,Codex CXG 36-1989 (INS),seed_verify
+270,Lactic acid,acidity regulator,acidity_regulator,Codex CXG 36-1989 (INS),seed_verify
+282,Calcium propionate,preservative,preservative,Codex CXG 36-1989 (INS),seed_verify
+290,Carbon dioxide,carbonating agent,carbonating_agent,Codex CXG 36-1989 (INS),seed_verify
+296,Malic acid,acidity regulator,acidity_regulator,Codex CXG 36-1989 (INS),seed_verify
+300,Ascorbic acid,antioxidant,antioxidant,Codex CXG 36-1989 (INS),seed_verify
+319,Tertiary butylhydroquinone (TBHQ),antioxidant,synthetic_antioxidant,Codex CXG 36-1989 (INS),seed_verify
+320,Butylated hydroxyanisole (BHA),antioxidant,synthetic_antioxidant,Codex CXG 36-1989 (INS),seed_verify
+321,Butylated hydroxytoluene (BHT),antioxidant,synthetic_antioxidant,Codex CXG 36-1989 (INS),seed_verify
+322,Lecithins,emulsifier,emulsifier,Codex CXG 36-1989 (INS),seed_verify
+330,Citric acid,acidity regulator,acidity_regulator,Codex CXG 36-1989 (INS),seed_verify
+331,Sodium citrates,acidity regulator,acidity_regulator,Codex CXG 36-1989 (INS),seed_verify
+338,Phosphoric acid,acidity regulator,acidity_regulator,Codex CXG 36-1989 (INS),seed_verify
+339,Sodium phosphates,acidity regulator,acidity_regulator,Codex CXG 36-1989 (INS),seed_verify
+407,Carrageenan,thickener,thickener,Codex CXG 36-1989 (INS),seed_verify
+410,Carob bean gum,thickener,thickener,Codex CXG 36-1989 (INS),seed_verify
+412,Guar gum,thickener,thickener,Codex CXG 36-1989 (INS),seed_verify
+414,Gum arabic,thickener,thickener,Codex CXG 36-1989 (INS),seed_verify
+415,Xanthan gum,thickener,thickener,Codex CXG 36-1989 (INS),seed_verify
+440,Pectins,thickener,thickener,Codex CXG 36-1989 (INS),seed_verify
+450,Diphosphates,raising agent,raising_agent,Codex CXG 36-1989 (INS),seed_verify
+451,Triphosphates,acidity regulator,acidity_regulator,Codex CXG 36-1989 (INS),seed_verify
+452,Polyphosphates,emulsifier,emulsifier,Codex CXG 36-1989 (INS),seed_verify
+471,Mono- and diglycerides of fatty acids,emulsifier,emulsifier,Codex CXG 36-1989 (INS),seed_verify
+472e,Diacetyltartaric and fatty acid esters of glycerol (DATEM),emulsifier,emulsifier,Codex CXG 36-1989 (INS),seed_verify
+476,Polyglycerol esters of interesterified ricinoleic acid (PGPR),emulsifier,emulsifier,Codex CXG 36-1989 (INS),seed_verify
+500,Sodium carbonates,raising agent,raising_agent,Codex CXG 36-1989 (INS),seed_verify
+501,Potassium carbonates,acidity regulator,acidity_regulator,Codex CXG 36-1989 (INS),seed_verify
+503,Ammonium carbonates,raising agent,raising_agent,Codex CXG 36-1989 (INS),seed_verify
+508,Potassium chloride,flavour enhancer,salt_substitute,Codex CXG 36-1989 (INS),seed_verify
+551,Silicon dioxide amorphous,anticaking agent,anticaking_agent,Codex CXG 36-1989 (INS),seed_verify
+621,Monosodium L-glutamate,flavour enhancer,flavour_enhancer,Codex CXG 36-1989 (INS),seed_verify
+627,Disodium 5'-guanylate,flavour enhancer,flavour_enhancer,Codex CXG 36-1989 (INS),seed_verify
+631,Disodium 5'-inosinate,flavour enhancer,flavour_enhancer,Codex CXG 36-1989 (INS),seed_verify
+635,Disodium 5'-ribonucleotides,flavour enhancer,flavour_enhancer,Codex CXG 36-1989 (INS),seed_verify
+950,Acesulfame potassium,sweetener,artificial_sweetener,Codex CXG 36-1989 (INS),seed_verify
+951,Aspartame,sweetener,artificial_sweetener,Codex CXG 36-1989 (INS),seed_verify
+954,Saccharins,sweetener,artificial_sweetener,Codex CXG 36-1989 (INS),seed_verify
+955,Sucralose,sweetener,artificial_sweetener,Codex CXG 36-1989 (INS),seed_verify
+960,Steviol glycosides,sweetener,non_nutritive_sweetener,Codex CXG 36-1989 (INS),seed_verify
+965,Maltitols,sweetener,polyol,Codex CXG 36-1989 (INS),seed_verify
+967,Xylitol,sweetener,polyol,Codex CXG 36-1989 (INS),seed_verify
+1422,Acetylated distarch adipate,thickener,modified_starch,Codex CXG 36-1989 (INS),seed_verify
+1442,Hydroxypropyl distarch phosphate,thickener,modified_starch,Codex CXG 36-1989 (INS),seed_verify

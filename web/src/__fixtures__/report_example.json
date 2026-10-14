@@ -1,0 +1,614 @@
+{
+ "product": {
+  "product_id": null,
+  "name": {
+   "value": "Choco Crunch Whole Grain Cereal - High Protein",
+   "label": "declared",
+   "source": "json-ld",
+   "note": null
+  },
+  "brand": {
+   "value": "Example Foods",
+   "label": "declared",
+   "source": "json-ld",
+   "note": null
+  },
+  "category": {
+   "value": "breakfast_cereals",
+   "label": "interpreted",
+   "source": "category_keywords.csv",
+   "note": "keyword baseline from name/category text"
+  },
+  "variant": {
+   "value": null,
+   "label": "unknown",
+   "source": null,
+   "note": null
+  },
+  "pack_size": {
+   "value": 375.0,
+   "label": "declared",
+   "source": "json-ld",
+   "note": null
+  },
+  "pack_unit": {
+   "value": "g",
+   "label": "declared",
+   "source": "json-ld",
+   "note": null
+  },
+  "price_inr": {
+   "value": 180.0,
+   "label": "declared",
+   "source": "json-ld",
+   "note": null
+  },
+  "nutrition_basis": "per_100g",
+  "nutrition": {
+   "energy": {
+    "value": 410.0,
+    "label": "declared",
+    "source": "json-ld",
+    "note": null
+   },
+   "protein": {
+    "value": 7.0,
+    "label": "declared",
+    "source": "json-ld",
+    "note": null
+   },
+   "carbohydrate": {
+    "value": 72.0,
+    "label": "declared",
+    "source": "json-ld",
+    "note": null
+   },
+   "total_sugars": {
+    "value": 28.0,
+    "label": "declared",
+    "source": "json-ld",
+    "note": null
+   },
+   "added_sugars": {
+    "value": null,
+    "label": "unknown",
+    "source": null,
+    "note": null
+   },
+   "total_fat": {
+    "value": 10.0,
+    "label": "declared",
+    "source": "json-ld",
+    "note": null
+   },
+   "saturated_fat": {
+    "value": 5.0,
+    "label": "declared",
+    "source": "json-ld",
+    "note": null
+   },
+   "trans_fat": {
+    "value": null,
+    "label": "unknown",
+    "source": null,
+    "note": null
+   },
+   "fibre": {
+    "value": 4.0,
+    "label": "declared",
+    "source": "json-ld",
+    "note": null
+   },
+   "sodium": {
+    "value": 400.0,
+    "label": "declared",
+    "source": "json-ld",
+    "note": null
+   }
+  },
+  "ingredients_raw": {
+   "value": "Whole Grain Wheat (62%), Sugar, Cocoa Solids (6%), Edible Vegetable Oil, Emulsifier, Flavouring",
+   "label": "declared",
+   "source": "json-ld",
+   "note": null
+  },
+  "ingredients_normalised": [
+   {
+    "position": 1,
+    "text": "Whole Grain Wheat (62%)",
+    "name": "whole grain wheat",
+    "term": "whole grain wheat",
+    "match": "exact",
+    "classes": [
+     "whole_grain"
+    ],
+    "additives": [],
+    "sub_ingredients": [
+     {
+      "position": 1,
+      "text": "62%",
+      "name": "",
+      "term": null,
+      "match": "none",
+      "classes": [],
+      "additives": [],
+      "sub_ingredients": []
+     }
+    ]
+   },
+   {
+    "position": 2,
+    "text": "Sugar",
+    "name": "sugar",
+    "term": "sugar",
+    "match": "exact",
+    "classes": [
+     "added_sugar"
+    ],
+    "additives": [],
+    "sub_ingredients": []
+   },
+   {
+    "position": 3,
+    "text": "Cocoa Solids (6%)",
+    "name": "cocoa solids",
+    "term": "cocoa solids",
+    "match": "exact",
+    "classes": [
+     "cocoa"
+    ],
+    "additives": [],
+    "sub_ingredients": [
+     {
+      "position": 3,
+      "text": "6%",
+      "name": "",
+      "term": null,
+      "match": "none",
+      "classes": [],
+      "additives": [],
+      "sub_ingredients": []
+     }
+    ]
+   },
+   {
+    "position": 4,
+    "text": "Edible Vegetable Oil",
+    "name": "edible vegetable oil",
+    "term": "edible vegetable oil",
+    "match": "exact",
+    "classes": [
+     "oil_unspecified"
+    ],
+    "additives": [],
+    "sub_ingredients": []
+   },
+   {
+    "position": 5,
+    "text": "Emulsifier",
+    "name": "emulsifier",
+    "term": "emulsifier",
+    "match": "exact",
+    "classes": [
+     "generic_additive"
+    ],
+    "additives": [],
+    "sub_ingredients": []
+   },
+   {
+    "position": 6,
+    "text": "Flavouring",
+    "name": "flavouring",
+    "term": "flavouring",
+    "match": "exact",
+    "classes": [
+     "flavouring"
+    ],
+    "additives": [],
+    "sub_ingredients": []
+   }
+  ],
+  "additives_ins": [],
+  "allergens": [
+   "gluten_cereals"
+  ],
+  "claims_raw": [
+   "Choco Crunch Whole Grain Cereal - High Protein",
+   "Crunchy whole grain wheat flakes with cocoa. High Protein."
+  ],
+  "source_url": "https://brand.example/cereal",
+  "collected_at": "2026-10-12T09:02:29+00:00",
+  "last_verified_at": null,
+  "conflict_flag": false,
+  "conflicts": [],
+  "warnings": []
+ },
+ "dimensions": {
+  "nutrition": {
+   "basis": "per_100g",
+   "facts": {
+    "energy": {
+     "value": 410.0,
+     "unit": "kcal",
+     "evidence": "declared"
+    },
+    "protein": {
+     "value": 7.0,
+     "unit": "g",
+     "evidence": "declared"
+    },
+    "carbohydrate": {
+     "value": 72.0,
+     "unit": "g",
+     "evidence": "declared"
+    },
+    "total_sugars": {
+     "value": 28.0,
+     "unit": "g",
+     "evidence": "declared"
+    },
+    "added_sugars": {
+     "value": null,
+     "unit": "g",
+     "evidence": "unknown"
+    },
+    "total_fat": {
+     "value": 10.0,
+     "unit": "g",
+     "evidence": "declared"
+    },
+    "saturated_fat": {
+     "value": 5.0,
+     "unit": "g",
+     "evidence": "declared"
+    },
+    "trans_fat": {
+     "value": null,
+     "unit": "g",
+     "evidence": "unknown"
+    },
+    "fibre": {
+     "value": 4.0,
+     "unit": "g",
+     "evidence": "declared"
+    },
+    "sodium": {
+     "value": 400.0,
+     "unit": "mg",
+     "evidence": "declared"
+    }
+   },
+   "traffic_lights": {
+    "total_sugars": "red",
+    "saturated_fat": "yellow",
+    "total_fat": "yellow",
+    "sodium": "yellow",
+    "fibre": "green",
+    "protein": "green"
+   },
+   "subscores": {
+    "total_sugars": {
+     "subscore": 30.22,
+     "reason": null,
+     "benchmark_source": "green: FSSAI Schedule I Sl. 10 'low sugar' (<=5 g/100 g); red: UK DH/FSA 2016 (>22.5 g/100 g)"
+    },
+    "saturated_fat": {
+     "subscore": 40.0,
+     "reason": null,
+     "benchmark_source": "green: FSSAI Schedule I Sl. 4 'low saturated fat' (<=1.5 g/100 g); red: UK DH/FSA 2016 (>5 g/100 g)"
+    },
+    "sodium": {
+     "subscore": 65.0,
+     "reason": null,
+     "benchmark_source": "green: FSSAI Schedule I Sl. 13 'low sodium' (<=0.12 g sodium = 0.3 g salt per 100 g); red: UK DH/FSA 2016 (>1.5 g salt/100 g)"
+    },
+    "energy": {
+     "subscore": null,
+     "reason": "no sourced benchmark yet (TODO in thresholds.csv)",
+     "benchmark_source": "TODO: no category energy benchmark found in FSSAI / ICMR-NIN texts"
+    },
+    "fibre": {
+     "subscore": 100.0,
+     "reason": null,
+     "benchmark_source": "FSSAI Schedule I Sl. 14 'source of dietary fibre' (>=3 g/100 g)"
+    },
+    "protein": {
+     "subscore": 100.0,
+     "reason": null,
+     "benchmark_source": "FSSAI Schedule I Sl. 11 'source of protein' (10% RDA per 100 g) x ICMR-NIN 2020 RDA 54 g/day (sedentary adult man)"
+    }
+   },
+   "score": 61,
+   "detail": {
+    "raw": 61.45,
+    "score": 61,
+    "coverage": 0.9,
+    "rows": [
+     {
+      "name": "total_sugars",
+      "score": 30.22,
+      "weight": 0.25,
+      "effective_weight": 0.2778,
+      "contribution": 8.3944
+     },
+     {
+      "name": "saturated_fat",
+      "score": 40.0,
+      "weight": 0.2,
+      "effective_weight": 0.2222,
+      "contribution": 8.8889
+     },
+     {
+      "name": "sodium",
+      "score": 65.0,
+      "weight": 0.15,
+      "effective_weight": 0.1667,
+      "contribution": 10.8333
+     },
+     {
+      "name": "energy",
+      "score": null,
+      "weight": 0.1,
+      "effective_weight": 0.0,
+      "contribution": null
+     },
+     {
+      "name": "fibre",
+      "score": 100.0,
+      "weight": 0.15,
+      "effective_weight": 0.1667,
+      "contribution": 16.6667
+     },
+     {
+      "name": "protein",
+      "score": 100.0,
+      "weight": 0.15,
+      "effective_weight": 0.1667,
+      "contribution": 16.6667
+     }
+    ],
+    "missing": [
+     "energy"
+    ]
+   },
+   "explanation": [
+    "energy: left out (no sourced benchmark yet (TODO in thresholds.csv)).",
+    "N uses 90% of the category weight; weights of the scored nutrients were renormalised.",
+    "total_sugars 28 g per 100 g: red.",
+    "saturated_fat 5 g per 100 g: yellow.",
+    "total_fat 10 g per 100 g: yellow.",
+    "sodium 400 mg per 100 g: yellow.",
+    "fibre 4 g per 100 g: green.",
+    "protein 7 g per 100 g: green."
+   ]
+  },
+  "ingredients": {
+   "score": 95.0,
+   "groups": {
+    "whole_grain": [
+     "Whole Grain Wheat (62%)"
+    ],
+    "added_sugar": [
+     "Sugar"
+    ],
+    "cocoa": [
+     "Cocoa Solids (6%)"
+    ],
+    "oil_unspecified": [
+     "Edible Vegetable Oil"
+    ],
+    "generic_additive": [
+     "Emulsifier"
+    ],
+    "flavouring": [
+     "Flavouring"
+    ]
+   },
+   "explanation": [
+    "Added sugar appears at ingredient #2 (top three): -15.",
+    "Whole grain is the first ingredient: +10."
+   ]
+  },
+  "transparency": {
+   "score": 90.0,
+   "missing": [],
+   "explanation": [
+    "10/10 core fields disclosed.",
+    "Also discloses fibre: +3 each.",
+    "Additive class named without INS code (Emulsifier): -5 each.",
+    "Oil source not disclosed (Edible Vegetable Oil): -8."
+   ]
+  },
+  "claims": {
+   "claims": [
+    {
+     "claim_id": "high_protein",
+     "claim": "High protein / Rich in protein",
+     "status": "potential inconsistency for review",
+     "facts": [
+      "protein = 7 g per 100 g (declared)",
+      "protein supplies 6.8% of energy (7 g \u00d7 4 kcal \u00f7 410 kcal, derived)",
+      "1.71 g per 100 kcal (derived)"
+     ],
+     "reason": "FSSAI condition needs at least 10.8 g per 100 g or 5.4 g per 100 kcal. A per-serving route also exists and was not checked (serving size unknown).",
+     "rule": "FSS (Advertising and Claims) Regulations, 2018 (compendium 14-12-2022); RDA from ICMR-NIN Nutrient Requirements 2020, Schedule I, Sl. No. 11 (Protein: Rich/High): 20% RDA per 100 g, 10% RDA per 100 ml, 10% RDA per 100 kcal, or 20% RDA per serving",
+     "rule_status": "derived_from_official_text",
+     "matched_text": "High Protein"
+    }
+   ],
+   "score": 0.0,
+   "explanation": [
+    "'High Protein': potential inconsistency for review. FSSAI condition needs at least 10.8 g per 100 g or 5.4 g per 100 kcal. A per-serving route also exists and was not checked (serving size unknown)."
+   ]
+  },
+  "value": {
+   "price_per_100": 48.0,
+   "category_median": null,
+   "score": null,
+   "explanation": [
+    "\u20b948.00 per 100 g (derived: \u20b9180 \u00f7 375 g \u00d7 100).",
+    "No comparison set yet, so value for money is not scored."
+   ]
+  }
+ },
+ "overall": {
+  "raw": 68.5,
+  "score": 69,
+  "coverage": 0.9,
+  "rows": [
+   {
+    "name": "nutrition",
+    "score": 61,
+    "weight": 0.4,
+    "effective_weight": 0.4444,
+    "contribution": 27.1111
+   },
+   {
+    "name": "ingredients",
+    "score": 95,
+    "weight": 0.25,
+    "effective_weight": 0.2778,
+    "contribution": 26.3889
+   },
+   {
+    "name": "transparency",
+    "score": 90,
+    "weight": 0.15,
+    "effective_weight": 0.1667,
+    "contribution": 15.0
+   },
+   {
+    "name": "claims",
+    "score": 0,
+    "weight": 0.1,
+    "effective_weight": 0.1111,
+    "contribution": 0.0
+   },
+   {
+    "name": "value",
+    "score": null,
+    "weight": 0.1,
+    "effective_weight": 0.0,
+    "contribution": null
+   }
+  ],
+  "missing": [
+   "value"
+  ],
+  "grade": "C",
+  "notes": [
+   "Not scored: value. The other dimension weights were renormalised."
+  ]
+ },
+ "fop_warning_simulation": {
+  "status": "not simulated",
+  "triggers": [],
+  "reason": "Draft FSSAI thresholds not yet copied into fop_warning.csv (TODO)."
+ },
+ "ingredients_normalised": {
+  "items": [
+   {
+    "position": 1,
+    "text": "Whole Grain Wheat (62%)",
+    "name": "whole grain wheat",
+    "term": "whole grain wheat",
+    "match": "exact",
+    "classes": [
+     "whole_grain"
+    ],
+    "additives": [],
+    "sub_ingredients": [
+     {
+      "position": 1,
+      "text": "62%",
+      "name": "",
+      "term": null,
+      "match": "none",
+      "classes": [],
+      "additives": [],
+      "sub_ingredients": []
+     }
+    ]
+   },
+   {
+    "position": 2,
+    "text": "Sugar",
+    "name": "sugar",
+    "term": "sugar",
+    "match": "exact",
+    "classes": [
+     "added_sugar"
+    ],
+    "additives": [],
+    "sub_ingredients": []
+   },
+   {
+    "position": 3,
+    "text": "Cocoa Solids (6%)",
+    "name": "cocoa solids",
+    "term": "cocoa solids",
+    "match": "exact",
+    "classes": [
+     "cocoa"
+    ],
+    "additives": [],
+    "sub_ingredients": [
+     {
+      "position": 3,
+      "text": "6%",
+      "name": "",
+      "term": null,
+      "match": "none",
+      "classes": [],
+      "additives": [],
+      "sub_ingredients": []
+     }
+    ]
+   },
+   {
+    "position": 4,
+    "text": "Edible Vegetable Oil",
+    "name": "edible vegetable oil",
+    "term": "edible vegetable oil",
+    "match": "exact",
+    "classes": [
+     "oil_unspecified"
+    ],
+    "additives": [],
+    "sub_ingredients": []
+   },
+   {
+    "position": 5,
+    "text": "Emulsifier",
+    "name": "emulsifier",
+    "term": "emulsifier",
+    "match": "exact",
+    "classes": [
+     "generic_additive"
+    ],
+    "additives": [],
+    "sub_ingredients": []
+   },
+   {
+    "position": 6,
+    "text": "Flavouring",
+    "name": "flavouring",
+    "term": "flavouring",
+    "match": "exact",
+    "classes": [
+     "flavouring"
+    ],
+    "additives": [],
+    "sub_ingredients": []
+   }
+  ],
+  "additives_ins": [],
+  "allergens": [
+   "gluten_cereals"
+  ],
+  "allergen_advisory": null,
+  "advisory_allergens": [],
+  "unmatched": []
+ },
+ "disclaimer": "Consumer decision-support assessment, not a medical or clinical score. Methodology v0.1.0 is a prototype; weights and thresholds are listed with their sources."
+}

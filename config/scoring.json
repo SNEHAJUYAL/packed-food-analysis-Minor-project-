@@ -1,0 +1,59 @@
+{
+  "_note": "Methodology v0.1 (prototype). Every weight and curve parameter here is a design choice to be justified and calibrated (master doc section 8.6), not validated science. Nutrient thresholds live in data/reference/thresholds.csv with sources.",
+  "methodology_version": "0.1.0",
+  "dimension_weights": {
+    "nutrition": 0.40,
+    "ingredients": 0.25,
+    "transparency": 0.15,
+    "claims": 0.10,
+    "value": 0.10
+  },
+  "grade_bands": [
+    {"grade": "A", "min": 85},
+    {"grade": "B", "min": 70},
+    {"grade": "C", "min": 55},
+    {"grade": "D", "min": 40},
+    {"grade": "E", "min": 0}
+  ],
+  "subscore_curve": {
+    "_note": "lower_better: value <= green_bound scores 100, falls linearly to amber_floor at red_bound, then to 0 at red_bound x zero_multiple. higher_better: 0 scores 0, rising linearly to 100 at green_bound.",
+    "amber_floor": 40,
+    "zero_multiple": 2.0
+  },
+  "min_nutrition_coverage": 0.5,
+  "ingredient_deductions": {
+    "_note": "Points removed from 100 for each class present. Signals of processing and disclosure, not safety judgements.",
+    "added_sugar_in_top3": 15,
+    "added_sugar_present": 5,
+    "oil_palm": 10,
+    "hydrogenated_fat": 20,
+    "artificial_sweetener": 10,
+    "synthetic_colour": 10,
+    "flavour_enhancer": 5,
+    "synthetic_antioxidant": 5,
+    "preservative": 5,
+    "artificial_flavour": 5,
+    "refined_flour_first": 10,
+    "whole_grain_first_bonus": 10
+  },
+  "transparency": {
+    "_note": "Score = 100 x share of core fields present, minus points per generic or undisclosed declaration.",
+    "core_fields": ["ingredients_raw", "pack_size", "price_inr", "energy", "protein", "carbohydrate", "total_sugars", "total_fat", "saturated_fat", "sodium"],
+    "bonus_fields": ["added_sugars", "trans_fat", "fibre"],
+    "bonus_field_points": 3,
+    "deduction_per_generic_declaration": 5,
+    "deduction_unspecified_oil": 8,
+    "max_deduction": 40
+  },
+  "claim_status_scores": {
+    "consistent with available evidence": 100,
+    "requires context": 60,
+    "potential inconsistency for review": 0,
+    "cannot be verified from available information": 50
+  },
+  "value_curve": {
+    "_note": "Price per 100 g at the category median scores 50; half the median scores 100; twice the median or more scores 0 (linear in log2 ratio).",
+    "at_median": 50
+  },
+  "energy_per_gram": {"protein": 4, "carbohydrate": 4, "fat": 9}
+}

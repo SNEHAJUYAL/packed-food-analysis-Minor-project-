@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-ink: #1f2a37;
+  --color-muted: #5b6676;
+  --color-line: #e3e7ec;
+  --color-canvas: #f7f8f6;
+  --color-brand-50: #eef7f5;
+  --color-brand-100: #d5ece7;
+  --color-brand-500: #2f8f7f;
+  --color-brand-600: #24786a;
+  --color-brand-700: #1d6157;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+/* Visible keyboard focus everywhere. */
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}

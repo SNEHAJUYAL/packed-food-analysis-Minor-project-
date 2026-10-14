@@ -1,0 +1,37 @@
+class,functional_category,explanation,reference_source
+whole_grain,Grain (whole),"A whole-grain cereal ingredient as named on the label. When it is the first ingredient the ingredient score gets a bonus (methodology, ingredient_deductions).",Team definition (methodology v0.1.0); term list in ingredient_terms.csv
+refined_flour,Grain (refined),"A refined cereal flour such as maida. When it is the first ingredient the ingredient score loses points (methodology).",Team definition (methodology v0.1.0)
+added_sugar,Sweetener (sugar),"A sugar-type ingredient added to the product. It counts toward total sugars and is the class checked for a 'no added sugar' claim (FSSAI reg. 6(1)).",FSS (Advertising and Claims) Regulations 2018 reg. 6(1)(a)(i) lists sugar types
+oil_palm,Fat or oil (palm),"Palm oil or palmolein, named on the label.",Team definition (methodology v0.1.0)
+oil_specified,Fat or oil (source named),"A fat or oil whose source is named on the label.",Team definition (methodology v0.1.0)
+oil_unspecified,Fat or oil (source not named),"An oil declared without naming its source, such as 'edible vegetable oil'. The transparency score loses points because the source is not disclosed.",Team definition (methodology v0.1.0)
+hydrogenated_fat,Fat or oil (hydrogenated),"A hydrogenated or partially hydrogenated fat, or vanaspati, as named on the label.",Team definition (methodology v0.1.0)
+salt,Salt,"Common salt or iodised salt as an ingredient. Its amount is assessed through the sodium value, not here.",Team definition (methodology v0.1.0)
+cocoa,Cocoa,"A cocoa ingredient such as cocoa solids or cocoa powder.",Team definition (methodology v0.1.0)
+flavouring,Flavouring,"A flavouring named without saying whether it is natural, nature-identical or artificial.",FSS (Labelling and Display) Regulations 2020 flavour declaration categories
+artificial_flavour,Flavouring (artificial),"A flavouring the label declares as artificial.",FSS (Labelling and Display) Regulations 2020 flavour declaration categories
+generic_additive,Additive (class only),"An additive class named without its INS number, so the exact substance is not disclosed.",Team definition (methodology v0.1.0)
+emulsifier,Additive: emulsifier,"Helps oil and water stay mixed.",Codex CXG 36-1989 functional classes
+thickener,Additive: thickener,"Increases viscosity.",Codex CXG 36-1989 functional classes
+modified_starch,Additive: modified starch,"A starch treated to change its properties; used as a thickener or stabiliser.",Codex CXG 36-1989 functional classes
+acidity_regulator,Additive: acidity regulator,"Controls acidity or alkalinity.",Codex CXG 36-1989 functional classes
+raising_agent,Additive: raising agent,"Releases gas to increase dough volume.",Codex CXG 36-1989 functional classes
+preservative,Additive: preservative,"Slows spoilage by microorganisms.",Codex CXG 36-1989 functional classes
+antioxidant,Additive: antioxidant,"Slows oxidation, for example of fats.",Codex CXG 36-1989 functional classes
+synthetic_antioxidant,Additive: antioxidant (synthetic),"A synthetic antioxidant such as BHA, BHT or TBHQ.",Codex CXG 36-1989 functional classes
+natural_colour,Additive: colour (natural origin),"A colour of natural origin, such as curcumin.",Codex CXG 36-1989 functional classes
+caramel_colour,Additive: colour (caramel),"A caramel colour.",Codex CXG 36-1989 functional classes
+synthetic_colour,Additive: colour (synthetic),"A synthetic colour such as tartrazine or sunset yellow.",Codex CXG 36-1989 functional classes
+colour,Additive: colour,"A colour.",Codex CXG 36-1989 functional classes
+flavour_enhancer,Additive: flavour enhancer,"Enhances existing taste or odour, for example monosodium glutamate (INS 621).",Codex CXG 36-1989 functional classes
+salt_substitute,Additive: salt substitute,"Used in place of common salt.",Codex CXG 36-1989 functional classes
+artificial_sweetener,Additive: sweetener (non-sugar),"A non-sugar sweetener such as sucralose or aspartame.",Codex CXG 36-1989 functional classes
+non_nutritive_sweetener,Additive: sweetener (non-sugar),"A non-sugar sweetener.",Codex CXG 36-1989 functional classes
+polyol,Additive: sweetener (polyol),"A sugar alcohol such as sorbitol.",Codex CXG 36-1989 functional classes
+carbonating_agent,Additive: carbonating agent,"Provides carbonation.",Codex CXG 36-1989 functional classes
+anticaking_agent,Additive: anticaking agent,"Stops particles from sticking together.",Codex CXG 36-1989 functional classes
+common_ingredient,Food ingredient,A recognised food ingredient with no specific scoring signal.,Team definition (methodology v0.1.0)
+micronutrient,Added vitamin or mineral,A vitamin or mineral added to the product.,Team definition (methodology v0.1.0)
+grain_unspecified,Grain (refinement not stated),A cereal flour such as 'wheat flour' where the label does not say whether it is whole grain or refined.,Team definition (methodology v0.1.0)
+carbohydrate_additive,Carbohydrate ingredient,A processed carbohydrate such as maltodextrin.,Team definition (methodology v0.1.0)
+caffeine,Caffeine,Caffeine added as an ingredient.,Team definition (methodology v0.1.0)

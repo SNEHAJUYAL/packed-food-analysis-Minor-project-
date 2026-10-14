@@ -1,0 +1,58 @@
+text,expected_class
+Sugar,added_sugar
+Invert Sugar Syrup,added_sugar
+Liquid Glucose,added_sugar
+Jaggery,added_sugar
+Honey,added_sugar
+Dextrose,added_sugar
+Whole Wheat Flour (Atta),whole_grain
+Whole Grain Oats (55%),whole_grain
+Rolled Oats,whole_grain
+Ragi,whole_grain
+Refined Wheat Flour (Maida),refined_flour
+Maida,refined_flour
+Palm Oil,oil_palm
+Palmolein,oil_palm
+Edible Vegetable Oil (Palmolein),oil_palm
+Palmolien Oil,oil_palm
+Rice Bran Oil,oil_specified
+Sunflower Oil,oil_specified
+Groundnut oil,oil_specified
+Butter (8%),oil_specified
+Edible Vegetable Oil,oil_unspecified
+Vegetable Fat,oil_unspecified
+Hydrogenated Vegetable Oil,hydrogenated_fat
+Vanaspati,hydrogenated_fat
+Iodised Salt,salt
+Salt,salt
+Cocoa Solids (6%),cocoa
+Cocoa Powder,cocoa
+Flavouring,flavouring
+Natural Flavour,flavouring
+Artificial Flavouring Substances (Vanilla),artificial_flavour
+Emulsifier,generic_additive
+Preservative,generic_additive
+Emulsifier (INS 322),emulsifier
+Flavour Enhancer (INS 627),flavour_enhancer
+Colour (INS 102),synthetic_colour
+Colour (INS 150d),caramel_colour
+Preservative (INS 211),preservative
+Sweetener (INS 955),artificial_sweetener
+Acidity Regulator (INS 330),acidity_regulator
+Raising Agent (INS 500(ii)),raising_agent
+Antioxidant (INS 320),synthetic_antioxidant
+Thickener (INS 412),thickener
+Potato,common_ingredient
+Gram Flour (Besan),common_ingredient
+Corn Grits,common_ingredient
+Carbonated Water,common_ingredient
+Mango Pulp (19%),common_ingredient
+Malt Extract,carbohydrate_additive
+Toned Milk,common_ingredient
+Kokum,uncertain
+Quinoa Puffs,uncertain
+Amchur,uncertain
+Sago Pearls,uncertain
+Wheat Flour,grain_unspecified
+Maltodextrin,carbohydrate_additive
+Vitamins,micronutrient

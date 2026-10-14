@@ -1,0 +1,6 @@
+category,keywords,notes
+breakfast_cereals,cereal|cornflakes|corn flakes|muesli|granola|oats|chocos|flakes|porridge,Keyword baseline; replace with the TF-IDF classifier once the OFF India subset is labelled
+biscuits_cookies,biscuit|biscuits|cookie|cookies|cracker|crackers|digestive|rusk,
+instant_noodles,noodles|noodle|ramen|maggi|hakka|cup noodles,
+beverages,juice|drink|beverage|soda|cola|soft drink|iced tea|nectar|lassi|buttermilk|milkshake,
+namkeen_chips,chips|crisps|namkeen|bhujia|mixture|nachos|wafers|puffs|sev|chakli,
