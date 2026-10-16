@@ -249,12 +249,12 @@
   "scoring_vs_nutriscore": {
     "status": "run",
     "data": "data/raw/off_india.jsonl",
-    "n_products": 379,
-    "spearman_nutrition_vs_nutriscore": 0.7321110184983323
+    "n_products": 339,
+    "spearman_nutrition_vs_nutriscore": 0.763103463040788
   },
   "real_data_coverage": {
     "status": "run",
-    "data": "Open Food Facts India records (ODbL) from the official CSV export",
+    "data": "Open Food Facts India records (ODbL) from the official CSV export: data/raw/off_india.jsonl",
     "n_products": 2692,
     "by_category": {
       "beverages": 1172,
@@ -264,21 +264,21 @@
       "instant_noodles": 135
     },
     "report_status": {
-      "insufficient_data": 2234,
-      "partial": 458
+      "insufficient_data": 2284,
+      "partial": 408
     },
     "share_missing_by_field": {
       "price_inr": 1.0,
-      "trans_fat": 0.952,
-      "fibre": 0.912,
-      "saturated_fat": 0.846,
-      "added_sugars": 0.84,
-      "sodium": 0.833,
-      "total_sugars": 0.828,
-      "protein": 0.825,
-      "carbohydrate": 0.825,
-      "total_fat": 0.824,
-      "energy": 0.822,
+      "trans_fat": 0.953,
+      "fibre": 0.921,
+      "saturated_fat": 0.86,
+      "added_sugars": 0.856,
+      "sodium": 0.85,
+      "total_sugars": 0.847,
+      "protein": 0.844,
+      "carbohydrate": 0.844,
+      "total_fat": 0.844,
+      "energy": 0.842,
       "ingredients_raw": 0.436,
       "pack_size": 0.408,
       "brand": 0.071
@@ -289,8 +289,8 @@
     "claim_statuses": {
       "potential inconsistency for review": 15,
       "consistent with available evidence": 31,
-      "cannot be verified from available information": 77,
-      "requires context": 16
+      "cannot be verified from available information": 78,
+      "requires context": 15
     }
   },
   "expert_ranking": {
@@ -408,7 +408,7 @@
     }
   },
   "targets_not_yet_met": [
-    "verified evaluation set of 100-200 real products (build spec target)",
-    "500-1,000 Open Food Facts India records (needs ./run.sh off with network access)"
+    "verified evaluation set of 100-200 real products checked against pack labels (build spec target)",
+    "expert rankings and relevance judgements for recommendations"
   ]
 }

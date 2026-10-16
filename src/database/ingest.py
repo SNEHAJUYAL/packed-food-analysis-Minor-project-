@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -51,6 +52,17 @@ def category_for(tags: Iterable[str]) -> Optional[str]:
     return None
 
 
+_UNIT_RE = re.compile(r"\d\s*(ml|cl|l|ltr|litre|liter|g|gm|gms|gram|grams|kg)\b", re.I)
+
+
+def _pack_unit(text: str) -> Optional[str]:
+    """'330ml', '1 ltr', '1.25L' -> 'ml'; '500 g', '1kg' -> 'g'; None when no amount with a unit is found."""
+    m = _UNIT_RE.search(text or "")
+    if not m:
+        return None
+    return "ml" if m.group(1).lower() in ("ml", "cl", "l", "ltr", "litre", "liter") else "g"
+
+
 def to_extraction(p: dict) -> dict:
     """Map one OFF product JSON to the extractor output format used by build_product."""
     synthetic = bool(p.get("_synthetic"))
@@ -65,7 +77,13 @@ def to_extraction(p: dict) -> dict:
     if "sodium" not in nutrition and nm.get("salt_100g") not in (None, ""):
         nutrition["salt"] = f"{nm['salt_100g']} g"
     qty = p.get("quantity") or ""
-    liquid = qty.strip().lower().endswith(("ml", "l", "cl"))
+    # OFF stores drinks' values under the same *_100g keys, so the basis has to come from the pack unit.
+    unit = _pack_unit(qty) or _pack_unit(p.get("product_name") or "")
+    liquid = unit == "ml"
+    if unit is None and category_for(p.get("categories_tags") or []) == "beverages":
+        basis_text = None  # a drink or a powder: unknown, so N is not scored rather than scored on the wrong basis
+    else:
+        basis_text = "100 ml" if liquid else "100 g"
     claims = [c.strip() for c in (p.get("labels") or "").split(",") if c.strip()]
     return {
         "source": "synthetic-sample" if synthetic else "open-food-facts",
@@ -74,7 +92,7 @@ def to_extraction(p: dict) -> dict:
         "price": p.get("_price_inr"), "currency": "INR" if p.get("_price_inr") else None,
         "pack_size_text": qty or None, "ingredients_text": p.get("ingredients_text") or None,
         "nutrition": nutrition,
-        "nutrition_basis_text": ("100 ml" if liquid else "100 g") if nutrition else None,
+        "nutrition_basis_text": basis_text if nutrition else None,
         "claims_text": [p.get("product_name") or ""] + claims, "gtin": p.get("code"),
     }
 

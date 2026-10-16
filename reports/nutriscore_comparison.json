@@ -1,0 +1,382 @@
+{
+  "data": "data/raw/off_india.jsonl",
+  "funnel": {
+    "records": 2692,
+    "no_nutriscore_grade": 1381,
+    "nutrition_score_unknown": 972,
+    "compared": 339
+  },
+  "note": "Nutri-Score grades come from Open Food Facts and are computed from the same nutrient values; this measures agreement with a reference scheme, not accuracy.",
+  "n_products": 339,
+  "spearman": 0.763,
+  "spearman_95ci": [
+    0.707,
+    0.808
+  ],
+  "kendall_tau_b": 0.63,
+  "kendall_95ci": [
+    0.582,
+    0.673
+  ],
+  "complete_products": 281,
+  "spearman_complete_only": 0.78,
+  "n_at_100": 33,
+  "by_category": {
+    "beverages": {
+      "n": 126,
+      "spearman": 0.792,
+      "spearman_95ci": [
+        0.721,
+        0.846
+      ],
+      "nutriscore_grades": {
+        "a": 1,
+        "b": 23,
+        "c": 16,
+        "d": 5,
+        "e": 81
+      }
+    },
+    "biscuits_cookies": {
+      "n": 85,
+      "spearman": 0.463,
+      "spearman_95ci": [
+        0.248,
+        0.632
+      ],
+      "nutriscore_grades": {
+        "c": 2,
+        "d": 12,
+        "e": 71
+      }
+    },
+    "breakfast_cereals": {
+      "n": 51,
+      "spearman": 0.773,
+      "spearman_95ci": [
+        0.586,
+        0.893
+      ],
+      "nutriscore_grades": {
+        "a": 14,
+        "b": 7,
+        "c": 14,
+        "d": 10,
+        "e": 6
+      }
+    },
+    "instant_noodles": {
+      "n": 2,
+      "spearman": null,
+      "spearman_95ci": null,
+      "nutriscore_grades": {
+        "e": 2
+      }
+    },
+    "namkeen_chips": {
+      "n": 75,
+      "spearman": 0.637,
+      "spearman_95ci": [
+        0.478,
+        0.746
+      ],
+      "nutriscore_grades": {
+        "a": 1,
+        "b": 3,
+        "c": 1,
+        "d": 12,
+        "e": 58
+      }
+    }
+  },
+  "n_by_nutriscore_grade": {
+    "a": {
+      "n": 16,
+      "q1": 94.0,
+      "median": 98.0,
+      "q3": 99.8
+    },
+    "b": {
+      "n": 33,
+      "q1": 95.0,
+      "median": 100.0,
+      "q3": 100.0
+    },
+    "c": {
+      "n": 33,
+      "q1": 80.5,
+      "median": 87.0,
+      "q3": 95.5
+    },
+    "d": {
+      "n": 39,
+      "q1": 40.0,
+      "median": 62.0,
+      "q3": 74.0
+    },
+    "e": {
+      "n": 218,
+      "q1": 14.0,
+      "median": 23.5,
+      "q3": 39.0
+    }
+  },
+  "band_agreement": {
+    "exact": 192,
+    "within_one_grade": 288,
+    "n": 339,
+    "exact_rate": 0.566,
+    "within_one_rate": 0.85,
+    "rows_nutriscore_cols_n_band": {
+      "a": {
+        "a": 14,
+        "b": 2,
+        "c": 0,
+        "d": 0,
+        "e": 0
+      },
+      "b": {
+        "a": 30,
+        "b": 2,
+        "c": 1,
+        "d": 0,
+        "e": 0
+      },
+      "c": {
+        "a": 19,
+        "b": 10,
+        "c": 2,
+        "d": 2,
+        "e": 0
+      },
+      "d": {
+        "a": 4,
+        "b": 8,
+        "c": 14,
+        "d": 4,
+        "e": 9
+      },
+      "e": {
+        "a": 3,
+        "b": 7,
+        "c": 10,
+        "d": 28,
+        "e": 170
+      }
+    }
+  },
+  "largest_disagreements": [
+    {
+      "name": "Coconãd Coconut Milk",
+      "brand": "KLF",
+      "category": "beverages",
+      "nutriscore": "e",
+      "n": 100,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "total_sugars": 100.0,
+        "energy": null
+      },
+      "direction": "N higher than Nutri-Score",
+      "percentile_gap": 63
+    },
+    {
+      "name": "Jimjam 57g (57)",
+      "brand": "Britannia",
+      "category": "biscuits_cookies",
+      "nutriscore": "d",
+      "n": 9,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "total_sugars": 21.51,
+        "saturated_fat": 4.0,
+        "energy": null,
+        "fibre": 0.0
+      },
+      "direction": "N lower than Nutri-Score",
+      "percentile_gap": -60
+    },
+    {
+      "name": "parle 20-20",
+      "brand": "Parle",
+      "category": "biscuits_cookies",
+      "nutriscore": "d",
+      "n": 14,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "total_sugars": 36.62,
+        "saturated_fat": 5.6,
+        "energy": null,
+        "fibre": 0.0
+      },
+      "direction": "N lower than Nutri-Score",
+      "percentile_gap": -54
+    },
+    {
+      "name": "dsdsds",
+      "brand": "bfgfg",
+      "category": "beverages",
+      "nutriscore": "e",
+      "n": 93,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "total_sugars": 92.66,
+        "energy": null
+      },
+      "direction": "N higher than Nutri-Score",
+      "percentile_gap": 53
+    },
+    {
+      "name": "Protein Milkshake",
+      "brand": "Epigamia Turbo",
+      "category": "beverages",
+      "nutriscore": "e",
+      "n": 87,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "total_sugars": 86.7,
+        "energy": null
+      },
+      "direction": "N higher than Nutri-Score",
+      "percentile_gap": 49
+    },
+    {
+      "name": "Masala Oats Classic Masala",
+      "brand": "Saffola",
+      "category": "breakfast_cereals",
+      "nutriscore": "e",
+      "n": 81,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "total_sugars": 96.39,
+        "saturated_fat": 94.14,
+        "sodium": 0.0,
+        "energy": null,
+        "fibre": 100.0,
+        "protein": 100.0
+      },
+      "direction": "N higher than Nutri-Score",
+      "percentile_gap": 45
+    },
+    {
+      "name": "Super ring",
+      "brand": "Cheese flavor",
+      "category": "namkeen_chips",
+      "nutriscore": "d",
+      "n": 19,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "sodium": 37.78,
+        "saturated_fat": 0.0,
+        "energy": null
+      },
+      "direction": "N lower than Nutri-Score",
+      "percentile_gap": -44
+    },
+    {
+      "name": "Flocon d'avoine pour poridg",
+      "brand": "Pepsico, Quaker",
+      "category": "breakfast_cereals",
+      "nutriscore": "e",
+      "n": 78,
+      "missing": [
+        "energy",
+        "fibre"
+      ],
+      "subscores": {
+        "total_sugars": 100.0,
+        "saturated_fat": 91.43,
+        "sodium": 0.0,
+        "energy": null,
+        "fibre": null,
+        "protein": 100.0
+      },
+      "direction": "N higher than Nutri-Score",
+      "percentile_gap": 44
+    },
+    {
+      "name": "Yakult",
+      "brand": "Yakult",
+      "category": "beverages",
+      "nutriscore": "e",
+      "n": 75,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "total_sugars": 74.94,
+        "energy": null
+      },
+      "direction": "N higher than Nutri-Score",
+      "percentile_gap": 42
+    },
+    {
+      "name": "Saffola Masala Oats Veggie Twist",
+      "brand": "Saffola",
+      "category": "breakfast_cereals",
+      "nutriscore": "e",
+      "n": 74,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "total_sugars": 96.39,
+        "saturated_fat": 62.56,
+        "sodium": 0.0,
+        "energy": null,
+        "fibre": 100.0,
+        "protein": 100.0
+      },
+      "direction": "N higher than Nutri-Score",
+      "percentile_gap": 41
+    },
+    {
+      "name": "Greek yogurt",
+      "brand": "epigama",
+      "category": "beverages",
+      "nutriscore": "e",
+      "n": 73,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "total_sugars": 72.77,
+        "energy": null
+      },
+      "direction": "N higher than Nutri-Score",
+      "percentile_gap": 40
+    },
+    {
+      "name": "Parle G biscuit",
+      "brand": "Parle",
+      "category": "biscuits_cookies",
+      "nutriscore": "d",
+      "n": 22,
+      "missing": [
+        "energy"
+      ],
+      "subscores": {
+        "total_sugars": 34.67,
+        "saturated_fat": 32.0,
+        "energy": null,
+        "fibre": 0.0
+      },
+      "direction": "N lower than Nutri-Score",
+      "percentile_gap": -40
+    }
+  ]
+}

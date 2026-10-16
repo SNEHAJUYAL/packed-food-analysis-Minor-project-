@@ -13,7 +13,7 @@ conditions, and suggests alternatives from stored products only.
 
 > Status (12 Oct 2026): URL-first V1. Consumer decision support, not a medical or clinical score.
 > Barcode scanning, label OCR, cross-source validation, personalisation, basket optimisation and lab
-> evidence are future work and are not implemented. No accuracy figures are claimed; see
+> evidence are future work and are not implemented. No accuracy figures are claimed; see [docs/nutriscore_comparison.md](docs/nutriscore_comparison.md) and
 > [reports/final_report.md](reports/final_report.md) for what was measured and on how much data.
 
 ![Product report](docs/screenshots/03_report.png)
@@ -76,9 +76,9 @@ docs/                      architecture, methodology, data sources, regulatory r
 ## Open items for the team
 
 1. **Protein RDA reference:** claims use 54 g/day (ICMR-NIN 2020, sedentary adult man). Confirm with the guides.
-2. **Verified set:** check 100–200 real products against their pack labels (`data/verified/`) and rerun
-   the notebook. Real OFF India data is loaded, but OFF is crowdsourced and 83 % of its India records in
-   these categories lack a usable nutrition panel.
+2. **Verified set:** fill the pack-checking sheet (`data/verified/pack_check/`, 150 real products plus
+   reserves) from real packs, then run `python -m evaluation.pack_check`. OFF is crowdsourced and 85 % of its
+   India records in these categories cannot be graded.
 3. **Front-of-pack warning thresholds** (`fop_warning.csv`) stay TODO until FSSAI publishes them; the red
    bounds in `thresholds.csv` are UK FSA 2016 placeholders.
 4. Verify `ins_codes.csv` and `allergens.csv` (status `seed_verify`), and the FSSAI regulation's
