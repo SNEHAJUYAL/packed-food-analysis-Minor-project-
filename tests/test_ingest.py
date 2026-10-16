@@ -41,3 +41,19 @@ def test_ingest_and_purge():
         assert not off.prices
         assert purge_synthetic(s) == 1
         assert s.query(ProductRow).count() == 1
+
+
+def test_drink_basis_comes_from_the_pack_unit():
+    from database.ingest import _pack_unit
+    assert _pack_unit("330ml") == "ml" and _pack_unit("1 ltr") == "ml" and _pack_unit("1.25L") == "ml"
+    assert _pack_unit("500 g") == "g" and _pack_unit("1kg") == "g" and _pack_unit("") is None
+    drink = {"product_name": "Mirinda can 330ml", "quantity": None, "categories_tags": ["en:beverages"],
+             "nutriments": {"sugars_100g": 6.8}}
+    assert to_extraction(drink)["nutrition_basis_text"] == "100 ml"
+    powder = dict(drink, product_name="Health drink", quantity="500 g")
+    assert to_extraction(powder)["nutrition_basis_text"] == "100 g"
+    # A drink with no unit anywhere: basis stays unknown instead of defaulting to per 100 g.
+    assert to_extraction(dict(drink, product_name="Mirinda"))["nutrition_basis_text"] is None
+    # Non-drinks keep the per 100 g default.
+    snack = dict(drink, product_name="Bhujia", categories_tags=["en:salty-snacks"])
+    assert to_extraction(snack)["nutrition_basis_text"] == "100 g"

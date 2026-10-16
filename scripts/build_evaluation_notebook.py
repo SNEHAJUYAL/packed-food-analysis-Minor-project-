@@ -43,8 +43,15 @@ md("## 4. Product matching: correct-match rate\nThe matcher links a new listing 
 code("""m = results['product_matching']
 print(m['data']); print('queries:', m['n_queries'], ' correct-match rate:', round(m['correct_match_rate'], 3))
 display(pd.DataFrame(m['by_perturbation']).T)"""),
-md("## 5. Scoring against Nutri-Score and expert rankings\nSpearman rank correlation between the nutrition score N and the Open Food Facts Nutri-Score grade (A=5 … E=1) for real India records that have both. Nutri-Score is a different, validated algorithm, so agreement is a sanity check of direction, not a target to maximise."),
-code("""print(json.dumps(results['scoring_vs_nutriscore'], indent=1))
+md("## 5. Scoring against Nutri-Score and expert rankings\nSpearman rank correlation between the nutrition score N and the Open Food Facts Nutri-Score grade (A=5 … E=1) for real India records that have both. Nutri-Score is an independently designed scheme and a reference point, not ground truth, so agreement is a check of direction, not a target to maximise. Full write-up with sample selection, missing data and limits: `docs/nutriscore_comparison.md`."),
+code("""from evaluation import nutriscore
+ns = nutriscore.main()   # also writes reports/nutriscore_comparison.json
+print('funnel:', ns['funnel'])
+print('n =', ns['n_products'], ' Spearman', ns['spearman'], ns['spearman_95ci'], ' Kendall tau-b', ns['kendall_tau_b'], ns['kendall_95ci'])
+display(pd.DataFrame(ns['by_category']).T[['n', 'spearman', 'spearman_95ci']])
+display(pd.DataFrame(ns['n_by_nutriscore_grade']).T)
+print('N band vs Nutri-Score grade (rows: Nutri-Score)')
+display(pd.DataFrame(ns['band_agreement']['rows_nutriscore_cols_n_band']).T)
 print(json.dumps(results['expert_ranking'], indent=1))"""),
 md("""## 5b. Real-data coverage (Open Food Facts India)
 What the pipeline can do with the 2,692 real OFF India records in the five categories (full extract in `data/raw/off_india.jsonl`, made with `scripts/off_export_to_jsonl.py`). This measures coverage, not accuracy. **Caveat:** the ingredient dictionary was expanded on 12 Oct 2026 from the most frequent unclassified terms in this same data, so the uncertain share is an in-sample figure."""),

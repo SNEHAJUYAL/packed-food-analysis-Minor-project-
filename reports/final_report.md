@@ -1,6 +1,6 @@
 # Food Decision Intelligence: build report
 
-12 October 2026 (updated the same evening with real Open Food Facts data) · methodology v0.1.0 · Minor project, MSIT (GGSIPU). Idea by Sneha Juyal; team Sneha
+12 October 2026 (updated the same evening with real Open Food Facts data, and on 16 October with the validation work) · methodology v0.1.0 · Minor project, MSIT (GGSIPU). Idea by Sneha Juyal; team Sneha
 Juyal, Radhika, Shinjini; guides Dr. Sudesh Pahal, Dr. Neeru Rathee.
 
 ## 1. Implemented
@@ -28,19 +28,20 @@ rendered report in the Next.js app.
 
 | Check | Result |
 | --- | --- |
-| `pytest` (SQLite for DB tests) | **141 passed** |
+| `pytest` (SQLite for DB tests) | **145 passed** |
 | `pytest tests/test_api_db.py` with `TEST_DATABASE_URL` (PostgreSQL 16, Alembic migration) | **18 passed** |
 | `npm test` (Vitest + Testing Library) | **33 passed** (6 files) |
 | `npm run lint`, `npm run typecheck`, `npm run build` | all exit 0 |
 | Live run: API + Next.js + PostgreSQL in this environment, seeded from scratch (466 real + 40 synthetic) | URL analysis, report, alternatives (now real OFF products), compare, methodology, blocked-URL error and insufficient-data report all rendered; screenshots in `docs/screenshots/` |
+| Clean install from a fresh clone (16 Oct): `./run.sh setup`, `migrate`, `seed`, `test`, `test-web`, `api`, `web` | all worked on Python 3.13, Node 22, PostgreSQL 16; details in [docs/deployment.md](../docs/deployment.md) |
 | `docker compose config` | valid. **`docker compose up` was not run**: no Docker daemon in the build environment |
 
 ### Evaluation (read the sample sizes; these are not accuracy claims)
 
 | Evaluation | n | Result |
 | --- | --- | --- |
-| **Nutrition score vs Nutri-Score** (Spearman, real OFF India records with both) | 379 products | **ρ = 0.73**: our nutrition score and the independent Nutri-Score grade rank products in broadly the same order |
-| Real-data coverage | 2,692 OFF India records | 83 % have no usable nutrition panel (insufficient data, no grade given); 1,519 have an ingredient list (11,461 items), of which 14.5 % stay *uncertain*. That share was 42.5 % before the dictionary was expanded from the most frequent unclassified terms in this same data, so 14.5 % is in-sample. 139 claims detected: 31 consistent, 16 requires context, 15 potential inconsistency, 77 cannot be verified |
+| **Nutrition score vs Nutri-Score** (real OFF India records with both) | 339 products | **Spearman ρ = 0.76** (95 % bootstrap 0.71–0.81), Kendall τ-b = 0.63: broadly the same order as Nutri-Score; weakest for biscuits (ρ = 0.46). Replaces the 12 Oct figure of 0.73 on 379, which scored some drinks on per-100 g thresholds (bug fixed). Full write-up: [docs/nutriscore_comparison.md](../docs/nutriscore_comparison.md) |
+| Real-data coverage | 2,692 OFF India records | 85 % get no grade (insufficient data: no usable nutrition panel, or a drink with no pack unit, so no basis); 1,519 have an ingredient list (11,461 items), of which 14.5 % stay *uncertain*. That share was 42.5 % before the dictionary was expanded from the most frequent unclassified terms in this same data, so 14.5 % is in-sample. 139 claims detected: 31 consistent, 15 requires context, 15 potential inconsistency, 78 cannot be verified |
 | Extraction, field level, deterministic extractors | 4 synthetic pages, 60 fields | precision 1.00, recall 0.81, exact match 0.85. Remaining misses are the unstructured page, which needs the LLM fallback (no key set). The evaluation found pack sizes left in product names; fixed |
 | Ingredient classification | 57 team-labelled phrases | P = R = F1 = 1.00. Labels and dictionary come from the same team: a consistency check, not generalisation |
 | Claim checks (positive = potential inconsistency) | 22 hand-worked FSSAI cases | status accuracy 1.00, FPR 0.00. Tests that the rules are implemented as written |
@@ -55,10 +56,17 @@ rendered report in the Next.js app.
 * **Open Food Facts data is crowdsourced and sparse for India:** most records lack nutrition, none have
   prices, and category tags such as `en:beverages` are broad. Value for money is therefore only shown for
   URL-analysed and synthetic products.
+* Energy is never scored (no sourced benchmark), so drinks' nutrition score rests on sugar alone and N
+  reaches 100 for 33 of the 339 compared products; it does not separate Nutri-Score A from B.
+* Alternatives repeat: in biscuits and in namkeen every sampled product gets the same first alternative,
+  because the balanced preference ranks by score and uses similarity only to break ties.
+* Drinks with no pack unit in OFF (51 of 197 real ones loaded) have no nutrition basis and so no grade.
 * Products with fewer scored dimensions have the remaining weights renormalised, so a real OFF product with
   no price and no claims can reach 100 on nutrition, ingredients and transparency alone (the report lists the
   unscored dimensions).
-* Spec target **not met**: the 100–200 product verified set checked against pack labels. The 500–1,000
+* Spec target **not met yet**: the 100–200 product verified set checked against pack labels. The sheet is
+  ready (`data/verified/pack_check/`: 150 real products sampled per category plus 50 reserves, with a scorer,
+  `python -m evaluation.pack_check`); the checking itself needs people with the packs. The 500–1,000
   record OFF target is met (2,692 loaded; 466 committed).
 * Methodology v0.1.0 weights and curves are prototype choices. Red nutrient bounds are UK FSA 2016
   placeholders; FSSAI front-of-pack thresholds are unpublished; energy has no benchmark.

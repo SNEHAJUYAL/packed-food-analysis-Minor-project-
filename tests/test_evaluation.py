@@ -1,6 +1,7 @@
 import pytest
 
-from evaluation.metrics import (binary_rates, field_scores, label_prf, ndcg_at_k, precision_at_k, spearman,
+from evaluation.metrics import (binary_rates, field_scores, kendall_tau_b, label_prf, ndcg_at_k, precision_at_k,
+                                spearman,
                                 values_match)
 
 
@@ -33,3 +34,11 @@ def test_spearman_and_ranking_metrics():
     assert precision_at_k(["a", "b", "c", "d"], {"a", "c"}, 3) == pytest.approx(2 / 3)
     assert ndcg_at_k(["a", "b"], {"a": 3, "b": 1}) == pytest.approx(1.0)
     assert ndcg_at_k(["b", "a"], {"a": 3, "b": 1}) < 1.0
+
+
+def test_kendall_tau_b_handles_ties():
+    assert kendall_tau_b([1, 2, 3, 4], [1, 2, 3, 4]) == pytest.approx(1.0)
+    assert kendall_tau_b([1, 2, 3, 4], [4, 3, 2, 1]) == pytest.approx(-1.0)
+    # scipy.stats.kendalltau([1, 2, 3, 4, 5], [1, 1, 2, 2, 3]) = 0.8944 (tau-b)
+    assert kendall_tau_b([1, 2, 3, 4, 5], [1, 1, 2, 2, 3]) == pytest.approx(0.8944, abs=1e-4)
+    assert kendall_tau_b([1, 1, 1], [1, 2, 3]) is None

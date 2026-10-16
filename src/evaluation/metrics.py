@@ -84,6 +84,29 @@ def spearman(x: Sequence[float], y: Sequence[float]) -> Optional[float]:
     return None if vx == 0 or vy == 0 else cov / (vx * vy)
 
 
+def kendall_tau_b(x: Sequence[float], y: Sequence[float]) -> Optional[float]:
+    """Kendall's tau-b, which corrects for ties (Nutri-Score has only five grades, so ties are common)."""
+    n = len(x)
+    if n != len(y) or n < 3:
+        return None
+    conc = disc = tx = ty = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            dx, dy = x[i] - x[j], y[i] - y[j]
+            if dx == 0 and dy == 0:
+                continue
+            if dx == 0:
+                tx += 1
+            elif dy == 0:
+                ty += 1
+            elif (dx > 0) == (dy > 0):
+                conc += 1
+            else:
+                disc += 1
+    denom = math.sqrt((conc + disc + tx) * (conc + disc + ty))
+    return None if denom == 0 else (conc - disc) / denom
+
+
 def precision_at_k(ranked: Sequence[Any], relevant: set, k: int = 3) -> Optional[float]:
     top = list(ranked)[:k]
     return _div(sum(1 for x in top if x in relevant), len(top)) if top else None
