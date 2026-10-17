@@ -13,6 +13,7 @@
 #   test-web            run the frontend component tests
 #   analyse <url|file>  analyse one product page in the terminal (add --json, --save, --category X)
 #   compare <a> <b> ... --category X   compare saved pages in one category
+#   prices <csv>        import hand-recorded prices (data/verified/prices/), then rescore
 #   rescore             recompute every stored analysis
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -38,6 +39,7 @@ case "$cmd" in
   test-web) cd web && npm test ;;
   analyse|analyze) activate; python src/cli.py analyse "$@" ;;
   compare) activate; python src/cli.py compare "$@" ;;
+  prices)  activate; python -m database.prices "$@" ;;
   rescore) activate; python -m database.ingest --rescore ;;
   *)       sed -n '2,17p' "$0" ;;
 esac
