@@ -13,5 +13,7 @@ numpy>=1.26
 pytest>=8.0
 psycopg[binary]>=3.1
 anthropic>=1.13
+pytesseract>=0.3.10
+Pillow>=10.0
 sqlalchemy>=2.0
 alembic>=1.13

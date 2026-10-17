@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { ErrorState, Spinner } from "./ui";
 import { ApiError, api } from "@/lib/api";
 import { validateUrl } from "./AnalyzeForm";
+import type { Category } from "@/lib/types";
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -34,6 +35,18 @@ export function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [site, setSite] = useState("");
   const [pageUrl, setPageUrl] = useState("");
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    api
+      .categories(ctrl.signal)
+      .then((r) => setCategories(r.categories ?? []))
+      .catch(() => setCategories([]));
+    return () => ctrl.abort();
+  }, []);
   const [busy, setBusy] = useState(false);
   const [inputError, setInputError] = useState<string | null>(null);
   const [apiError, setApiError] = useState<ApiError | null>(null);
@@ -46,7 +59,13 @@ export function UploadForm() {
     if (problem || !file) return;
     setBusy(true);
     try {
-      const result = await api.analyzeUpload({ file, site: site || null, page_url: pageUrl.trim() || null });
+      const result = await api.analyzeUpload({
+        file,
+        site: site || null,
+        page_url: pageUrl.trim() || null,
+        name: name.trim() || null,
+        category: category || null,
+      });
       router.push(`/products/${result.product_id}`);
     } catch (err) {
       setBusy(false);
@@ -99,10 +118,35 @@ export function UploadForm() {
             {busy ? "Reading…" : "Upload and analyse"}
           </button>
         </div>
+        <div className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:gap-4">
+          <input
+            type="text"
+            aria-label="Product name (optional)"
+            placeholder="Product name (optional)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={busy}
+            maxLength={200}
+            className="min-w-0 flex-1 rounded-lg border border-line bg-white px-3 py-1.5 placeholder:text-slate-400"
+          />
+          {categories.length ? (
+            <label className="flex items-center gap-2">
+              <span className="text-slate-700">Category</span>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} disabled={busy} className="rounded-lg border border-line bg-white px-2 py-1.5">
+                <option value="">Detect automatically</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+        </div>
         {inputError ? <p className="text-sm text-amber-800">{inputError}</p> : null}
         <p id="upload-help" className="text-xs text-muted">
-          Photos are read by an AI model and only values that appear in its transcript of the label are kept; check them
-          against the pack. A page saved from the browser (Ctrl+S or ⌘S) is read as saved, with nothing fetched. Choosing
+          Photos are read with free offline OCR (or by Claude when an API key is set). Photograph the ingredients and
+          nutrition panel flat and sharp, and check the read text in the report against the pack. A page saved from the browser (Ctrl+S or ⌘S) is read as saved, with nothing fetched. Choosing
           the shop lets alternatives come from products analysed from the same shop.
         </p>
       </form>

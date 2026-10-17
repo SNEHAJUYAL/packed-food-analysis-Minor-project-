@@ -124,6 +124,7 @@ export const api = {
     if (body.page_url) form.append("page_url", body.page_url);
     if (body.site) form.append("site", body.site);
     if (body.category) form.append("category", body.category);
+    if (body.name) form.append("name", body.name);
     return request<ProductAnalysis>("/api/analyze-upload", { method: "POST", body: form, signal });
   },
   listProducts: (params: { category?: string; q?: string; limit?: number } = {}, signal?: AbortSignal) =>

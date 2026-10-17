@@ -22,7 +22,7 @@ from database.models import ProductRow, ProductSource
 from extract.fetch import fetch, validate_url
 from extract.html_parser import extract_html
 from extract.jsonld import extract_jsonld
-from extract import label_image, llm_fallback
+from extract import label_image, label_ocr, llm_fallback
 from normalise.build import build_product
 from pipeline import analyse_product
 
@@ -183,7 +183,7 @@ def image_media_type(filename: str, content_type: Optional[str]) -> str:
 
 def analyze_upload(s: Session, data: bytes, filename: str, content_type: Optional[str],
                    page_url: Optional[str] = None, site: Optional[str] = None,
-                   category: Optional[str] = None, client=None) -> dict:
+                   category: Optional[str] = None, client=None, name: Optional[str] = None) -> dict:
     """Analyse a pack photo, an app screenshot, or a product page saved from the browser.
 
     Nothing is fetched: a saved page is read as it was saved, a photo is read by the vision model.
@@ -202,26 +202,37 @@ def analyze_upload(s: Session, data: bytes, filename: str, content_type: Optiona
         media_type = image_media_type(filename, content_type)
         if len(data) > label_image.MAX_IMAGE_BYTES:
             raise UploadError(413, "too_large", "Images must be 8 MB or smaller.")
-        if client is None and not label_image.available_for_images():
-            raise UploadError(503, "vision_not_configured",
-                              "Reading photos needs an Anthropic API key (ANTHROPIC_API_KEY in .env). "
-                              "Saved product pages work without one.")
+        use_claude = client is not None or label_image.available_for_images()
+        if not use_claude and not label_ocr.available():
+            raise UploadError(503, "photo_reader_missing",
+                              "Reading photos needs the free Tesseract OCR program (on a Mac: brew install "
+                              "tesseract, then restart the API), or an Anthropic API key in .env. "
+                              "Saved product pages work without either.")
+        steps = [{"step": "upload", "outcome": "ok", "detail": f"image ({media_type}, {len(data) // 1024} KB)"}]
         try:
-            ex = label_image.extract_image(data, media_type, client=client)
+            if use_claude:
+                ex = label_image.extract_image(data, media_type, client=client)
+                transcript, method, step = (ex or {}).get("description"), "label-photo", "label-photo"
+                note = "every value checked against the model's transcript of the image (next step)"
+            else:
+                ex, transcript = label_ocr.extract_ocr(data)
+                method = step = "label-ocr"
+                note = "read with offline OCR (Tesseract); OCR can misread curved or shiny packs"
         except ValueError as e:
             raise UploadError(422, "validation_error", str(e))
-        steps = [{"step": "upload", "outcome": "ok", "detail": f"image ({media_type}, {len(data) // 1024} KB)"}]
+        except Exception as e:  # unreadable image file
+            raise UploadError(422, "unreadable_image", f"The image could not be read ({type(e).__name__}).")
         fields = _filled(ex)
-        steps.append({"step": "label-photo", "outcome": "ok" if fields else "nothing found",
-                      "detail": (", ".join(fields) + "; every value checked against the model's transcript "
-                                 "of the image (next step), so compare that with the pack")
-                      if fields else "no label text could be read"})
-        if ex and ex.get("description"):
-            steps.append({"step": "transcript", "outcome": "ok", "detail": ex["description"][:2000]})
+        steps.append({"step": step, "outcome": "ok" if fields else "nothing found",
+                      "detail": (", ".join(fields) + f"; {note}, so compare the text with the pack")
+                      if fields else "no label values could be read; try a sharper, flatter photo of the "
+                                     "ingredients and nutrition panel"})
+        if transcript:
+            steps.append({"step": "transcript", "outcome": "ok", "detail": transcript[:2000]})
         if ex and ex.get("unreadable"):
             steps.append({"step": "unreadable", "outcome": "flagged",
                           "detail": "could not be read with confidence: " + ", ".join(ex["unreadable"][:10])})
-        found, method, source_type, external_id = ([ex] if fields else []), "label-photo", "photo", f"photo:{digest}"
+        found, source_type, external_id = ([ex] if fields else []), "photo", f"photo:{digest}"
     elif kind == "html":
         if len(data) > MAX_PAGE_BYTES:
             raise UploadError(413, "too_large", "Saved pages must be 5 MB or smaller.")
@@ -239,6 +250,10 @@ def analyze_upload(s: Session, data: bytes, filename: str, content_type: Optiona
         raise UploadError(415, "unsupported_type",
                           "Upload a photo or screenshot (JPEG, PNG, WebP, GIF) or a saved web page (.html).")
 
+    if name and name.strip():
+        typed = dict(label_ocr.empty_extracted("entered-by-user"), name=name.strip()[:200])
+        found = [typed] + found  # the person's own name for the product wins over a guess from the image
+        steps.append({"step": "name", "outcome": "ok", "detail": "product name typed by the person uploading"})
     product = build_product(found, url=page_url, category_override=category)
     match = match_open_food_facts(s, product.name.value, product.brand.value, product.category.value)
     steps.append({"step": "open-food-facts-match", "outcome": "ok" if match else "no match",

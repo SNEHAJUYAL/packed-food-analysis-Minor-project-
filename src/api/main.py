@@ -285,14 +285,17 @@ async def analyze_upload(file: UploadFile = File(..., description="Pack photo, a
                                                         description="Where the product was listed, if known"),
                          site: Optional[str] = Form(None, max_length=100,
                                                     description="Shop it is from, e.g. blinkit.com or zeptonow.com"),
-                         category: Optional[Category] = Form(None), s=Depends(db)) -> dict:
+                         category: Optional[Category] = Form(None),
+                         name: Optional[str] = Form(None, max_length=200,
+                                                    description="Product name, if the image does not show it"),
+                         s=Depends(db)) -> dict:
     """Read a photo or a saved page (nothing is fetched), then normalise, store and score it like a URL."""
     data = await file.read(MAX_UPLOAD_BYTES + 1)
     if len(data) > MAX_UPLOAD_BYTES:
         raise error(413, "too_large", f"File over {MAX_UPLOAD_BYTES} bytes.")
     try:
         return services.analyze_upload(s, data, file.filename or "", file.content_type, page_url or None,
-                                       site or None, category)
+                                       site or None, category, name=name or None)
     except services.UploadError as e:
         raise error(e.status, e.code, e.message)
 
@@ -364,8 +367,9 @@ LIMITATIONS = [
     "Red (high) nutrient bounds use the UK FSA 2016 scheme as a labelled placeholder; FSSAI has no final 'high' cut-offs.",
     "FSSAI front-of-pack warning thresholds are not published, so the warning simulation is not run.",
     "Extraction accuracy has not been measured on a verified set yet; see notebooks/evaluation.ipynb for what is measured.",
-    "Label photos are read by a vision model; values are kept only if they appear in its transcript, but the "
-    "transcript itself can be misread, so check it against the pack. Accuracy on photos has not been measured.",
+    "Label photos are read offline with Tesseract OCR, or by a vision model when an Anthropic API key is set. "
+    "Either can misread a label, so check the text in the extraction log against the pack. Accuracy on photos "
+    "has not been measured.",
     "Same-site alternatives come only from products already analysed from that site; the shop's catalogue is "
     "not crawled.",
     "Barcode scanning, cross-source validation, personalisation and lab evidence are future work.",
