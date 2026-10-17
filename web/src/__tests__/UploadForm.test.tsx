@@ -61,3 +61,25 @@ describe("AlternativesPanel scope", () => {
     expect(await screen.findByText(/from blinkit\.com considered/)).toBeInTheDocument();
   });
 });
+
+describe("service problems", () => {
+  it("explains a bare proxy 500 as the API not running", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("Internal Server Error", { status: 500 })));
+    const { ServiceStatus } = await import("@/components/ServiceStatus");
+    render(<ServiceStatus />);
+    expect(await screen.findByText(/API\) is not running/)).toBeInTheDocument();
+  });
+
+  it("explains a database outage", async () => {
+    mockFetch(() => ({ body: { status: "degraded", database: "unavailable", methodology_version: "0.1.0", product_count: null } }));
+    const { ServiceStatus } = await import("@/components/ServiceStatus");
+    render(<ServiceStatus />);
+    expect(await screen.findByText(/cannot reach the database/)).toBeInTheDocument();
+  });
+
+  it("adds the upload hint when a shop refuses the fetch", async () => {
+    const { errorHint } = await import("@/components/AnalyzeForm");
+    expect(errorHint("fetch_failed")).toMatch(/Save the product page/);
+    expect(errorHint("blocked_destination")).toBeNull();
+  });
+});

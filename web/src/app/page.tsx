@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AnalyzeForm } from "@/components/AnalyzeForm";
 import { EvidenceBadge } from "@/components/badges";
 import { SampleAnalysis } from "@/components/SampleAnalysis";
+import { ServiceStatus } from "@/components/ServiceStatus";
 import { UploadForm } from "@/components/UploadForm";
 import { EVIDENCE_LABELS, EVIDENCE_ORDER } from "@/lib/labels";
 
@@ -38,6 +39,7 @@ export default function HomePage() {
             calculated and which are missing. Food Decision Intelligence reads a product page, normalises it to a common basis,
             and explains every score with the evidence behind it.
           </p>
+          <ServiceStatus />
           <AnalyzeForm />
           <UploadForm />
           <p className="text-sm text-muted">
