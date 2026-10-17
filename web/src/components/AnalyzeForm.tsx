@@ -9,6 +9,21 @@ import type { Category } from "@/lib/types";
 
 type Phase = "idle" | "running" | "done" | "error";
 
+// Which progress step an API error belongs to; the steps advance on a timer, so the step shown
+// when an error arrives is not necessarily where it happened.
+const ERROR_STEP: Record<string, number> = {
+  invalid_url: 0, blocked_destination: 0, validation_error: 0,
+  robots_disallowed: 1, fetch_failed: 1, timeout: 1, too_large: 1, unsupported_content: 1,
+};
+const SERVICE_DOWN = new Set(["backend_unreachable", "network_error", "database_unavailable", "internal_error"]);
+const SHOP_HINT =
+  "Shopping apps such as Blinkit, Zepto and Swiggy Instamart often refuse automated requests. Save the product page " +
+  "in your browser (⌘S or Ctrl+S) or take a screenshot, and upload it below instead.";
+
+export function errorHint(code: string): string | null {
+  return ERROR_STEP[code] === 1 ? SHOP_HINT : null;
+}
+
 export function validateUrl(raw: string): string | null {
   const v = raw.trim();
   if (!v) return "Enter the address of a product page.";
@@ -92,8 +107,10 @@ export function AnalyzeForm({ stepIntervalMs = 1800 }: { stepIntervalMs?: number
       router.push(`/products/${result.product_id}`);
     } catch (err) {
       if (timer.current) clearInterval(timer.current);
-      setPhase("error");
-      setApiError(err instanceof ApiError ? err : new ApiError(0, "error", "The analysis could not be completed."));
+      const e = err instanceof ApiError ? err : new ApiError(0, "error", "The analysis could not be completed.");
+      setPhase(SERVICE_DOWN.has(e.code) ? "idle" : "error");
+      if (e.code in ERROR_STEP) setActive(ERROR_STEP[e.code]);
+      setApiError(e);
     }
   }
 
@@ -169,7 +186,13 @@ export function AnalyzeForm({ stepIntervalMs = 1800 }: { stepIntervalMs?: number
           {phase === "done" ? <p className="mt-3 text-sm text-muted">Done. Opening the report…</p> : null}
         </div>
       ) : null}
-      {apiError ? <ErrorState title="The page could not be analysed" message={apiError.message} code={apiError.code} /> : null}
+      {apiError ? (
+        <ErrorState
+          title={SERVICE_DOWN.has(apiError.code) ? "The analysis service is not available" : "The page could not be analysed"}
+          message={[apiError.message, errorHint(apiError.code)].filter(Boolean).join(" ")}
+          code={apiError.code}
+        />
+      ) : null}
     </div>
   );
 }

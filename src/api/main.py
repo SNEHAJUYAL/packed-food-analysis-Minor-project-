@@ -65,7 +65,19 @@ async def _fetch_error(request: Request, exc: FetchError):
 async def _db_error(request: Request, exc: Exception):
     log.warning("database unavailable: %s", type(exc).__name__)
     return JSONResponse(status_code=503, content={"detail": {
-        "code": "database_unavailable", "message": "The product database is not available. Check DATABASE_URL."}})
+        "code": "database_unavailable",
+        "message": "The API is running but cannot reach the database. Check that PostgreSQL is running and that "
+                   "DATABASE_URL in .env is right, then run ./run.sh migrate and ./run.sh seed."}})
+
+
+@app.exception_handler(Exception)
+async def _unexpected(request: Request, exc: Exception):
+    # Anything not handled above: log the traceback, answer with the usual error shape instead of a bare 500.
+    log.exception("unhandled error on %s %s", request.method, request.url.path)
+    return JSONResponse(status_code=500, content={"detail": {
+        "code": "internal_error",
+        "message": f"The analysis failed with an unexpected error ({type(exc).__name__}). "
+                   "The API terminal shows the details."}})
 
 
 @app.middleware("http")

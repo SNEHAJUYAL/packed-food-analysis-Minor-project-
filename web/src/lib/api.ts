@@ -48,6 +48,9 @@ const FALLBACK_MESSAGES: Record<number, string> = {
   504: "The page took too long to respond.",
 };
 
+export const BACKEND_DOWN =
+  "The analysis service (API) is not running. Start it in a second terminal with ./run.sh api, then try again.";
+
 /** Turn any error body into an ApiError, keeping the API's plain-language `message`. */
 export function parseApiError(status: number, body: unknown): ApiError {
   const detail = (body as ApiErrorBody | null)?.detail;
@@ -81,7 +84,7 @@ async function request<T>(path: string, init?: RequestInit & { signal?: AbortSig
     });
   } catch (err) {
     if ((err as Error)?.name === "AbortError") throw err;
-    throw new ApiError(0, "network_error", "Could not reach the analysis service. Is the backend running?");
+    throw new ApiError(0, "network_error", BACKEND_DOWN);
   }
   let body: unknown = null;
   const text = await res.text();
@@ -92,7 +95,14 @@ async function request<T>(path: string, init?: RequestInit & { signal?: AbortSig
       body = null;
     }
   }
-  if (!res.ok) throw parseApiError(res.status, body);
+  if (!res.ok) {
+    // A 5xx with no JSON body comes from the Next.js proxy, not the API: the backend is not running
+    // or not reachable at API_BASE_URL.
+    if (res.status >= 500 && (body === null || typeof body !== "object")) {
+      throw new ApiError(res.status, "backend_unreachable", BACKEND_DOWN);
+    }
+    throw parseApiError(res.status, body);
+  }
   return body as T;
 }
 

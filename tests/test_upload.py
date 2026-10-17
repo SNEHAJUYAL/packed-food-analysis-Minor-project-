@@ -209,3 +209,11 @@ def test_same_site_falls_back_and_says_so(client):
     assert d["site"] == "zeptonow.com" and d["scope"] == "all"
     assert d["message"].startswith("No other product analysed from zeptonow.com does better")
     assert d["alternatives"]  # drawn from all stored biscuits instead
+
+
+def test_unexpected_errors_keep_the_error_shape(monkeypatch):
+    def boom(*a, **k):
+        raise RuntimeError("bug")
+    monkeypatch.setattr(api_main, "session_factory", lambda *a, **k: boom)
+    r = TestClient(api_main.app, raise_server_exceptions=False).get("/api/reference/categories")
+    assert r.status_code == 500 and r.json()["detail"]["code"] == "internal_error"
