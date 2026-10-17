@@ -29,7 +29,7 @@ cp .env.example .env
 docker compose up --build        # web http://localhost:3000, API docs http://localhost:8000/docs
 ```
 
-Without Docker: `./run.sh setup && ./run.sh migrate && ./run.sh seed`, then `./run.sh api` and
+Without Docker (create the `fdi` role and database first, see [docs/deployment.md](docs/deployment.md#option-b-local-processes)): `./run.sh setup && ./run.sh migrate && ./run.sh seed`, then `./run.sh api` and
 `./run.sh web`. Details, the offline URL demo and production notes: [docs/deployment.md](docs/deployment.md).
 
 **About the sample data.** Seeding loads 466 **real Open Food Facts India records** (ODbL, no prices,
