@@ -28,6 +28,20 @@ cp .env.example .env           # set DATABASE_URL
 ./run.sh web                   # http://localhost:3000
 ```
 
+**PostgreSQL without Docker** (for example Postgres.app or Homebrew on a Mac). `./run.sh migrate` needs a
+role and database matching `DATABASE_URL`; "password authentication failed for user fdi" means they do not
+exist yet or the password differs. Create them once as the PostgreSQL superuser (Postgres.app puts `psql`
+in `/Applications/Postgres.app/Contents/Versions/latest/bin/`; Homebrew in `$(brew --prefix)/bin/`):
+
+```bash
+psql -h localhost -d postgres -c "CREATE ROLE fdi LOGIN PASSWORD 'change_me_locally';"
+psql -h localhost -d postgres -c "CREATE DATABASE fdi OWNER fdi;"
+```
+
+Use the same password in `DATABASE_URL` in `.env`
+(`postgresql://fdi:change_me_locally@localhost:5432/fdi`), then run `./run.sh migrate` and `./run.sh seed`.
+If the superuser needs a password, add `-U postgres` and enter it when asked.
+
 `.env` is read by bash, so quote any value containing `&`, for example a socket URL:
 `DATABASE_URL='postgresql://fdi@/fdi?host=/tmp&port=5433'`. Unquoted, the `&` silently drops the variable.
 
