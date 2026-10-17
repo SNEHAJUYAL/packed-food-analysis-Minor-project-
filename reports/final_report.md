@@ -28,7 +28,7 @@ rendered report in the Next.js app.
 
 | Check | Result |
 | --- | --- |
-| `pytest` (SQLite for DB tests) | **145 passed** |
+| `pytest` (SQLite for DB tests) | **146 passed** |
 | `pytest tests/test_api_db.py` with `TEST_DATABASE_URL` (PostgreSQL 16, Alembic migration) | **18 passed** |
 | `npm test` (Vitest + Testing Library) | **33 passed** (6 files) |
 | `npm run lint`, `npm run typecheck`, `npm run build` | all exit 0 |
