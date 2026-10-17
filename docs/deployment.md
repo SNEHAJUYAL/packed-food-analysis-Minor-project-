@@ -28,6 +28,11 @@ cp .env.example .env           # set DATABASE_URL
 ./run.sh web                   # http://localhost:3000
 ```
 
+**Photo reading.** Pack photos and screenshots are read offline by the free Tesseract OCR program. Install it
+once (macOS with Homebrew: `brew install tesseract`; Ubuntu: `sudo apt install tesseract-ocr`), run
+`./run.sh setup` for the Python package, and restart the API. Setting `ANTHROPIC_API_KEY` in `.env` switches
+photo reading to Claude, which copes better with curved or shiny packs.
+
 **PostgreSQL without Docker** (for example Postgres.app or Homebrew on a Mac). `./run.sh migrate` needs a
 role and database matching `DATABASE_URL`; "password authentication failed for user fdi" means they do not
 exist yet or the password differs. Create them once as the PostgreSQL superuser (Postgres.app puts `psql`

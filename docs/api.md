@@ -34,19 +34,24 @@ Multipart form: `file` (required), `page_url` (optional, where the product was l
 e.g. `blinkit.com`), `category` (optional). Returns a **ProductAnalysis** like `analyze-url`. Nothing is
 fetched.
 
-* **Pack photo or app screenshot** (JPEG, PNG, WebP, GIF, up to 8 MB): Claude's vision model writes a
-  verbatim transcript of the label, then fills the product schema; a value is kept only if it appears in
-  that transcript. The transcript is in the extraction log (step `transcript`) so it can be checked against
-  the pack, and fields the model could not read are listed (step `unreadable`). `source_type` is `photo`
-  and the record id is the image's hash, so the same photo replaces its earlier record. Without
-  `ANTHROPIC_API_KEY` the endpoint answers 503 `vision_not_configured`.
+* **Pack photo or app screenshot** (JPEG, PNG, WebP, GIF, up to 8 MB). Two readers:
+  * **Offline OCR (default, free):** Tesseract reads the text and fixed rules take the ingredient list,
+    nutrient rows (the per-100 column), net quantity and price from it (`extraction_method` `label-ocr`).
+    Needs the Tesseract program (`brew install tesseract`) and the `pytesseract` package.
+  * **Claude (optional, when `ANTHROPIC_API_KEY` is set):** the vision model writes a verbatim transcript,
+    then fills the schema; a value is kept only if it appears in that transcript (`label-photo`).
+
+  The text that was read is in the extraction log (step `transcript`) so it can be checked against the pack.
+  `source_type` is `photo` and the record id is the image's hash, so the same photo replaces its earlier
+  record. Optional form field `name` sets the product name when the image does not show it. With neither
+  reader available the endpoint answers 503 `photo_reader_missing`.
 * **Saved product page** (`.html`, up to 5 MB, e.g. Ctrl+S / ⌘S in the browser): read as saved with the
   same extractors as a URL. If no `page_url` is given, the page's canonical link or `og:url` is used.
   `source_type` is `saved_page`.
 
 `site` is taken from the form, else from the page address (host without `www.`). It decides which shop
 same-site alternatives are drawn from. Errors: 413 `too_large`, 415 `unsupported_type`, 422 `empty_file` or
-`validation_error`, 503 `vision_not_configured`.
+`validation_error` or `unreadable_image`, 503 `photo_reader_missing`.
 
 ## GET /api/products?category=&q=&limit=50
 

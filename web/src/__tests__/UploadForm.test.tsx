@@ -36,20 +36,22 @@ describe("UploadForm", () => {
     render(<UploadForm />);
     await userEvent.upload(screen.getByLabelText("Photo, screenshot or saved page"), png());
     await userEvent.selectOptions(screen.getByRole("combobox"), "blinkit.com");
+    await userEvent.type(screen.getByLabelText("Product name (optional)"), "Troovy Moong Dal Chips");
     await userEvent.click(screen.getByRole("button", { name: "Upload and analyse" }));
     await waitFor(() => expect(routerPush).toHaveBeenCalled());
     expect(sent).toBeInstanceOf(FormData);
     expect(sent?.get("site")).toBe("blinkit.com");
+    expect(sent?.get("name")).toBe("Troovy Moong Dal Chips");
     expect((sent?.get("file") as File).name).toBe("okra.png");
     expect(headers?.["Content-Type"]).toBeUndefined();
   });
 
   it("shows the API's message when photos cannot be read", async () => {
-    mockFetch(() => ({ status: 503, body: { detail: { code: "vision_not_configured", message: "Reading photos needs an Anthropic API key (ANTHROPIC_API_KEY in .env). Saved product pages work without one." } } }));
+    mockFetch(() => ({ status: 503, body: { detail: { code: "photo_reader_missing", message: "Reading photos needs the free Tesseract OCR program (on a Mac: brew install tesseract, then restart the API)." } } }));
     render(<UploadForm />);
     await userEvent.upload(screen.getByLabelText("Photo, screenshot or saved page"), png());
     await userEvent.click(screen.getByRole("button", { name: "Upload and analyse" }));
-    expect(await screen.findByText(/needs an Anthropic API key/)).toBeInTheDocument();
+    expect(await screen.findByText(/brew install tesseract/)).toBeInTheDocument();
     expect(routerPush).not.toHaveBeenCalled();
   });
 });

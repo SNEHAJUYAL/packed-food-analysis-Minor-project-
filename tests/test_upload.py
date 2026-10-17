@@ -168,10 +168,12 @@ def test_photo_upload(client, monkeypatch):
     assert again.json()["product_id"] == d["product_id"]
 
 
-def test_photo_without_api_key_says_so(client, monkeypatch):
+def test_photo_without_any_reader_says_so(client, monkeypatch):
     monkeypatch.setattr(label_image, "available_for_images", lambda: False)
+    monkeypatch.setattr(services.label_ocr, "available", lambda: False)
     r = upload(client, "pack.jpg", PNG, "image/jpeg")
-    assert r.status_code == 503 and r.json()["detail"]["code"] == "vision_not_configured"
+    assert r.status_code == 503 and r.json()["detail"]["code"] == "photo_reader_missing"
+    assert "brew install tesseract" in r.json()["detail"]["message"]
 
 
 def test_upload_rejections(client):

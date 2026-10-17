@@ -14,9 +14,9 @@ conditions, and suggests alternatives from stored products only, from the same s
 when the product came from one.
 
 > Status (17 Oct 2026): URL-first V1 with photo and saved-page upload. Consumer decision support, not a
-> medical or clinical score. Photos are read by Claude's vision model (needs `ANTHROPIC_API_KEY`); values
-> are kept only if they appear in the model's transcript of the label, and photo-reading accuracy has not
-> been measured. Barcode scanning, cross-source validation, personalisation, basket optimisation and lab
+> medical or clinical score. Photos are read offline with free Tesseract OCR (`brew install tesseract`),
+> or by Claude's vision model when `ANTHROPIC_API_KEY` is set (then values are kept only if they appear in
+> its transcript of the label). Photo-reading accuracy has not been measured. Barcode scanning, cross-source validation, personalisation, basket optimisation and lab
 > evidence are future work and are not implemented. No accuracy figures are claimed; see [docs/nutriscore_comparison.md](docs/nutriscore_comparison.md) and
 > [reports/final_report.md](reports/final_report.md) for what was measured and on how much data.
 

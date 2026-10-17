@@ -49,6 +49,8 @@ export interface AnalyzeUploadRequest {
   /** Shop it is from, e.g. blinkit.com. */
   site?: string | null;
   category?: string | null;
+  /** Product name, when the image does not show it. */
+  name?: string | null;
 }
 
 export interface ProductSummary {
