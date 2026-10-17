@@ -7,7 +7,9 @@ and time per field -> flag missing and conflicting data -> partial result if nee
 """
 from __future__ import annotations
 
+import hashlib
 import logging
+import re
 from typing import Optional
 
 from rapidfuzz import fuzz
@@ -20,7 +22,7 @@ from database.models import ProductRow, ProductSource
 from extract.fetch import fetch, validate_url
 from extract.html_parser import extract_html
 from extract.jsonld import extract_jsonld
-from extract import llm_fallback
+from extract import label_image, llm_fallback
 from normalise.build import build_product
 from pipeline import analyse_product
 
@@ -126,6 +128,130 @@ def analyze_url(s: Session, url: str, category: Optional[str] = None, refresh: b
     row = repo.save_product(s, product, source_type="url", extraction_method=method, extraction_log=steps)
     report = analyse_row(s, row)
     log.info("analysed url=%s product_id=%s status=%s method=%s", url, row.id, report["status"], method)
+    return payload(row, report)
+
+
+class UploadError(ValueError):
+    def __init__(self, status: int, code: str, message: str):
+        super().__init__(message)
+        self.status, self.code, self.message = status, code, message
+
+
+HTML_TYPES = {"text/html", "application/xhtml+xml"}
+MAX_PAGE_BYTES = 5 * 1024 * 1024
+_CANONICAL_RES = (re.compile(r'<link[^>]+rel=["\']canonical["\'][^>]*href=["\']([^"\']+)', re.I),
+                  re.compile(r'<link[^>]+href=["\']([^"\']+)["\'][^>]*rel=["\']canonical', re.I),
+                  re.compile(r'<meta[^>]+property=["\']og:url["\'][^>]*content=["\']([^"\']+)', re.I))
+
+
+def page_url_in(html: str) -> Optional[str]:
+    """The page's own address from a saved copy (canonical link or og:url), if it states one."""
+    for rx in _CANONICAL_RES:
+        m = rx.search(html)
+        if m and m.group(1).strip().lower().startswith(("https://", "http://")):
+            return m.group(1).strip()
+    return None
+
+
+def _clean_site(site: Optional[str]) -> Optional[str]:
+    if not site:
+        return None
+    site = site.strip().lower()
+    return repo.site_of(site if "://" in site else f"https://{site}")
+
+
+def upload_kind(filename: str, content_type: Optional[str]) -> Optional[str]:
+    ct = (content_type or "").split(";")[0].strip().lower()
+    name = (filename or "").lower()
+    if ct in label_image.MEDIA_TYPES:
+        return "image"
+    if ct in HTML_TYPES or name.endswith((".html", ".htm")):
+        return "html"
+    by_ext = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp",
+              ".gif": "image/gif"}
+    return "image" if any(name.endswith(e) for e in by_ext) else None
+
+
+def image_media_type(filename: str, content_type: Optional[str]) -> str:
+    ct = (content_type or "").split(";")[0].strip().lower()
+    if ct in label_image.MEDIA_TYPES:
+        return ct
+    name = (filename or "").lower()
+    return "image/png" if name.endswith(".png") else "image/webp" if name.endswith(".webp") \
+        else "image/gif" if name.endswith(".gif") else "image/jpeg"
+
+
+def analyze_upload(s: Session, data: bytes, filename: str, content_type: Optional[str],
+                   page_url: Optional[str] = None, site: Optional[str] = None,
+                   category: Optional[str] = None, client=None) -> dict:
+    """Analyse a pack photo, an app screenshot, or a product page saved from the browser.
+
+    Nothing is fetched: a saved page is read as it was saved, a photo is read by the vision model.
+    page_url (optional) records where the page or listing was; site says which shop it is from,
+    so alternatives can be drawn from the same shop.
+    """
+    if not data:
+        raise UploadError(422, "empty_file", "The uploaded file is empty.")
+    if page_url and not page_url.strip().lower().startswith(("https://", "http://")):
+        raise UploadError(422, "validation_error", "page_url must start with http:// or https://")
+    page_url = page_url.strip() if page_url else None
+    kind = upload_kind(filename, content_type)
+    digest = hashlib.sha256(data).hexdigest()[:32]
+
+    if kind == "image":
+        media_type = image_media_type(filename, content_type)
+        if len(data) > label_image.MAX_IMAGE_BYTES:
+            raise UploadError(413, "too_large", "Images must be 8 MB or smaller.")
+        if client is None and not label_image.available_for_images():
+            raise UploadError(503, "vision_not_configured",
+                              "Reading photos needs an Anthropic API key (ANTHROPIC_API_KEY in .env). "
+                              "Saved product pages work without one.")
+        try:
+            ex = label_image.extract_image(data, media_type, client=client)
+        except ValueError as e:
+            raise UploadError(422, "validation_error", str(e))
+        steps = [{"step": "upload", "outcome": "ok", "detail": f"image ({media_type}, {len(data) // 1024} KB)"}]
+        fields = _filled(ex)
+        steps.append({"step": "label-photo", "outcome": "ok" if fields else "nothing found",
+                      "detail": (", ".join(fields) + "; every value checked against the model's transcript "
+                                 "of the image (next step), so compare that with the pack")
+                      if fields else "no label text could be read"})
+        if ex and ex.get("description"):
+            steps.append({"step": "transcript", "outcome": "ok", "detail": ex["description"][:2000]})
+        if ex and ex.get("unreadable"):
+            steps.append({"step": "unreadable", "outcome": "flagged",
+                          "detail": "could not be read with confidence: " + ", ".join(ex["unreadable"][:10])})
+        found, method, source_type, external_id = ([ex] if fields else []), "label-photo", "photo", f"photo:{digest}"
+    elif kind == "html":
+        if len(data) > MAX_PAGE_BYTES:
+            raise UploadError(413, "too_large", "Saved pages must be 5 MB or smaller.")
+        html = data.decode("utf-8", errors="replace")
+        stated = page_url_in(html)
+        page_url = page_url or stated
+        steps = [{"step": "upload", "outcome": "ok",
+                  "detail": f"saved page ({len(data) // 1024} KB), read as saved; nothing fetched"
+                            + (f"; page address from the file: {stated}" if stated and page_url == stated else "")}]
+        found, ex_steps, method = run_extraction(html, page_url or "")
+        steps += ex_steps
+        source_type = "saved_page"
+        external_id = repo.external_id_for_url(page_url) if page_url else f"page:{digest}"
+    else:
+        raise UploadError(415, "unsupported_type",
+                          "Upload a photo or screenshot (JPEG, PNG, WebP, GIF) or a saved web page (.html).")
+
+    product = build_product(found, url=page_url, category_override=category)
+    match = match_open_food_facts(s, product.name.value, product.brand.value, product.category.value)
+    steps.append({"step": "open-food-facts-match", "outcome": "ok" if match else "no match",
+                  "detail": (f"stored record #{match['product_id']} ({match['brand']} {match['name']}), "
+                             f"similarity {match['score']}; reference only, values not merged")
+                  if match else "no stored Open Food Facts record above the similarity cutoff"})
+    if product.conflicts:
+        steps.append({"step": "conflicts", "outcome": "flagged", "detail": "; ".join(product.conflicts)})
+    row = repo.save_product(s, product, source_type=source_type, external_id=external_id,
+                            extraction_method=method, extraction_log=steps,
+                            site=_clean_site(site) or repo.site_of(page_url))
+    report = analyse_row(s, row)
+    log.info("analysed upload kind=%s product_id=%s status=%s method=%s", kind, row.id, report["status"], method)
     return payload(row, report)
 
 

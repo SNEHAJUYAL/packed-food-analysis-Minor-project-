@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 from datetime import date, datetime, timezone
 from typing import Iterable, Optional
+from urllib.parse import urlsplit
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
@@ -16,7 +17,19 @@ from normalise.units import price_per_100
 
 SCALAR_FIELDS = ("name", "brand", "category", "variant", "pack_size", "pack_unit", "ingredients_raw")
 RELIABILITY = {"url": "brand_or_retailer_page", "open_food_facts": "open_food_facts_crowdsourced",
-               "synthetic_sample": "synthetic", "manual": "manual_entry"}
+               "synthetic_sample": "synthetic", "manual": "manual_entry",
+               "photo": "label_photo_read_by_model", "saved_page": "brand_or_retailer_page"}
+SITE_SOURCES = ("url", "photo", "saved_page")  # sources that come from a shop or brand page
+
+
+def site_of(url: Optional[str]) -> Optional[str]:
+    """'https://www.blinkit.com/prn/x' -> 'blinkit.com'. None for anything that is not an http(s) URL."""
+    if not url:
+        return None
+    host = (urlsplit(url.strip()).hostname or "").lower()
+    if not host or not url.strip().lower().startswith(("http://", "https://")):
+        return None
+    return host[4:] if host.startswith("www.") else host
 
 
 def external_id_for_url(url: str) -> str:
@@ -95,7 +108,8 @@ def _ingredient_row(s: Session, canonical: str, classes: list[str], cache: dict)
 
 def save_product(s: Session, p: Product, *, source_type: str, external_id: Optional[str] = None,
                  barcode: Optional[str] = None, extraction_method: Optional[str] = None,
-                 extraction_log: Optional[list] = None, reliability: Optional[str] = None) -> ProductRow:
+                 extraction_log: Optional[list] = None, reliability: Optional[str] = None,
+                 site: Optional[str] = None) -> ProductRow:
     """Insert or replace a product by external id. Prices and sources accumulate as observations."""
     external_id = external_id or (external_id_for_url(p.source_url) if p.source_url else None)
     if external_id is None:
@@ -157,7 +171,8 @@ def save_product(s: Session, p: Product, *, source_type: str, external_id: Optio
             observed_at=_dt(p.collected_at) or datetime.now(timezone.utc)))
 
     row.sources.append(ProductSource(
-        source_type=source_type, source_url=p.source_url, collected_at=_dt(p.collected_at) or datetime.now(timezone.utc),
+        source_type=source_type, source_url=p.source_url,
+        site=site or (site_of(p.source_url) if source_type in SITE_SOURCES else None), collected_at=_dt(p.collected_at) or datetime.now(timezone.utc),
         last_verified_at=_dt(p.last_verified_at), source_reliability=reliability or RELIABILITY[source_type],
         extraction_method=extraction_method, extraction_log=extraction_log or []))
     s.flush()
@@ -225,9 +240,9 @@ def to_product(row: ProductRow) -> Product:
 def source_info(row: ProductRow) -> dict:
     src = row.sources[-1] if row.sources else None
     if src is None:
-        return {"source_type": "manual", "source_url": None, "extraction_method": None, "collected_at": None,
+        return {"source_type": "manual", "source_url": None, "site": None, "extraction_method": None, "collected_at": None,
                 "last_verified_at": None, "source_reliability": "unknown"}
-    return {"source_type": src.source_type, "source_url": src.source_url, "extraction_method": src.extraction_method,
+    return {"source_type": src.source_type, "source_url": src.source_url, "site": src.site, "extraction_method": src.extraction_method,
             "collected_at": _iso(src.collected_at), "last_verified_at": _iso(src.last_verified_at),
             "source_reliability": src.source_reliability}
 

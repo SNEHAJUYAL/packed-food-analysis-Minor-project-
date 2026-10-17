@@ -28,6 +28,26 @@ Fetches the page (SSRF checks, robots.txt, timeouts, size limit, cache), extract
 (then the optional LLM fallback), normalises, stores the product in PostgreSQL, scores it against
 the stored products of the same category and returns a **ProductAnalysis**.
 
+## POST /api/analyze-upload
+
+Multipart form: `file` (required), `page_url` (optional, where the product was listed), `site` (optional,
+e.g. `blinkit.com`), `category` (optional). Returns a **ProductAnalysis** like `analyze-url`. Nothing is
+fetched.
+
+* **Pack photo or app screenshot** (JPEG, PNG, WebP, GIF, up to 8 MB): Claude's vision model writes a
+  verbatim transcript of the label, then fills the product schema; a value is kept only if it appears in
+  that transcript. The transcript is in the extraction log (step `transcript`) so it can be checked against
+  the pack, and fields the model could not read are listed (step `unreadable`). `source_type` is `photo`
+  and the record id is the image's hash, so the same photo replaces its earlier record. Without
+  `ANTHROPIC_API_KEY` the endpoint answers 503 `vision_not_configured`.
+* **Saved product page** (`.html`, up to 5 MB, e.g. Ctrl+S / ⌘S in the browser): read as saved with the
+  same extractors as a URL. If no `page_url` is given, the page's canonical link or `og:url` is used.
+  `source_type` is `saved_page`.
+
+`site` is taken from the form, else from the page address (host without `www.`). It decides which shop
+same-site alternatives are drawn from. Errors: 413 `too_large`, 415 `unsupported_type`, 422 `empty_file` or
+`validation_error`, 503 `vision_not_configured`.
+
 ## GET /api/products?category=&q=&limit=50
 
 `{"products": [ProductSummary], "total": int}`
@@ -47,8 +67,9 @@ Returns a **ProductAnalysis**:
   "status": "complete" | "partial" | "insufficient_data",
   "is_synthetic": false,            // true for the labelled synthetic demo records
   "source": {
-    "source_type": "url" | "open_food_facts" | "synthetic_sample",
+    "source_type": "url" | "photo" | "saved_page" | "open_food_facts" | "synthetic_sample",
     "source_url": "https://...",
+    "site": "blinkit.com" | null,          // shop the listing came from; null for OFF and sample records
     "extraction_method": "json-ld+html",   // which extractors produced data
     "collected_at": "2026-10-12T09:00:00+00:00",
     "last_verified_at": null,
@@ -111,7 +132,7 @@ Request: `{"product_ids": [1, 2, 3], "priorities": {"nutrition": 0.4, ...} | nul
     "completeness": 0.8,               // share of core fields known
     "ingredient_classes": ["whole_grain", "added_sugar"],
     "claims": [{"matched_text": "High Protein", "status": "..."}],
-    "source_url": "...", "collected_at": "..."
+    "source_url": "...", "site": "blinkit.com" | null, "collected_at": "..."
   }],
   "ingredient_differences": {"shared_classes": ["added_sugar"], "only_in": {"1": ["whole_grain"], "2": ["oil_palm"]}},
   "picks": {
@@ -123,9 +144,13 @@ Request: `{"product_ids": [1, 2, 3], "priorities": {"nutrition": 0.4, ...} | nul
 }
 ```
 
-## GET /api/products/{id}/alternatives?preference=balanced&limit=5
+## GET /api/products/{id}/alternatives?preference=balanced&limit=5&scope=same_site
 
 `preference`: `balanced` (methodology weights) | `nutrition` | `price` | `transparency`.
+`scope`: `same_site` (default) uses only products analysed from the same shop as this one when that shop
+is known and at least one of them qualifies; otherwise all stored products are used and `message` says so.
+`all` always uses every stored product. The shop's catalogue is never crawled, so same-site results grow
+only as more of its products are analysed.
 Candidates are stored products only: same category, same nutrition basis, an overall score, and
 not the product itself. They are ranked by the preference with TF-IDF similarity as a tie-break.
 
@@ -135,6 +160,8 @@ not the product itself. They are ranked by the preference with TF-IDF similarity
   "preference": "balanced",
   "methodology_version": "0.1.0",
   "eligible_count": 7,
+  "site": "blinkit.com" | null,
+  "scope": "same_site" | "all",          // where the alternatives were actually drawn from
   "alternatives": [{
     "product_id": 3, "rank": 1, "name": "...", "brand": "...", "is_synthetic": false,
     "overall": 74, "grade": "B", "nutrition": 70, "transparency": 85, "price_per_100": 39.5,
@@ -160,6 +187,7 @@ not the product itself. They are ranked by the preference with TF-IDF similarity
 
 ## Limits
 
-Request bodies over 64 KB are rejected. `analyze-url` is rate limited per client
+Request bodies over 64 KB are rejected, except `analyze-upload` (`MAX_UPLOAD_BYTES`, default 9 MB, and a
+Content-Length is required). `analyze-url` and `analyze-upload` are rate limited per client
 (`RATE_LIMIT_PER_MINUTE`, default 10). Fetches time out after `FETCH_TIMEOUT_SECONDS` (default 15)
 and stop reading after `FETCH_MAX_BYTES` (default 3 MB).

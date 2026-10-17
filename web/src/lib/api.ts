@@ -1,5 +1,6 @@
 import type {
   AlternativesResult,
+  AnalyzeUploadRequest,
   AnalyzeUrlRequest,
   ApiErrorBody,
   Category,
@@ -39,7 +40,7 @@ const FALLBACK_MESSAGES: Record<number, string> = {
   403: "Access to this page is not permitted.",
   404: "Not found.",
   413: "The page is too large to analyse.",
-  415: "This page type is not supported.",
+  415: "This file or page type is not supported.",
   422: "Please check the input and try again.",
   429: "Too many requests. Please wait a minute and try again.",
   502: "The page could not be fetched.",
@@ -70,7 +71,12 @@ async function request<T>(path: string, init?: RequestInit & { signal?: AbortSig
   try {
     res = await fetch(`${apiBase()}${path}`, {
       ...init,
-      headers: { Accept: "application/json", ...(init?.body ? { "Content-Type": "application/json" } : {}), ...init?.headers },
+      headers: {
+        Accept: "application/json",
+        // FormData sets its own multipart Content-Type with the boundary.
+        ...(init?.body && !(init.body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
+        ...init?.headers,
+      },
       cache: "no-store",
     });
   } catch (err) {
@@ -101,6 +107,15 @@ export const api = {
   health: (signal?: AbortSignal) => request<Health>("/api/health", { signal }),
   analyzeUrl: (body: AnalyzeUrlRequest, signal?: AbortSignal) =>
     request<ProductAnalysis>("/api/analyze-url", { method: "POST", body: JSON.stringify(body), signal }),
+  /** A pack photo, app screenshot or saved product page; nothing is fetched by the server. */
+  analyzeUpload: (body: AnalyzeUploadRequest, signal?: AbortSignal) => {
+    const form = new FormData();
+    form.append("file", body.file);
+    if (body.page_url) form.append("page_url", body.page_url);
+    if (body.site) form.append("site", body.site);
+    if (body.category) form.append("category", body.category);
+    return request<ProductAnalysis>("/api/analyze-upload", { method: "POST", body: form, signal });
+  },
   listProducts: (params: { category?: string; q?: string; limit?: number } = {}, signal?: AbortSignal) =>
     request<ProductList>(`/api/products${q(params)}`, { signal }),
   getProduct: (id: number | string, signal?: AbortSignal) =>

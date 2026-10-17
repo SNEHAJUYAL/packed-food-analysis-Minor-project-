@@ -104,7 +104,7 @@ export function AlternativesPanel({ productId, initialPreference = "balanced" }:
         <SectionHeading
           id="alternatives-heading"
           title="Alternatives"
-          subtitle="Only stored products in the same category and nutrition basis are considered. Nothing is suggested beyond what the analysis returns."
+          subtitle="Only stored products in the same category and nutrition basis are considered, from the same shop when the product came from one. Nothing is suggested beyond what the analysis returns."
           action={<PreferenceSelector value={preference} onChange={setPreference} />}
         />
         {state.kind === "loading" ? <LoadingState label="Finding alternatives…" /> : null}
@@ -112,7 +112,8 @@ export function AlternativesPanel({ productId, initialPreference = "balanced" }:
         {state.kind === "ready" ? (
           <div className="space-y-4">
             <p className="text-xs text-muted">
-              {state.data.eligible_count} eligible stored product{state.data.eligible_count === 1 ? "" : "s"} considered · methodology v
+              {state.data.eligible_count} eligible stored product{state.data.eligible_count === 1 ? "" : "s"}
+              {state.data.scope === "same_site" && state.data.site ? ` from ${state.data.site}` : ""} considered · methodology v
               {state.data.methodology_version}
             </p>
             {state.data.message ? (
