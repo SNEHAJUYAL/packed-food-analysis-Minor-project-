@@ -2,15 +2,16 @@ import Link from "next/link";
 import { AnalyzeForm } from "@/components/AnalyzeForm";
 import { EvidenceBadge } from "@/components/badges";
 import { SampleAnalysis } from "@/components/SampleAnalysis";
+import { UploadForm } from "@/components/UploadForm";
 import { EVIDENCE_LABELS, EVIDENCE_ORDER } from "@/lib/labels";
 
 const STEPS = [
-  { title: "Product URL", body: "You paste a brand or retailer product page." },
+  { title: "Product URL or photo", body: "You paste a product page, or upload a pack photo, a screenshot or a saved page." },
   { title: "Extraction", body: "Structured data (JSON-LD) first, then the page HTML. robots.txt is respected." },
   { title: "Normalised record", body: "Values converted to per 100 g/ml, each with an evidence label and source." },
   { title: "Analysis", body: "Nutrients against sourced benchmarks, ingredient list, disclosure and printed claims." },
   { title: "Explainable score", body: "Five dimensions with their reasons, combined into a 0–100 score and A–E grade." },
-  { title: "Alternatives", body: "Stored products in the same category, ranked by the preference you choose." },
+  { title: "Alternatives", body: "Stored products in the same category, from the same shop when it is known, ranked by the preference you choose." },
 ];
 
 const LIMITATIONS = [
@@ -38,6 +39,7 @@ export default function HomePage() {
             and explains every score with the evidence behind it.
           </p>
           <AnalyzeForm />
+          <UploadForm />
           <p className="text-sm text-muted">
             Or <Link href="/products" className="text-brand-700 underline">browse products already analysed</Link> and{" "}
             <Link href="/compare" className="text-brand-700 underline">compare them</Link>.

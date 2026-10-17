@@ -4,6 +4,9 @@
 2. Rule-based eligibility for the chosen preference (it must be better on that preference).
 3. Multi-criteria ranking: preference score, then TF-IDF similarity as the tie-break.
 4. Separate picks: best match, lowest unit price, best nutrition, each with a reason.
+5. Scope: when the product came from a shop page (blinkit.com, zeptonow.com...), alternatives come from
+   products already analysed from that same shop; if none qualifies, all stored products are used and the
+   response says so. The shop's catalogue is never crawled.
 Nothing is generated: every alternative is a database record with its source.
 """
 from __future__ import annotations
@@ -18,6 +21,7 @@ from database.models import AnalysisResult, ProductRow
 from recommend.similarity import similar
 
 PREFERENCES = ("balanced", "nutrition", "price", "transparency")
+SCOPES = ("same_site", "all")
 PER = {"per_100g": "100 g", "per_100ml": "100 ml"}
 LOWER_BETTER = (("total_sugars", "sugar", "g"), ("saturated_fat", "saturated fat", "g"), ("sodium", "sodium", "mg"))
 HIGHER_BETTER = (("fibre", "fibre", "g"), ("protein", "protein", "g"))
@@ -85,10 +89,32 @@ def rationale(src: ProductRow, src_res: AnalysisResult, row: ProductRow, res: An
     return f"{_label(row)}: " + "; ".join(parts[:4]) + "."
 
 
+def _site(row: ProductRow) -> Optional[str]:
+    return row.sources[-1].site if row.sources else None
+
+
+def _not_worse_overall(res: AnalysisResult, src_res: AnalysisResult) -> bool:
+    return src_res.overall_score is None or res.overall_score >= src_res.overall_score
+
+
+def _better(res: AnalysisResult, src_res: AnalysisResult, preference: str) -> bool:
+    """Better on the chosen preference (for price: cheaper per unit and not worse overall)."""
+    v, src_val = _pref_value(res, preference), _pref_value(src_res, preference)
+    if v is None:
+        return False
+    if src_val is None:
+        return True
+    if preference == "price":
+        return v < src_val and _not_worse_overall(res, src_res)
+    return v > src_val
+
+
 def alternatives(s: Session, product_id: int, preference: str = "balanced", limit: int = 5,
-                 store: bool = True) -> Optional[dict]:
+                 store: bool = True, scope: str = "same_site") -> Optional[dict]:
     if preference not in PREFERENCES:
         raise ValueError(f"preference must be one of {PREFERENCES}")
+    if scope not in SCOPES:
+        raise ValueError(f"scope must be one of {SCOPES}")
     src = repo.get_row(s, product_id)
     if src is None:
         return None
@@ -96,7 +122,8 @@ def alternatives(s: Session, product_id: int, preference: str = "balanced", limi
     version = scoring_config()["methodology_version"]
     base = {"source_product_id": product_id, "preference": preference, "methodology_version": version,
             "eligible_count": 0, "alternatives": [],
-            "picks": {"best_match": None, "lowest_unit_price": None, "best_nutrition": None}, "message": None}
+            "picks": {"best_match": None, "lowest_unit_price": None, "best_nutrition": None}, "message": None,
+            "site": _site(src), "scope": "all"}
     if src_res is None:
         base["message"] = "This product has not been analysed yet."
         return base
@@ -107,28 +134,26 @@ def alternatives(s: Session, product_id: int, preference: str = "balanced", limi
 
     pool = [(r, a) for r, a in repo.latest_analyses(s, src.category)
             if r.id != src.id and r.nutrition_basis == src.nutrition_basis and a.overall_score is not None]
-    base["eligible_count"] = len(pool)
     if not pool:
         base["message"] = "No other stored product in this category has enough data to compare."
         return base
+    notes = []
+    if scope == "same_site" and base["site"]:
+        same = [(r, a) for r, a in pool if _site(r) == base["site"]]
+        if any(_better(a, src_res, preference) for _, a in same):
+            pool, base["scope"] = same, "same_site"
+        else:
+            notes.append(f"No other product analysed from {base['site']} does better, so these come from all "
+                         "stored products. Analyse more products from that site to compare within it.")
+    base["eligible_count"] = len(pool)
 
     sims = dict(similar(repo.to_product(src), [repo.to_product(r) for r, _ in pool], k=len(pool),
                         same_category=False))
-    src_val = _pref_value(src_res, preference)
-
-    def better(res: AnalysisResult) -> bool:
-        v = _pref_value(res, preference)
-        if v is None:
-            return False
-        if src_val is None:
-            return True
-        return v < src_val if preference == "price" else v > src_val
 
     def not_worse_overall(res: AnalysisResult) -> bool:
-        return src_res.overall_score is None or res.overall_score >= src_res.overall_score
+        return _not_worse_overall(res, src_res)
 
-    eligible = [(i, r, a) for i, (r, a) in enumerate(pool)
-                if better(a) and (preference != "price" or not_worse_overall(a))]
+    eligible = [(i, r, a) for i, (r, a) in enumerate(pool) if _better(a, src_res, preference)]
     sign = 1 if preference == "price" else -1
     eligible.sort(key=lambda t: (sign * _pref_value(t[2], preference), -sims.get(t[0], 0.0)))
 
@@ -141,13 +166,14 @@ def alternatives(s: Session, product_id: int, preference: str = "balanced", limi
                     "preference_score": _pref_value(a, preference),
                     "matching_attributes": matching_attributes(src, src_res, r, a),
                     "rationale": rationale(src, src_res, r, a, preference),
-                    "source_url": repo.source_info(r)["source_url"],
+                    "source_url": repo.source_info(r)["source_url"], "site": _site(r),
                     "collected_at": repo.source_info(r)["collected_at"]})
     base["alternatives"] = out
     if not out:
         what = {"balanced": "overall", "nutrition": "nutrition", "transparency": "transparency",
                 "price": "price per unit without a lower overall score"}[preference]
-        base["message"] = f"No stored product in this category does better on {what} than this one."
+        notes.append(f"No stored product in this category does better on {what} than this one.")
+    base["message"] = " ".join(notes) or None
 
     def pick(cands, key, lowest=False, reason=""):
         cands = [(r, a) for r, a in cands if key(a) is not None]

@@ -6,13 +6,17 @@ AI-Based Multimodal Packaged Food Analysis and Consumer Decision Support System.
 Minor project, MSIT (GGSIPU), New Delhi. Idea originated by **Sneha Juyal**.
 Team: Sneha Juyal, Radhika, Shinjini. Guides: Dr. Sudesh Pahal, Dr. Neeru Rathee.
 
-Paste a packaged-food product page. The system fetches it safely, extracts the listing, normalises every
+Paste a packaged-food product page, or upload a pack photo, an app screenshot or a page saved from the
+browser. The system reads it (fetching a URL safely, or reading the file with nothing fetched), extracts the listing, normalises every
 value to per 100 g/ml with its evidence label and source, stores it in PostgreSQL, scores nutrition,
 ingredients, transparency, claims and value with explanations, checks front-of-pack claims against FSSAI
-conditions, and suggests alternatives from stored products only.
+conditions, and suggests alternatives from stored products only, from the same shop (for example Blinkit)
+when the product came from one.
 
-> Status (12 Oct 2026): URL-first V1. Consumer decision support, not a medical or clinical score.
-> Barcode scanning, label OCR, cross-source validation, personalisation, basket optimisation and lab
+> Status (17 Oct 2026): URL-first V1 with photo and saved-page upload. Consumer decision support, not a
+> medical or clinical score. Photos are read by Claude's vision model (needs `ANTHROPIC_API_KEY`); values
+> are kept only if they appear in the model's transcript of the label, and photo-reading accuracy has not
+> been measured. Barcode scanning, cross-source validation, personalisation, basket optimisation and lab
 > evidence are future work and are not implemented. No accuracy figures are claimed; see [docs/nutriscore_comparison.md](docs/nutriscore_comparison.md) and
 > [reports/final_report.md](reports/final_report.md) for what was measured and on how much data.
 
@@ -37,13 +41,13 @@ extract (2,692 records) is reproducible with `./run.sh off-export`. See [data/sa
 
 | Page | |
 | --- | --- |
-| Landing (`/`) | URL input, how it works, an illustrative sample (labelled synthetic), evidence standards, limitations |
+| Landing (`/`) | URL input, photo / screenshot / saved-page upload with the shop it came from, how it works, an illustrative sample (labelled synthetic), evidence standards, limitations |
 | Product report (`/products/{id}`) | Score and grade, dimension explanations, nutrition per 100 g/ml with traffic lights, printed vs normalised values, ingredient explorer, claim panel, missing and conflicting fields, extraction log, alternatives |
 | Compare (`/compare`) | 2–6 stored products in one category on one basis, picks with reasons, ingredient differences |
-| Alternatives | Balanced, nutrition, lower unit price or transparency; stored records only; says so when none qualify |
+| Alternatives | Balanced, nutrition, lower unit price or transparency; stored records only, from the same shop when known (falls back to all stored products and says so); says so when none qualify |
 | Methodology (`/methodology`) | Weights, thresholds and claim rules with sources, missing-data rules, limitations, data licences |
 
-API: `POST /api/analyze-url`, `GET /api/products`, `GET /api/products/{id}`, `POST /api/products/compare`,
+API: `POST /api/analyze-url`, `POST /api/analyze-upload`, `GET /api/products`, `GET /api/products/{id}`, `POST /api/products/compare`,
 `GET /api/products/{id}/alternatives`, `GET /api/reference/categories`, `GET /api/reference/methodology`,
 `GET /api/health`. See [docs/api.md](docs/api.md).
 

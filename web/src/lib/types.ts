@@ -42,6 +42,15 @@ export interface AnalyzeUrlRequest {
   refresh?: boolean;
 }
 
+export interface AnalyzeUploadRequest {
+  file: File;
+  /** Where the product was listed, if known. */
+  page_url?: string | null;
+  /** Shop it is from, e.g. blinkit.com. */
+  site?: string | null;
+  category?: string | null;
+}
+
 export interface ProductSummary {
   product_id: number;
   name: string | null;
@@ -67,6 +76,8 @@ export interface ProductList {
 export interface SourceInfo {
   source_type: string;
   source_url: string | null;
+  /** Shop the listing came from, e.g. blinkit.com (null for Open Food Facts and sample records). */
+  site?: string | null;
   extraction_method?: string | null;
   collected_at?: string | null;
   last_verified_at?: string | null;
@@ -315,6 +326,7 @@ export interface Alternative {
   matching_attributes: string[];
   rationale: string;
   source_url: string | null;
+  site?: string | null;
   collected_at: string | null;
 }
 
@@ -323,6 +335,10 @@ export interface AlternativesResult {
   preference: Preference;
   methodology_version: string;
   eligible_count: number;
+  /** Shop the source product came from, if known. */
+  site?: string | null;
+  /** same_site: drawn only from products analysed from that shop; all: every stored product. */
+  scope?: "same_site" | "all";
   alternatives: Alternative[];
   picks?: {
     best_match?: (Partial<Alternative> & { product_id: number; reason?: string }) | null;

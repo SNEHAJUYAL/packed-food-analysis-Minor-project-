@@ -20,7 +20,7 @@ EVIDENCE = ("declared", "derived", "interpreted", "verified", "unknown")
 CATEGORIES = ("biscuits_cookies", "breakfast_cereals", "instant_noodles", "beverages", "namkeen_chips")
 CLAIM_STATUSES = ("consistent with available evidence", "requires context",
                   "potential inconsistency for review", "cannot be verified from available information")
-SOURCE_TYPES = ("url", "open_food_facts", "synthetic_sample", "manual")
+SOURCE_TYPES = ("url", "open_food_facts", "synthetic_sample", "manual", "photo", "saved_page")
 
 
 def _in(col: str, values) -> str:
@@ -87,6 +87,7 @@ class ProductSource(Base):
     product_id: Mapped[int] = mapped_column(ForeignKey("product.id", ondelete="CASCADE"), index=True)
     source_type: Mapped[str] = mapped_column(String(30))
     source_url: Mapped[Optional[str]] = mapped_column(Text)
+    site: Mapped[Optional[str]] = mapped_column(String(100), index=True)  # shop the listing came from, e.g. blinkit.com
     collected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     last_verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
     source_reliability: Mapped[str] = mapped_column(String(60))

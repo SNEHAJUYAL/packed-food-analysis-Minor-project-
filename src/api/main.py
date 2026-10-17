@@ -7,7 +7,7 @@ import time
 from collections import defaultdict, deque
 from typing import Any, Literal, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Query, Request
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Query, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -27,6 +27,8 @@ logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"),
 log = logging.getLogger("fdi.api")
 
 MAX_BODY_BYTES = int(os.environ.get("MAX_REQUEST_BYTES", 65536))
+MAX_UPLOAD_BYTES = int(os.environ.get("MAX_UPLOAD_BYTES", 9 * 1024 * 1024))  # photos up to 8 MB plus form fields
+UPLOAD_PATHS = {"/api/analyze-upload"}
 RATE_LIMIT = int(os.environ.get("RATE_LIMIT_PER_MINUTE", 10))
 VERSION = scoring_config()["methodology_version"]
 
@@ -70,9 +72,13 @@ async def _db_error(request: Request, exc: Exception):
 async def limits_and_logging(request: Request, call_next):
     started = time.perf_counter()
     length = request.headers.get("content-length")
-    if length and length.isdigit() and int(length) > MAX_BODY_BYTES:
+    limit = MAX_UPLOAD_BYTES if request.url.path in UPLOAD_PATHS else MAX_BODY_BYTES
+    if request.url.path in UPLOAD_PATHS and not (length and length.isdigit()):
+        return JSONResponse(status_code=411, content={"detail": {
+            "code": "length_required", "message": "Uploads need a Content-Length header."}})
+    if length and length.isdigit() and int(length) > limit:
         return JSONResponse(status_code=413, content={"detail": {
-            "code": "too_large", "message": f"Request body over {MAX_BODY_BYTES} bytes."}})
+            "code": "too_large", "message": f"Request body over {limit} bytes."}})
     response = await call_next(request)
     log.info("%s %s -> %s in %.0f ms", request.method, request.url.path, response.status_code,
              (time.perf_counter() - started) * 1000)
@@ -120,6 +126,7 @@ class AnalyzeUrlRequest(BaseModel):
 class SourceInfo(BaseModel):
     source_type: str
     source_url: Optional[str]
+    site: Optional[str] = None
     extraction_method: Optional[str]
     collected_at: Optional[str]
     last_verified_at: Optional[str]
@@ -207,6 +214,7 @@ class Alternative(BaseModel):
     matching_attributes: list[str]
     rationale: str
     source_url: Optional[str]
+    site: Optional[str] = None
     collected_at: Optional[str]
 
 
@@ -218,6 +226,8 @@ class AlternativesResponse(BaseModel):
     alternatives: list[Alternative]
     picks: dict[str, Optional[Pick]]
     message: Optional[str]
+    site: Optional[str] = Field(None, description="Shop the product was analysed from, if known")
+    scope: Literal["same_site", "all"] = Field("all", description="Where the alternatives were drawn from")
 
 
 class CategoryInfo(BaseModel):
@@ -256,6 +266,25 @@ def analyze_url(req: AnalyzeUrlRequest, s=Depends(db)) -> dict:
     return services.analyze_url(s, req.url.strip(), req.category, req.refresh)
 
 
+@app.post("/api/analyze-upload", response_model=ProductAnalysis, tags=["analysis"],
+          dependencies=[Depends(rate_limited)])
+async def analyze_upload(file: UploadFile = File(..., description="Pack photo, app screenshot, or saved product page (.html)"),
+                         page_url: Optional[str] = Form(None, max_length=2048,
+                                                        description="Where the product was listed, if known"),
+                         site: Optional[str] = Form(None, max_length=100,
+                                                    description="Shop it is from, e.g. blinkit.com or zeptonow.com"),
+                         category: Optional[Category] = Form(None), s=Depends(db)) -> dict:
+    """Read a photo or a saved page (nothing is fetched), then normalise, store and score it like a URL."""
+    data = await file.read(MAX_UPLOAD_BYTES + 1)
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise error(413, "too_large", f"File over {MAX_UPLOAD_BYTES} bytes.")
+    try:
+        return services.analyze_upload(s, data, file.filename or "", file.content_type, page_url or None,
+                                       site or None, category)
+    except services.UploadError as e:
+        raise error(e.status, e.code, e.message)
+
+
 @app.get("/api/products", response_model=ProductList, tags=["products"])
 def list_products(category: Optional[Category] = None, q: Optional[str] = Query(None, max_length=100),
                   limit: int = Query(50, ge=1, le=500), s=Depends(db)) -> dict:
@@ -282,8 +311,11 @@ def compare(req: CompareRequest, s=Depends(db)) -> dict:
 
 @app.get("/api/products/{product_id}/alternatives", response_model=AlternativesResponse, tags=["products"])
 def get_alternatives(product_id: int, preference: Literal["balanced", "nutrition", "price", "transparency"] = "balanced",
-                     limit: int = Query(5, ge=1, le=20), s=Depends(db)) -> dict:
-    out = alternatives(s, product_id, preference, limit)
+                     limit: int = Query(5, ge=1, le=20),
+                     scope: Literal["same_site", "all"] = Query("same_site", description="same_site falls back to "
+                                                                "all stored products when nothing qualifies"),
+                     s=Depends(db)) -> dict:
+    out = alternatives(s, product_id, preference, limit, scope=scope)
     if out is None:
         raise error(404, "not_found", f"No stored product with id {product_id}.")
     return out
@@ -320,7 +352,11 @@ LIMITATIONS = [
     "Red (high) nutrient bounds use the UK FSA 2016 scheme as a labelled placeholder; FSSAI has no final 'high' cut-offs.",
     "FSSAI front-of-pack warning thresholds are not published, so the warning simulation is not run.",
     "Extraction accuracy has not been measured on a verified set yet; see notebooks/evaluation.ipynb for what is measured.",
-    "Barcode scanning, label OCR, cross-source validation, personalisation and lab evidence are future work.",
+    "Label photos are read by a vision model; values are kept only if they appear in its transcript, but the "
+    "transcript itself can be misread, so check it against the pack. Accuracy on photos has not been measured.",
+    "Same-site alternatives come only from products already analysed from that site; the shop's catalogue is "
+    "not crawled.",
+    "Barcode scanning, cross-source validation, personalisation and lab evidence are future work.",
     "The score is consumer decision support, not a medical or clinical assessment.",
 ]
 DATA_SOURCES = [
