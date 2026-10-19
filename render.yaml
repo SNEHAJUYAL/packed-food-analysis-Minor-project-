@@ -1,0 +1,23 @@
+# Render Blueprint for the API (Render dashboard: New > Blueprint, pick this repository).
+# The web app goes on Vercel; the database is a free Neon PostgreSQL. See docs/deployment.md, "Option C".
+services:
+  - type: web
+    name: fdi-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    # Migrate, load the sample data into an empty database, then serve on Render's port
+    dockerCommand: >-
+      sh -c "alembic upgrade head
+      && python -m database.ingest data/sample/off_india_subset.jsonl data/sample/synthetic_products.jsonl --if-empty
+      && uvicorn api.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'"
+    envVars:
+      - key: DATABASE_URL
+        sync: false # paste the Neon connection string in the Render dashboard
+      - key: ANTHROPIC_API_KEY
+        sync: false # optional; leave empty to use Tesseract only
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "30"
+      - key: LOG_LEVEL
+        value: INFO

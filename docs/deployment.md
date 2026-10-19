@@ -77,6 +77,28 @@ Local URL demo without internet: `./run.sh demo-pages` serves the synthetic test
 the private-address check, then analyse `http://127.0.0.1:8090/cereal_jsonld.html` in the web app. Never
 set `FETCH_DEV_ALLOW_HOSTS` on a shared deployment.
 
+## Option C: hosted (Vercel + Render + Neon, all free tiers)
+
+* **Web** (Next.js in `web/`) on Vercel. The browser only talks to Vercel; its `/api/*` rewrite forwards
+  to the API, so no CORS setup is needed.
+* **API** (FastAPI) on Render as a Docker service, because it needs the Tesseract program for photo
+  uploads, which Vercel's Python runtime does not have. `render.yaml` describes the service; on each
+  start it applies migrations and loads the sample data into an empty database.
+* **Database**: a free Neon PostgreSQL. Render's free database is deleted after 30 days, Neon's is not.
+
+Steps:
+
+1. Neon: create a project and copy its connection string (`postgresql://...?sslmode=require`).
+2. Render: New > Blueprint, pick this repository, paste the Neon string as `DATABASE_URL`, deploy.
+   Check `https://<service>.onrender.com/api/health`.
+3. Vercel: Add New > Project, import this repository, set Root Directory to `web`, add the environment
+   variable `API_BASE_URL=https://<service>.onrender.com`, deploy. The rewrite target is fixed at build
+   time, so redeploy on Vercel after changing it.
+
+Render's free service sleeps after 15 minutes without traffic; the first request after that takes
+about a minute while it wakes. Shops such as Blinkit or Zepto may refuse page fetches from hosted
+servers, so uploading a saved page or a screenshot remains the dependable route.
+
 ## Tests
 
 ```bash
