@@ -31,7 +31,7 @@ import httpx
 
 from core.config import ROOT
 
-CACHE_DIR = ROOT / "data" / "cache"
+CACHE_DIR = Path(os.environ.get("FETCH_CACHE_DIR") or ROOT / "data" / "cache")
 USER_AGENT = "FoodDecisionIntelligence/0.1 (academic project, MSIT GGSIPU)"
 ALLOWED_SCHEMES = {"http", "https"}
 ALLOWED_PORTS = {None, 80, 443}

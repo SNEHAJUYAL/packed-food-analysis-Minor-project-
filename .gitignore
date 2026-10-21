@@ -13,3 +13,9 @@ web/.next/
 web/next-env.d.ts
 web/*.tsbuildinfo
 web/.env.local
+.vercel
+# files the Vercel Python build generates locally
+_uv/
+api/pyproject.toml
+api/uv.lock
+api/.python-version

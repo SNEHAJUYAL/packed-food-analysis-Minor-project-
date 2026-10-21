@@ -77,27 +77,33 @@ Local URL demo without internet: `./run.sh demo-pages` serves the synthetic test
 the private-address check, then analyse `http://127.0.0.1:8090/cereal_jsonld.html` in the web app. Never
 set `FETCH_DEV_ALLOW_HOSTS` on a shared deployment.
 
-## Option C: hosted (Vercel + Render + Neon, all free tiers)
+## Option C: hosted on Vercel (two projects) with a Neon database
 
-* **Web** (Next.js in `web/`) on Vercel. The browser only talks to Vercel; its `/api/*` rewrite forwards
-  to the API, so no CORS setup is needed.
-* **API** (FastAPI) on Render as a Docker service, because it needs the Tesseract program for photo
-  uploads, which Vercel's Python runtime does not have. `render.yaml` describes the service; on each
-  start it applies migrations and loads the sample data into an empty database.
-* **Database**: a free Neon PostgreSQL. Render's free database is deleted after 30 days, Neon's is not.
+* **Web**: a Vercel project with Root Directory `web`. The browser only talks to it; its `/api/*` rewrite
+  forwards to the API project, so no CORS setup is needed.
+* **API**: a second Vercel project with the repository root as its root. `api/index.py` is the entry,
+  `api/requirements.txt` its slimmed dependencies (Vercel's size limit), and `vercel.json` sends every
+  path to it. The first cold start applies the migrations and loads the sample data into an empty database.
+* **Database**: add Neon from the API project's Storage tab; it sets `DATABASE_URL` (and
+  `DATABASE_URL_UNPOOLED`, used for migrations).
+
+Limits on Vercel: there is no Tesseract program, so pack photos are read only when `ANTHROPIC_API_KEY`
+is set (saved product pages work either way); uploads are capped at 4.5 MB; scikit-learn is left out and
+`src/recommend/similarity.py` uses an equivalent plain-Python TF-IDF (same scores).
 
 Steps:
 
-1. Neon: create a project and copy its connection string (`postgresql://...?sslmode=require`).
-2. Render: New > Blueprint, pick this repository, paste the Neon string as `DATABASE_URL`, deploy.
-   Check `https://<service>.onrender.com/api/health`.
-3. Vercel: Add New > Project, import this repository, set Root Directory to `web`, add the environment
-   variable `API_BASE_URL=https://<service>.onrender.com`, deploy. The rewrite target is fixed at build
-   time, so redeploy on Vercel after changing it.
+1. Deploy the API project from the repository root (Vercel import, or `npx vercel --prod` in the root).
+2. In that project: Storage > Create Database > Neon, connect it to the project, then redeploy.
+   Check `https://<api-project>.vercel.app/api/health`.
+3. In the web project: Settings > Environment Variables, set `API_BASE_URL` to the API address, then
+   redeploy (the rewrite target is fixed at build time).
 
-Render's free service sleeps after 15 minutes without traffic; the first request after that takes
-about a minute while it wakes. Shops such as Blinkit or Zepto may refuse page fetches from hosted
-servers, so uploading a saved page or a screenshot remains the dependable route.
+Shops such as Blinkit or Zepto may refuse page fetches from hosted servers, so uploading a saved page
+remains the dependable route.
+
+`render.yaml` is the alternative for the API when photo reading must work without an API key: Render
+runs the Dockerfile, which includes Tesseract.
 
 ## Tests
 

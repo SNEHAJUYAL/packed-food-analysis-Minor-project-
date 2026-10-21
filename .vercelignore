@@ -1,0 +1,8 @@
+web
+docs
+notebooks
+reports
+tests
+data/raw
+data/cache
+.venv
