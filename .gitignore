@@ -19,3 +19,5 @@ _uv/
 api/pyproject.toml
 api/uv.lock
 api/.python-version
+/uv.lock
+/.python-version
