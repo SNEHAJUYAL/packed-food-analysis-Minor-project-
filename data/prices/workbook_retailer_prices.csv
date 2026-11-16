@@ -1,0 +1,81 @@
+observed_date,retailer,place,product_name,brand,pack_size,price_inr,listing_url,workbook_ref
+2026-11-16,DMart Ready,Delhi,Real Fruit Power Mixed Fruit,Dabur,1L,102,,PRD-001
+2026-11-16,JioMart Grocery,Delhi,Real Fruit Power Mixed Fruit,Dabur,1L,75,,PRD-001
+2026-11-16,Digihaat,Delhi,Real Fruit Power Mixed Fruit,Dabur,1L,115,,PRD-001
+2026-11-16,Gharstuff,Delhi,Real Fruit Power Mixed Fruit,Dabur,1L,107,,PRD-001
+2026-11-16,Amazon.in,Delhi,Real Fruit Power Mixed Fruit,Dabur,1L,125,,PRD-001
+2026-11-16,Fetch N Buy,Delhi,Paper Boat Aam Panna,Hector Beverages,250ml,40,,PRD-002
+2026-11-16,servicemagician.in,Delhi,Paper Boat Aam Panna,Hector Beverages,250ml,33,,PRD-002
+2026-11-16,Zepto,Delhi,B Natural Mixed Fruit,ITC,1L,77,,PRD-003
+2026-11-16,StarQuik,Delhi,Tang Orange Drink Powder,Mondelez India,500g,164.9,,PRD-005
+2026-11-16,IndBiz,Delhi,Tang Orange Drink Powder,Mondelez India,500g,149,,PRD-005
+2026-11-16,Digihaat,Delhi,Tang Orange Drink Powder,Mondelez India,500g,135,,PRD-005
+2026-11-16,FarmLokal,Delhi,Tang Orange Drink Powder,Mondelez India,500g,150,,PRD-005
+2026-11-16,JuleBi,Delhi,Tang Orange Drink Powder,Mondelez India,500g,139,,PRD-005
+2026-11-16,StarQuik,Delhi,Appy Fizz,Parle Agro,600ml,39,,PRD-006
+2026-11-16,Instamart,Delhi,Appy Fizz,Parle Agro,600ml,38,,PRD-006
+2026-11-16,FarmLokal,Delhi,Appy Fizz,Parle Agro,600ml,38,,PRD-006
+2026-11-16,Zepto,Delhi,Bournvita Chocolate Nutrition Drink,Mondelez India,500g,263,,PRD-007
+2026-11-16,JioMart Grocery,Delhi,Bournvita Chocolate Nutrition Drink,Mondelez India,500g,224,,PRD-007
+2026-11-16,Fetch N Buy,Delhi,Bournvita Chocolate Nutrition Drink,Mondelez India,500g,223,,PRD-007
+2026-11-16,Quick Pantry,Delhi,Bournvita Chocolate Nutrition Drink,Mondelez India,500g,255,,PRD-007
+2026-11-16,Bejjur Supermarket,Delhi,Bournvita Chocolate Nutrition Drink,Mondelez India,500g,219,,PRD-007
+2026-11-16,Apollo247,Delhi,Protinex Original,Danone India,400g,631.8,,PRD-010
+2026-11-16,Apollo247,Delhi,Boost Health Drink,Hindustan Unilever,500g,264,,PRD-012
+2026-11-16,Digihaat,Delhi,Boost Health Drink,Hindustan Unilever,500g,284,,PRD-012
+2026-11-16,Zepto,Delhi,NutriChoice Digestive Biscuits,Britannia,250g,56,,PRD-013
+2026-11-16,FarmLokal,Delhi,NutriChoice Digestive Biscuits,Britannia,250g,60,,PRD-013
+2026-11-16,DMart Ready,Delhi,Maggi 2-Minute Instant Masala Noodles,Nestlé India,70g,14,,PRD-014
+2026-11-16,Hyperpure,Delhi,Maggi 2-Minute Instant Masala Noodles,Nestlé India,70g,14.7,,PRD-014
+2026-11-16,Zepto,Delhi,Maggi 2-Minute Instant Masala Noodles,Nestlé India,70g,15,,PRD-014
+2026-11-16,Digihaat,Delhi,Maggi 2-Minute Instant Masala Noodles,Nestlé India,70g,14,,PRD-014
+2026-11-16,Mystore,Delhi,Maggi 2-Minute Instant Masala Noodles,Nestlé India,70g,13,,PRD-014
+2026-11-16,DMart Ready,Delhi,Parle-G Biscuits,Parle Products,800g,82,,PRD-015
+2026-11-16,StarQuik,Delhi,Parle-G Biscuits,Parle Products,800g,79,,PRD-015
+2026-11-16,Apna Mart,Delhi,Parle-G Biscuits,Parle Products,800g,68,,PRD-015
+2026-11-16,FarmLokal,Delhi,Parle-G Biscuits,Parle Products,800g,75,,PRD-015
+2026-11-16,Digihaat,Delhi,Parle-G Biscuits,Parle Products,800g,85,,PRD-015
+2026-11-16,StarQuik,Delhi,Sunfeast Dark Fantasy Choco Fills,ITC,300g,99,,PRD-016
+2026-11-16,Bejjur Supermarket,Delhi,Britannia Good Day Butter,Britannia,250g,48,,PRD-017
+2026-11-16,Bajarhaat,Delhi,Oreo Original,Mondelez India,120g,30,,PRD-018
+2026-11-16,bigbasket.com,Delhi,Haldiram's Aloo Bhujia,Haldiram's,400g,109,,PRD-019
+2026-11-16,Instamart,Delhi,Kellogg's Chocos,Kellogg India,350g,210,,PRD-020
+2026-11-16,Amazon.in,Delhi,Kellogg's Corn Flakes Original,Kellogg India,475g,175,,PRD-021
+2026-11-16,Zepto,Delhi,Kellogg's Corn Flakes Original,Kellogg India,475g,175,,PRD-021
+2026-11-16,Instamart,Delhi,Kellogg's Corn Flakes Original,Kellogg India,475g,193,,PRD-021
+2026-11-16,Apollo247,Delhi,Kellogg's Corn Flakes Original,Kellogg India,475g,195,,PRD-021
+2026-11-16,StarQuik,Delhi,Kellogg's Corn Flakes Original,Kellogg India,475g,195,,PRD-021
+2026-11-16,DMart Ready,Delhi,Quaker Oats,PepsiCo India,400g,80,,PRD-023
+2026-11-16,Instamart,Delhi,Quaker Oats,PepsiCo India,400g,86,,PRD-023
+2026-11-16,Apollo247,Delhi,Quaker Oats,PepsiCo India,400g,86,,PRD-023
+2026-11-16,Zepto,Delhi,Quaker Oats,PepsiCo India,400g,86,,PRD-023
+2026-11-16,CityMall,Delhi,Quaker Oats,PepsiCo India,400g,75,,PRD-023
+2026-11-16,DMart Ready,Delhi,Bagrrys White Oats,Bagrrys India,1kg,161,,PRD-025
+2026-11-16,Zepto,Delhi,Bagrrys White Oats,Bagrrys India,1kg,174,,PRD-025
+2026-11-16,Bagrrys.com,Delhi,Bagrrys White Oats,Bagrrys India,1kg,227,,PRD-025
+2026-11-16,bigbasket.com,Delhi,Bagrrys White Oats,Bagrrys India,1kg,192.02,,PRD-025
+2026-11-16,Amazon.in,Delhi,Bagrrys White Oats,Bagrrys India,1kg,165,,PRD-025
+2026-11-16,Instamart,Delhi,Kissan Mixed Fruit Jam,Hindustan Unilever,500g,25,,PRD-026
+2026-11-16,Zepto,Delhi,Maggi Rich Tomato Ketchup,Nestlé India,1kg,155,,PRD-027
+2026-11-16,Digihaat,Delhi,Maggi Rich Tomato Ketchup,Nestlé India,1kg,132,,PRD-027
+2026-11-16,Fetch N Buy,Delhi,Maggi Rich Tomato Ketchup,Nestlé India,1kg,150,,PRD-027
+2026-11-16,FarmLokal,Delhi,Maggi Rich Tomato Ketchup,Nestlé India,1kg,155,,PRD-027
+2026-11-16,Satvacart,Delhi,Maggi Rich Tomato Ketchup,Nestlé India,1kg,155,,PRD-027
+2026-11-16,FarmLokal,Delhi,Hershey's Chocolate Syrup,Hershey India,623g,198,,PRD-029
+2026-11-16,Add2Bag,Delhi,Hershey's Chocolate Syrup,Hershey India,623g,237.5,,PRD-029
+2026-11-16,Dizcover,Delhi,Hershey's Chocolate Syrup,Hershey India,623g,172,,PRD-029
+2026-11-16,The Gourmet Outlet,Delhi,Hershey's Chocolate Syrup,Hershey India,623g,230,,PRD-029
+2026-11-16,Easy Bakes,Delhi,Hershey's Chocolate Syrup,Hershey India,623g,210,,PRD-029
+2026-11-16,Instamart,Delhi,Funfoods Veg Mayonnaise,Dr. Oetker India,400g,95,,PRD-031
+2026-11-16,Zepto,Delhi,Crax Peri Peri Ragi Chips,Crax,80g,39,,PRD-032
+2026-11-16,Instamart,Delhi,Crax Peri Peri Ragi Chips,Crax,80g,38,,PRD-032
+2026-11-16,Fetch N Buy,Delhi,Crax Peri Peri Ragi Chips,Crax,80g,50,,PRD-032
+2026-11-16,Zepto,Delhi,The Health Factory Mini Cakes Berry Blast,The Health Factory,,114,,PRD-033
+2026-11-16,Zepto,Delhi,Sweet Karam Coffee Classic Tapioca Chips,Sweet Karam Coffee,,61,,PRD-034
+2026-11-16,Instamart,Delhi,Sweet Karam Coffee Classic Tapioca Chips,Sweet Karam Coffee,,66,,PRD-034
+2026-11-16,bigbasket.com,Delhi,Sweet Karam Coffee Classic Tapioca Chips,Sweet Karam Coffee,,64.17,,PRD-034
+2026-11-16,Sweet Karam Coffee,Delhi,Sweet Karam Coffee Classic Tapioca Chips,Sweet Karam Coffee,,69,,PRD-034
+2026-11-16,Zepto,Delhi,RAW Pressery Iced Green Tea Peach,RAW Pressery,250ml,48,,PRD-035
+2026-11-16,bigbasket.com,Delhi,RAW Pressery Iced Green Tea Peach,RAW Pressery,250ml,50.35,,PRD-035
+2026-11-16,JioMart Grocery,Delhi,Paper Boat Swing Pomegranate Fruit Juice,Paper Boat,600ml,36,,PRD-036
+2026-11-16,Bejjur Supermarket,Delhi,Paper Boat Swing Pomegranate Fruit Juice,Paper Boat,600ml,40,,PRD-036

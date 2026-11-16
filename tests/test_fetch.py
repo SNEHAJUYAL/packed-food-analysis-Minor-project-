@@ -76,6 +76,34 @@ def test_redirect_chain_is_followed_and_validated():
     assert final == "https://brand.example/new" and "ok" in text
 
 
+def test_source_host_allowlist_blocks_public_cross_host_redirect():
+    calls = []
+    def handler(request):
+        calls.append(request.url.host)
+        return httpx.Response(302, headers={"location": "https://other.example/product"})
+    with pytest.raises(F.FetchBlocked) as e:
+        F.safe_get("https://world.openfoodfacts.org/product/123", _client(handler), resolver=PUBLIC,
+                   allowed_hosts={"world.openfoodfacts.org"})
+    assert e.value.code == "source_redirect_blocked"
+    assert calls == ["world.openfoodfacts.org"]
+
+
+def test_restricted_fetch_blocks_unregistered_initial_host_before_dns_or_http():
+    dns_calls, requests = [], []
+    client = _client(lambda request: requests.append(request.url.host) or httpx.Response(200, html="ok"))
+    with pytest.raises(F.FetchBlocked) as e:
+        F.fetch_page("https://unregistered.example/product", client=client,
+                     resolver=lambda host: dns_calls.append(host) or ["93.184.216.34"],
+                     allowed_hosts=frozenset({"world.openfoodfacts.org"}))
+    assert e.value.code == "source_redirect_blocked"
+    assert dns_calls == [] and requests == []
+
+
+def test_restricted_source_uses_policy_scoped_cache_key():
+    url = "https://world.openfoodfacts.org/product/123"
+    assert F._cache_path(url) != F._cache_path(url, frozenset({"world.openfoodfacts.org"}))
+
+
 def test_too_many_redirects():
     client = _client(lambda r: httpx.Response(302, headers={"location": "/loop"}))
     with pytest.raises(F.FetchError) as e:

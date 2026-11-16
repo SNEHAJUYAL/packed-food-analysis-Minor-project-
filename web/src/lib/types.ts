@@ -42,6 +42,60 @@ export interface AnalyzeUrlRequest {
   refresh?: boolean;
 }
 
+export interface CandidateProvenance {
+  source_id: string;
+  source_url: string;
+  extraction_method: string;
+  collected_at: string;
+  raw_value?: unknown;
+  evidence_state?: string;
+}
+
+export interface CandidateFieldEvidence {
+  field_path: string;
+  original_value: unknown;
+  normalized_value?: unknown;
+  provenance: CandidateProvenance;
+  validation_status: "candidate" | "requires_review" | "conflict" | "invalid";
+}
+
+export interface CandidateIssue {
+  code: string;
+  field_path: string;
+  message: string;
+  severity: "error" | "warning" | "info";
+}
+
+export interface ProductURLCandidateResult {
+  status: "candidate" | "blocked" | "invalid" | "failed";
+  submitted_url: string;
+  source_id?: string | null;
+  candidate?: {
+    candidate_id: string;
+    status: "candidate";
+    source_id: string;
+    source_attribution?: string | null;
+    license?: string | null;
+    submitted_url: string;
+    final_url: string;
+    extracted_at: string;
+    normalized_product: Product;
+    field_evidence: CandidateFieldEvidence[];
+    images: {
+      image_url: string;
+      source: string;
+      image_type: string;
+      product_association: "product_entity" | "page_level_unverified";
+      validation_status: "url_syntax_valid_not_fetched" | "requires_review" | "invalid";
+      provenance: CandidateProvenance;
+    }[];
+    issues: CandidateIssue[];
+  } | null;
+  issues?: CandidateIssue[];
+  error_code?: string | null;
+  message?: string | null;
+}
+
 export interface AnalyzeUploadRequest {
   file: File;
   /** Where the product was listed, if known. */
@@ -51,6 +105,28 @@ export interface AnalyzeUploadRequest {
   category?: string | null;
   /** Product name, when the image does not show it. */
   name?: string | null;
+  /** Optional corrections/additions; user values take precedence over extracted values. */
+  corrections?: {
+    brand?: string | null;
+    variant?: string | null;
+    pack_size_text?: string | null;
+    ingredients_text?: string | null;
+    nutrition_basis?: NutritionBasis | null;
+    nutrition_text?: string | null;
+  };
+}
+
+export interface ManualAnalyzeRequest {
+  name: string;
+  brand?: string | null;
+  category?: string | null;
+  variant?: string | null;
+  pack_size?: number | null;
+  pack_unit?: "g" | "ml" | null;
+  ingredients_text?: string | null;
+  nutrition_basis?: NutritionBasis | null;
+  nutrition?: Record<string, string>;
+  price_inr?: number | null;
 }
 
 export interface ProductSummary {
@@ -123,7 +199,7 @@ export interface IngredientItem {
 }
 
 export interface Product {
-  product_id?: number | null;
+  product_id?: number | string | null;
   name: Evidence<string>;
   brand: Evidence<string>;
   category: Evidence<string>;
@@ -131,6 +207,12 @@ export interface Product {
   pack_size: Evidence<number>;
   pack_unit: Evidence<string>;
   price_inr: Evidence<number>;
+  image_url?: Evidence<string>;
+  mrp_inr?: Evidence<number>;
+  discount_percent?: Evidence<number>;
+  availability?: Evidence<string>;
+  multipack_count?: Evidence<number>;
+  retailer?: Evidence<string>;
   ingredients_raw?: Evidence<string>;
   nutrition_basis: NutritionBasis | null;
   nutrition: Record<string, Evidence<number>>;
@@ -263,6 +345,125 @@ export interface ProductAnalysis {
   extraction_log?: ExtractionLogEntry[];
   methodology_version: string;
   report: Report;
+  extras?: ProductExtras;
+}
+
+export interface Micronutrient {
+  label: string;
+  value: number;
+  unit: string;
+  group: "mineral" | "vitamin" | "other";
+  source: string;
+}
+
+/** Shown on the report but not scored. */
+export interface ProductExtras {
+  micronutrients?: Record<string, Micronutrient>;
+  image_url?: string | null;
+  off_nutriscore_grade?: string | null;
+  price_observation_count?: number;
+}
+
+export interface SearchStoredHit {
+  product_id: number;
+  name: string | null;
+  brand: string | null;
+  category: string | null;
+  barcode?: string | null;
+  pack_size?: number | null;
+  pack_unit?: "g" | "ml" | null;
+  price_inr?: number | null;
+  price_retailer?: string | null;
+  price_evidence?: PriceEvidence | null;
+  source_url?: string | null;
+  collected_at?: string | null;
+  overall: number | null;
+  grade: Grade | null;
+  status: AnalysisStatus;
+  price_per_100: number | null;
+  is_synthetic: boolean;
+  image_url?: string | null;
+}
+
+export interface SearchOnlineHit {
+  barcode: string;
+  name: string | null;
+  brand: string | null;
+  quantity: string | null;
+  nutriscore_grade: string | null;
+  image_url: string | null;
+  product_id: number | null;
+  stored: boolean;
+  source_url: string;
+}
+
+export interface SearchResult {
+  query: string;
+  stored: SearchStoredHit[];
+  online: SearchOnlineHit[];
+  notes: string[];
+  attribution: string;
+}
+
+export type PriceEvidence = "invoice" | "hand" | "unverified" | "synthetic";
+
+export interface PriceObservationRow {
+  id: number;
+  retailer: string;
+  retailer_label: string;
+  price_inr: number;
+  pack_size: number | null;
+  pack_unit: string | null;
+  price_per_100: number | null;
+  observed_at: string | null;
+  source: string | null;
+  source_url: string | null;
+  evidence: PriceEvidence;
+  evidence_text: string;
+  is_mrp: boolean;
+  outlier: boolean;
+}
+
+export interface RetailerPrice {
+  retailer: string;
+  retailer_label: string;
+  observations: number;
+  evidence: PriceEvidence;
+  outlier: boolean;
+  latest_price_inr: number;
+  latest_price_per_100: number | null;
+  latest_observed_at: string | null;
+  pack_size: number | null;
+  pack_unit: string | null;
+  lowest_price_per_100: number | null;
+  highest_price_per_100: number | null;
+  change_inr: number | null;
+  change_percent: number | null;
+  trend: "up" | "down" | "flat" | null;
+  source_url: string | null;
+}
+
+export interface PriceSummary {
+  product_id: number;
+  basis: string;
+  is_synthetic: boolean;
+  observations: PriceObservationRow[];
+  retailers: RetailerPrice[];
+  cheapest: string | null;
+  spread: { cheapest: string; dearest: string; difference_per_100: number; difference_percent: number | null } | null;
+  vs_category: { category_median_per_100: number; peer_count: number; difference_percent: number } | null;
+  mrp: { price_inr: number; observed_at: string | null; evidence_text: string } | null;
+  notes: string[];
+  retailer_options: Record<string, string>;
+}
+
+export interface PriceEntryRequest {
+  retailer: string;
+  price_inr: number;
+  pack_size_text?: string | null;
+  observed_at?: string | null;
+  place?: string | null;
+  listing_url?: string | null;
 }
 
 export interface CompareRequest {

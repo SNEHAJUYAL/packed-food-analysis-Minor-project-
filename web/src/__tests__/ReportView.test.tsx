@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { ReportView } from "@/components/ReportView";
 import { alternatives, makeAnalysis, makePartialAnalysis, makeUnscoredAnalysis } from "@/__fixtures__";
 import { mockFetch } from "./helpers";
@@ -10,6 +10,15 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("ReportView (current backend output)", () => {
+  it("labels saved-page evidence as user-supplied and unverified", () => {
+    const analysis = makeAnalysis({ source: {
+      source_type: "saved_page", source_url: null, extraction_method: "json-ld+html",
+      collected_at: "2026-11-16T00:00:00Z", last_verified_at: null, source_reliability: "brand_or_retailer_page",
+    } });
+    render(<ReportView analysis={analysis} />);
+    expect(screen.getByText(/User-supplied evidence · not independently verified/)).toBeInTheDocument();
+    expect(screen.getByText(/parsed locally as uploaded/)).toBeInTheDocument();
+  });
   it("shows identity, synthetic badge, price per 100 g and source link", () => {
     render(<ReportView analysis={makeAnalysis()} />);
     expect(screen.getByRole("heading", { level: 1, name: "Choco Crunch Whole Grain Cereal - High Protein" })).toBeInTheDocument();
@@ -17,6 +26,29 @@ describe("ReportView (current backend output)", () => {
     expect(screen.getByText("₹48.00")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /brand\.example/ })).toHaveAttribute("href", "https://brand.example/cereal");
     expect(screen.getByText("12 Oct 2026, 09:02 UTC")).toBeInTheDocument();
+  });
+
+  it("shows an extracted product image and its source", () => {
+    const analysis = makeAnalysis();
+    analysis.report.product.image_url = {
+      value: "https://cdn.example.test/cereal.jpg",
+      label: "declared",
+      source: "json-ld",
+    };
+    render(<ReportView analysis={analysis} />);
+    expect(screen.getByRole("img", { name: "Choco Crunch Whole Grain Cereal - High Protein product image" }))
+      .toHaveAttribute("src", "https://cdn.example.test/cereal.jpg");
+    expect(screen.getByText("Product image from json-ld.")).toBeInTheDocument();
+  });
+
+  it("shows the fallback when a remote image cannot be decoded", () => {
+    const analysis = makeAnalysis();
+    analysis.report.product.image_url = {
+      value: "https://cdn.example.test/broken.jpg", label: "declared", source: "json-ld",
+    };
+    render(<ReportView analysis={analysis} />);
+    fireEvent.error(screen.getByRole("img", { name: /product image/ }));
+    expect(screen.getByText("Product image not available from this source.")).toBeInTheDocument();
   });
 
   it("shows overall score, grade and dimension explanations", () => {

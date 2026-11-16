@@ -15,6 +15,7 @@
 #   compare <a> <b> ... --category X   compare saved pages in one category
 #   prices <csv>        import hand-recorded prices (data/verified/prices/), then rescore
 #   rescore             recompute every stored analysis
+#   market-prices       load the Zepto invoice prices and workbook shop prices (data/prices/), then rescore
 set -euo pipefail
 cd "$(dirname "$0")"
 [ -f .env ] && set -a && . ./.env && set +a
@@ -41,5 +42,6 @@ case "$cmd" in
   compare) activate; python src/cli.py compare "$@" ;;
   prices)  activate; python -m database.prices "$@" ;;
   rescore) activate; python -m database.ingest --rescore ;;
-  *)       sed -n '2,17p' "$0" ;;
+  market-prices) activate; python scripts/load_market_prices.py ;;
+  *)       sed -n '2,18p' "$0" ;;
 esac

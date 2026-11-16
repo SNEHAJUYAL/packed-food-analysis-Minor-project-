@@ -124,8 +124,8 @@ def client():
         yield c
 
 
-def upload(client, name, data, ctype, **form):
-    return client.post("/api/analyze-upload", files={"file": (name, data, ctype)}, data=form)
+def upload(client, filename, data, ctype, **form):
+    return client.post("/api/analyze-upload", files={"file": (filename, data, ctype)}, data=form)
 
 
 def test_saved_page_is_read_without_fetching(client):
@@ -137,6 +137,71 @@ def test_saved_page_is_read_without_fetching(client):
     assert d["extraction_log"][0]["step"] == "upload" and "nothing fetched" in d["extraction_log"][0]["detail"]
     assert d["report"]["product"]["nutrition"]["total_sugars"]["value"] == 24.5
     assert d["report"]["product"]["category"]["value"] == "biscuits_cookies"
+
+
+def test_saved_html_parses_locally_without_llm_or_remote_resources(client, monkeypatch):
+    from extract import llm_fallback
+
+    def unexpected_llm(*args, **kwargs):
+        raise AssertionError("saved HTML must not be sent to the optional remote LLM fallback")
+
+    monkeypatch.setattr(llm_fallback, "available", lambda: True)
+    monkeypatch.setattr(llm_fallback, "extract_llm", unexpected_llm)
+    html = b'''<html><head><meta property="og:image" content="https://remote.example/image.jpg"></head>
+      <body><h1>Offline synthetic saved page</h1></body></html>'''
+    response = upload(client, "saved.html", html, "text/html")
+    assert response.status_code == 200, response.text
+    assert response.json()["source"]["source_type"] == "saved_page"
+    steps = response.json()["extraction_log"]
+    assert any(step["step"] == "llm-fallback" and "parsed locally" in step["detail"] for step in steps)
+
+
+def test_uploaded_photo_accepts_manual_corrections_and_keeps_ocr_transcript(client, monkeypatch):
+    fake = fake_client(okra_reading())
+    monkeypatch.setattr(label_image, "available_for_images", lambda: True)
+    real = label_image.extract_image
+    monkeypatch.setattr(label_image, "extract_image", lambda data, mt, client=None: real(data, mt, client=fake))
+    response = upload(client, "okra.png", PNG, "image/png", name="Corrected Okra Crisps",
+                      brand="Corrected Brand", variant="Chilli", pack_size_text="70 g",
+                      ingredients_text="Corrected ingredients: okra, oil, salt",
+                      nutrition_basis="per_100g", nutrition_text="energy: 500 kcal\nprotein: 10 g")
+    assert response.status_code == 200, response.text
+    product = response.json()["report"]["product"]
+    assert product["name"]["value"] == "Corrected Okra Crisps"
+    assert product["brand"]["value"] == "Corrected Brand"
+    assert product["variant"]["value"] == "Chilli"
+    assert product["pack_size"]["value"] == 70
+    assert product["ingredients_raw"]["value"] == "Corrected ingredients: okra, oil, salt"
+    assert product["nutrition"]["energy"]["value"] == 500
+    steps = {step["step"]: step for step in response.json()["extraction_log"]}
+    assert "Okra (62%)" in steps["transcript"]["detail"]
+    assert "user-supplied corrections take precedence" in steps["manual-correction"]["detail"]
+
+
+def test_manual_entry_is_saved_with_unverified_manual_provenance(client):
+    response = client.post("/api/analyze-manual", json={
+        "name": "Synthetic Manual Cereal", "brand": "Example Brand",
+        "category": "breakfast_cereals", "pack_size": 300, "pack_unit": "g",
+        "ingredients_text": "Whole oats, sugar", "nutrition_basis": "per_100g",
+        "nutrition": {"energy": "390 kcal", "protein": "12 g", "sodium": "210 mg"},
+        "price_inr": 125,
+    })
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert result["source"]["source_type"] == "manual"
+    assert result["source"]["source_reliability"] == "manual_entry"
+    assert result["source"]["source_url"] is None
+    assert result["report"]["product"]["name"]["source"] == "manual-entry"
+    assert any("not independently verified" in warning
+               for warning in result["report"]["product"]["warnings"])
+
+
+def test_manual_entry_requires_basis_for_nutrition(client):
+    response = client.post("/api/analyze-manual", json={
+        "name": "Synthetic Manual Product", "nutrition": {"energy": "420 kcal"}
+    })
+    assert response.status_code == 422
+    assert response.json()["detail"]["code"] == "validation_error"
 
 
 def test_saved_page_without_address_uses_given_site(client):

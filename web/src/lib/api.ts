@@ -8,9 +8,14 @@ import type {
   CompareResult,
   Health,
   Methodology,
+  ManualAnalyzeRequest,
   Preference,
   ProductAnalysis,
   ProductList,
+  PriceEntryRequest,
+  PriceSummary,
+  ProductURLCandidateResult,
+  SearchResult,
 } from "./types";
 
 /**
@@ -53,6 +58,11 @@ export const BACKEND_DOWN =
 
 /** Turn any error body into an ApiError, keeping the API's plain-language `message`. */
 export function parseApiError(status: number, body: unknown): ApiError {
+  const root = body as { error_code?: unknown; message?: unknown } | null;
+  if (root && typeof root === "object" && typeof root.error_code === "string" &&
+      typeof root.message === "string" && root.message) {
+    return new ApiError(status, root.error_code, root.message);
+  }
   const detail = (body as ApiErrorBody | null)?.detail;
   if (detail && typeof detail === "object" && !Array.isArray(detail)) {
     const d = detail as { code?: unknown; message?: unknown };
@@ -117,6 +127,13 @@ export const api = {
   health: (signal?: AbortSignal) => request<Health>("/api/health", { signal }),
   analyzeUrl: (body: AnalyzeUrlRequest, signal?: AbortSignal) =>
     request<ProductAnalysis>("/api/analyze-url", { method: "POST", body: JSON.stringify(body), signal }),
+  /** Source-policy-gated candidate extraction. This endpoint never saves or scores the product. */
+  candidateFromUrl: (url: string, signal?: AbortSignal) =>
+    request<ProductURLCandidateResult>("/api/product-candidates/from-url", {
+      method: "POST", body: JSON.stringify({ url }), signal,
+    }),
+  analyzeManual: (body: ManualAnalyzeRequest, signal?: AbortSignal) =>
+    request<ProductAnalysis>("/api/analyze-manual", { method: "POST", body: JSON.stringify(body), signal }),
   /** A pack photo, app screenshot or saved product page; nothing is fetched by the server. */
   analyzeUpload: (body: AnalyzeUploadRequest, signal?: AbortSignal) => {
     const form = new FormData();
@@ -125,6 +142,12 @@ export const api = {
     if (body.site) form.append("site", body.site);
     if (body.category) form.append("category", body.category);
     if (body.name) form.append("name", body.name);
+    if (body.corrections?.brand) form.append("brand", body.corrections.brand);
+    if (body.corrections?.variant) form.append("variant", body.corrections.variant);
+    if (body.corrections?.pack_size_text) form.append("pack_size_text", body.corrections.pack_size_text);
+    if (body.corrections?.ingredients_text) form.append("ingredients_text", body.corrections.ingredients_text);
+    if (body.corrections?.nutrition_basis) form.append("nutrition_basis", body.corrections.nutrition_basis);
+    if (body.corrections?.nutrition_text) form.append("nutrition_text", body.corrections.nutrition_text);
     return request<ProductAnalysis>("/api/analyze-upload", { method: "POST", body: form, signal });
   },
   listProducts: (params: { category?: string; q?: string; limit?: number } = {}, signal?: AbortSignal) =>
@@ -140,6 +163,18 @@ export const api = {
     ),
   categories: (signal?: AbortSignal) => request<{ categories: Category[] }>("/api/reference/categories", { signal }),
   methodology: (signal?: AbortSignal) => request<Methodology>("/api/reference/methodology", { signal }),
+  /** Stored products plus Open Food Facts results that have not been analysed yet. */
+  search: (text: string, signal?: AbortSignal) =>
+    request<SearchResult>(`/api/search${q({ q: text, limit: 20 })}`, { signal }),
+  /** Bring one Open Food Facts product in (by its Open Food Facts code) and score it. */
+  importOff: (code: string, signal?: AbortSignal) =>
+    request<ProductAnalysis>("/api/products/import-off", { method: "POST", body: JSON.stringify({ barcode: code }), signal }),
+  prices: (id: number | string, signal?: AbortSignal) =>
+    request<PriceSummary>(`/api/products/${encodeURIComponent(String(id))}/prices`, { signal }),
+  addPrice: (id: number | string, body: PriceEntryRequest, signal?: AbortSignal) =>
+    request<PriceSummary>(`/api/products/${encodeURIComponent(String(id))}/prices`, {
+      method: "POST", body: JSON.stringify(body), signal,
+    }),
 };
 
 export type Api = typeof api;

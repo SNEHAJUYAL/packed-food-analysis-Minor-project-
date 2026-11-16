@@ -1,0 +1,109 @@
+{
+  "manifest_version": "1.0",
+  "pipeline": "scripts/consolidate_product_datasets.py",
+  "script_version": "1.0.0",
+  "imported_at": "2026-11-16T00:00:00Z",
+  "annotation_schema_version": "1.0",
+  "candidate_dataset_version": "candidate-import-0.1.0",
+  "taxonomy_version": "india-packaged-food-v1",
+  "inputs": [
+    {
+      "workbook": "misleading_indian_food_products.xlsx",
+      "path": "/Users/snehajuyal/Downloads/misleading_indian_food_products.xlsx",
+      "sha256": "b518cf68fa29ea8a2bf1043f9b5b10503ad4448c4928580b8ef5de2f6ba9fa30",
+      "candidate_records_added": 22,
+      "sheets": [
+        {
+          "worksheet": "Misleading Food Claims",
+          "header_row": 4,
+          "nonempty_rows": 22,
+          "empty_rows": 0,
+          "treated_as_supplemental_checklist": false
+        }
+      ],
+      "supplemental_rows_linked": 0,
+      "empty_rows": 0
+    },
+    {
+      "workbook": "indian_packaged_food_annotation_records.xlsx",
+      "path": "/Users/snehajuyal/Downloads/indian_packaged_food_annotation_records.xlsx",
+      "sha256": "2c8dbae4048dd92c4e1bcd9aba057e756332efea84b2cfaf14eff655339b019d",
+      "candidate_records_added": 25,
+      "sheets": [
+        {
+          "worksheet": "Dataset Annotation Records",
+          "header_row": 4,
+          "nonempty_rows": 25,
+          "empty_rows": 0,
+          "treated_as_supplemental_checklist": false
+        }
+      ],
+      "supplemental_rows_linked": 0,
+      "empty_rows": 0
+    },
+    {
+      "workbook": "master_verified_food_corpus.xlsx",
+      "path": "/Users/snehajuyal/Downloads/master_verified_food_corpus.xlsx",
+      "sha256": "1ea37f12e0872ccc3456a98349c4357048794c57b2818e1951704b327cb8d1b1",
+      "candidate_records_added": 38,
+      "sheets": [
+        {
+          "worksheet": "Verified Research Corpus",
+          "header_row": 4,
+          "nonempty_rows": 38,
+          "empty_rows": 0,
+          "treated_as_supplemental_checklist": false
+        },
+        {
+          "worksheet": "Data Collection Checklist",
+          "header_row": 4,
+          "nonempty_rows": 38,
+          "empty_rows": 0,
+          "treated_as_supplemental_checklist": true
+        }
+      ],
+      "supplemental_rows_linked": 38,
+      "empty_rows": 0
+    }
+  ],
+  "candidate_records_total": 85,
+  "possible_duplicate_group_count": 37,
+  "duplicate_pair_count": 45,
+  "duplicate_status_counts": {
+    "possible_duplicate": 78,
+    "unresolved": 5,
+    "distinct_variant": 2
+  },
+  "uncertain_category_mapping_count": 10,
+  "category_review_queue_count": 85,
+  "category_mapping_status_counts": {
+    "mapped_requires_review": 75,
+    "requires_review": 10
+  },
+  "claim_verification_queue_count": 85,
+  "malformed_or_suspicious_count": 1,
+  "all_candidates_annotation_status": "pending_review",
+  "all_candidates_pipeline_verification_status": "unverified",
+  "no_automatic_merges": true,
+  "outputs": {
+    "jsonl": "consolidated_annotation_candidates.jsonl",
+    "csv": "consolidated_product_candidates.csv",
+    "xlsx": "consolidated_product_candidates.xlsx",
+    "duplicates": "duplicate_candidates.csv",
+    "categories": "category_mapping_review.csv",
+    "claims": "claim_verification_queue.csv",
+    "malformed": "malformed_suspicious_records.csv"
+  },
+  "limitations": [
+    "Workbook statements are research assertions, not independent verification or package transcription.",
+    "Input licenses/attribution were not established by importing workbook cells and are marked unknown.",
+    "Category mappings are candidates and require review; no category is marked verified.",
+    "No GTIN, pack size, nutrition, serving size, package photo, source URL or reviewer was invented."
+  ],
+  "annotation_validator": {
+    "status": "ok",
+    "errors_count": 0,
+    "warnings_count": 0,
+    "report": "annotation_validation_report.json"
+  }
+}

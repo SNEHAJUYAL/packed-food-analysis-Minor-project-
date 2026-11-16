@@ -1,0 +1,1180 @@
+{
+  "source_id": "complete_product_catalog",
+  "source_workbook": "Complete_Product_Catalog_With_JSON_Photos.xlsx",
+  "source_sha256": "66b23c65bad489ff3ac4ee150d14c578e949d708ef580f6d4883a8a9a6b5712f",
+  "candidate_status": "candidate",
+  "verification_status": "unverified",
+  "candidate_annotation_count": 25,
+  "acquisition_record_count": 100,
+  "product_listing_record_count": 25,
+  "price_candidate_record_count": 75,
+  "price_observation_record_count": 75,
+  "missing_price_placeholder_count": 0,
+  "invalid_price_placeholder_count": 0,
+  "acquisition_records_by_type": {
+    "product_listing": 25,
+    "populated_unverified_price": 75,
+    "missing_price_placeholder": 0,
+    "invalid_price_placeholder": 0
+  },
+  "source_product_ids_total": 25,
+  "source_product_ids_unique": 25,
+  "duplicate_source_product_ids": [],
+  "worksheets_preserved": [
+    "Price & Category Summary",
+    "Sheet1"
+  ],
+  "nonempty_workbook_rows_preserved": 45,
+  "source_fields_per_product_row": 22,
+  "source_row_fingerprints": "SHA-256 over ordered original header/value pairs",
+  "image_references": {
+    "count": 125,
+    "expected": 125,
+    "source_platform_counts": {
+      "Zepto": 125
+    },
+    "downloaded_or_network_checked": false
+  },
+  "barcode_validation": {
+    "checksum_valid_candidate_only": 1,
+    "numeric_requires_review": 24
+  },
+  "category_distribution": {
+    "Instant noodles": 1,
+    "Biscuits": 3,
+    "Chips & snacks": 3,
+    "Dairy": 4,
+    "Namkeen": 1,
+    "Pulses & staples": 1,
+    "Flour & staples": 1,
+    "Spreads": 1,
+    "Beverages": 2,
+    "Breakfast cereals": 1,
+    "Ready-to-eat meals": 1,
+    "Spices & masalas": 2,
+    "Breakfast cereals & staples": 1,
+    "Dairy & desserts": 1,
+    "Cooking oils": 1,
+    "Chocolates & confectionery": 1
+  },
+  "pack_and_ingredient_checks": {
+    "g_parsed": 21,
+    "ingredients_present_candidate": 25,
+    "ml_parsed": 4
+  },
+  "nutrition_checks": {
+    "panel_present": 25,
+    "recognized_nutrient_fields": 230,
+    "basis_present": 25
+  },
+  "retailer_price_candidates": {
+    "candidate_record_count": 75,
+    "populated_unverified_count": 75,
+    "missing_placeholder_count": 0,
+    "invalid_placeholder_count": 0,
+    "by_retailer": {
+      "Blinkit:present_unverified": 25,
+      "Zepto:present_unverified": 25,
+      "Swiggy Instamart:present_unverified": 25
+    },
+    "prices_are_verified": false
+  },
+  "individual_product_url_missing_count": {
+    "Blinkit": 25,
+    "Swiggy Instamart": 25
+  },
+  "product_source_url_count": 25,
+  "collection_date_only_count": 25,
+  "collection_time_invented": false,
+  "pin_code_invented": false,
+  "source_license": "unknown",
+  "source_attribution": "User-supplied workbook; original dataset license/source not stated",
+  "annotation_schema_validation": {
+    "status": "ok",
+    "errors_count": 0,
+    "warnings_count": 0,
+    "records_included": 25,
+    "missingness": null
+  },
+  "issues_count": 119,
+  "issues_by_code": {
+    "listing_url_missing": 50,
+    "numeric_barcode_requires_review": 24,
+    "invalid_gtin": 24,
+    "category_unmapped": 14,
+    "pack_size_range": 7
+  },
+  "issues": [
+    {
+      "severity": "warning",
+      "record_id": "FP001",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-2:f448308a0cff570d",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-2:f448308a0cff570d:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP001",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-2:f448308a0cff570d",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-2:f448308a0cff570d:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP002",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-3:743bfc9cf92be4df",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-3:743bfc9cf92be4df:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-3:743bfc9cf92be4df:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-3:743bfc9cf92be4df",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-3:743bfc9cf92be4df:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP002",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-3:743bfc9cf92be4df",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-3:743bfc9cf92be4df:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP002",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-3:743bfc9cf92be4df",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-3:743bfc9cf92be4df:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP003",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-4:8976fb13d6e0b216",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-4:8976fb13d6e0b216:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-4:8976fb13d6e0b216:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-4:8976fb13d6e0b216",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-4:8976fb13d6e0b216:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP003",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-4:8976fb13d6e0b216",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-4:8976fb13d6e0b216:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP003",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-4:8976fb13d6e0b216",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-4:8976fb13d6e0b216:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP004",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP004",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Chips & snacks'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP004",
+      "field_path": "Pack size",
+      "code": "pack_size_range",
+      "message": "Pack text includes a quantity range; parsed amount remains a candidate and needs review.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP004",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP004",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-5:b67e6a04a2198e71:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP005",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP005",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Chips & snacks'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP005",
+      "field_path": "Pack size",
+      "code": "pack_size_range",
+      "message": "Pack text includes a quantity range; parsed amount remains a candidate and needs review.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP005",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP005",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-6:585fbac3fc81bcce:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP006",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-7:526b3d60d6b8f4ba",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-7:526b3d60d6b8f4ba:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-7:526b3d60d6b8f4ba:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-7:526b3d60d6b8f4ba",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-7:526b3d60d6b8f4ba:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP006",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-7:526b3d60d6b8f4ba",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-7:526b3d60d6b8f4ba:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP006",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-7:526b3d60d6b8f4ba",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-7:526b3d60d6b8f4ba:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP007",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-8:e5c1b2cb858547db",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-8:e5c1b2cb858547db:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-8:e5c1b2cb858547db:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-8:e5c1b2cb858547db",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-8:e5c1b2cb858547db:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP007",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-8:e5c1b2cb858547db",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-8:e5c1b2cb858547db:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP007",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-8:e5c1b2cb858547db",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-8:e5c1b2cb858547db:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP008",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-9:e93be46999431de4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-9:e93be46999431de4:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP008",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Namkeen'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-9:e93be46999431de4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-9:e93be46999431de4:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP008",
+      "field_path": "Pack size",
+      "code": "pack_size_range",
+      "message": "Pack text includes a quantity range; parsed amount remains a candidate and needs review.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-9:e93be46999431de4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-9:e93be46999431de4:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-9:e93be46999431de4:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-9:e93be46999431de4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-9:e93be46999431de4:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP008",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-9:e93be46999431de4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-9:e93be46999431de4:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP008",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-9:e93be46999431de4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-9:e93be46999431de4:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP009",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP009",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Pulses & staples'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP009",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP009",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-10:f5d8e8a791c73704:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP010",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-11:c081a096b205923e",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-11:c081a096b205923e:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP010",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Flour & staples'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-11:c081a096b205923e",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-11:c081a096b205923e:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-11:c081a096b205923e:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-11:c081a096b205923e",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-11:c081a096b205923e:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP010",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-11:c081a096b205923e",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-11:c081a096b205923e:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP010",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-11:c081a096b205923e",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-11:c081a096b205923e:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP011",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-12:33629825834df57c",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-12:33629825834df57c:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP011",
+      "field_path": "Pack size",
+      "code": "pack_size_range",
+      "message": "Pack text includes a quantity range; parsed amount remains a candidate and needs review.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-12:33629825834df57c",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-12:33629825834df57c:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-12:33629825834df57c:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-12:33629825834df57c",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-12:33629825834df57c:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP011",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-12:33629825834df57c",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-12:33629825834df57c:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP011",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-12:33629825834df57c",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-12:33629825834df57c:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP012",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-13:9f7a96d0963541e0",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-13:9f7a96d0963541e0:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-13:9f7a96d0963541e0:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-13:9f7a96d0963541e0",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-13:9f7a96d0963541e0:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP012",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-13:9f7a96d0963541e0",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-13:9f7a96d0963541e0:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP012",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-13:9f7a96d0963541e0",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-13:9f7a96d0963541e0:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP013",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-14:1152b3066ec2b0b9",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-14:1152b3066ec2b0b9:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-14:1152b3066ec2b0b9:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-14:1152b3066ec2b0b9",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-14:1152b3066ec2b0b9:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP013",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-14:1152b3066ec2b0b9",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-14:1152b3066ec2b0b9:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP013",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-14:1152b3066ec2b0b9",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-14:1152b3066ec2b0b9:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP014",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP014",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "Broad Biscuits & Snacks source label is insufficient to choose a taxonomy leaf.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP014",
+      "field_path": "Pack size",
+      "code": "pack_size_range",
+      "message": "Pack text includes a quantity range; parsed amount remains a candidate and needs review.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP014",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP014",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-15:80c1298f4180d41d:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP015",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-16:fe3fc543b257d980",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-16:fe3fc543b257d980:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-16:fe3fc543b257d980:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-16:fe3fc543b257d980",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-16:fe3fc543b257d980:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP015",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-16:fe3fc543b257d980",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-16:fe3fc543b257d980:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP015",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-16:fe3fc543b257d980",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-16:fe3fc543b257d980:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP016",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP016",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Ready-to-eat meals'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP016",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP016",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-17:2fa45469bc7999a7:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP017",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP017",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Spices & masalas'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP017",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP017",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-18:abe3993ac5decd0f:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP018",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP018",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Spices & masalas'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP018",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP018",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-19:fe2d07466078dd30:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP019",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP019",
+      "field_path": "Pack size",
+      "code": "pack_size_range",
+      "message": "Pack text includes a quantity range; parsed amount remains a candidate and needs review.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP019",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP019",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-20:c9a7e841bbadbd93:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP020",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-21:e9776fce6528724c",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-21:e9776fce6528724c:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-21:e9776fce6528724c:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-21:e9776fce6528724c",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-21:e9776fce6528724c:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP020",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-21:e9776fce6528724c",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-21:e9776fce6528724c:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP020",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-21:e9776fce6528724c",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-21:e9776fce6528724c:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP021",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP021",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Breakfast cereals & staples'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP021",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP021",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-22:bd2972188e6592a1:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP022",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP022",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Chips & snacks'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP022",
+      "field_path": "Pack size",
+      "code": "pack_size_range",
+      "message": "Pack text includes a quantity range; parsed amount remains a candidate and needs review.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP022",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP022",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-23:b11590a417ffb2ec:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP023",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP023",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Dairy & desserts'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP023",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP023",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-24:35e1a3d3e8071838:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP024",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP024",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Cooking oils'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP024",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP024",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-25:ba514845d20592ab:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP025",
+      "field_path": "Barcode number",
+      "code": "numeric_barcode_requires_review",
+      "message": "Barcode is stored as an Excel number; original value is preserved and leading zeroes cannot be reconstructed.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP025",
+      "field_path": "Product category",
+      "code": "category_unmapped",
+      "message": "No documented mapping for source category 'Chocolates & confectionery'.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4:product"
+    },
+    {
+      "code": "invalid_gtin",
+      "field_path": "product_identity.gtin",
+      "message": "GTIN must be 8, 12, 13, or 14 digits with a valid check digit; this does not verify product ownership.",
+      "severity": "error",
+      "record_id": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4:product",
+      "source_row_id": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP025",
+      "field_path": "Blinkit.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Blinkit product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4:product"
+    },
+    {
+      "severity": "warning",
+      "record_id": "FP025",
+      "field_path": "Swiggy Instamart.listing_url",
+      "code": "listing_url_missing",
+      "message": "No individual Swiggy Instamart product evidence URL is provided.",
+      "source_row_id": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4",
+      "product_record_identity": "complete_product_catalog:Sheet1:row-26:b020bbf1b5ff64b4:product"
+    }
+  ]
+}

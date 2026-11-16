@@ -1,5 +1,6 @@
 import { ClaimStatusBadge, EvidenceBadge, GradeBadge, TrafficLight } from "./badges";
-import { Badge } from "./ui";
+import { Badge, ScoreRing } from "./ui";
+import { scoreColor } from "@/lib/format";
 
 // A fixed, synthetic example (the pipeline run on a made-up "Example Foods" page).
 // It is static, labelled as illustrative, and never presented as a real product.
@@ -30,12 +31,13 @@ const SAMPLE = {
 
 export function SampleAnalysis() {
   return (
-    <figure className="rounded-2xl border border-line bg-white p-4 shadow-sm sm:p-6" aria-labelledby="sample-caption">
+    <figure className="rounded-[24px] border border-line bg-white p-5 shadow-[var(--shadow-lift)] sm:p-7" aria-labelledby="sample-caption">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Badge tone="violet">Illustrative sample (synthetic data)</Badge>
         <span className="text-xs text-muted">Methodology v0.1.0</span>
       </div>
-      <div className="mt-4 flex items-start gap-4">
+      <div className="mt-5 flex items-center gap-4">
+        <ScoreRing score={SAMPLE.overall} size={76} stroke={7} label={`Sample overall score ${SAMPLE.overall} out of 100`} caption="score" />
         <GradeBadge grade={SAMPLE.grade} size="lg" />
         <div>
           <p className="font-semibold text-ink">{SAMPLE.name}</p>
@@ -50,7 +52,7 @@ export function SampleAnalysis() {
           <li key={d.name} className="grid grid-cols-[96px_1fr_64px] items-center gap-2 text-sm">
             <span className="text-slate-700">{d.name}</span>
             <span className="h-2 rounded-full bg-slate-100">
-              {d.score !== null ? <span className="block h-2 rounded-full bg-brand-500" style={{ width: `${Math.max(d.score, 1)}%` }} /> : null}
+              {d.score !== null ? <span className="block h-2 rounded-full" style={{ width: `${Math.max(d.score, 1)}%`, background: scoreColor(d.score) }} /> : null}
             </span>
             <span className="text-right tabular-nums text-slate-700">{d.score ?? "not scored"}</span>
           </li>
@@ -69,7 +71,7 @@ export function SampleAnalysis() {
           ))}
         </tbody>
       </table>
-      <div className="mt-4 rounded-xl bg-slate-50 p-3 text-sm">
+      <div className="mt-4 rounded-2xl bg-[#fdf6ec] p-4 text-sm">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="font-medium text-ink">“{SAMPLE.claim.text}”</span>
           <ClaimStatusBadge status={SAMPLE.claim.status} />

@@ -8,6 +8,7 @@ from typing import Optional
 from bs4 import BeautifulSoup
 
 from extract.jsonld import empty_extracted
+from extract.image_validation import image_url_from_metadata
 
 # Ordered: more specific labels first ("saturated fat" before "fat").
 NUTRIENT_LABELS = [
@@ -32,6 +33,12 @@ _INGREDIENTS_RE = re.compile(
 )
 _PACK_RE = re.compile(r"net\s+(?:wt\.?|weight|qty\.?|quantity|content)\s*[:\-]?\s*([\d.,]+\s*(?:kg|g|gm|ml|l|ltr)\b)",
                       re.IGNORECASE)
+_SERVING_SIZE_RE = re.compile(r"serving\s+size\s*[:\-]?\s*([\d.,]+\s*(?:kg|g|gm|ml|l|ltr)\b)",
+                              re.IGNORECASE)
+_SERVING_HEADER_RE = re.compile(r"per\s+(?:serving|serve|portion)\s*\(\s*([\d.,]+\s*(?:kg|g|gm|ml|l|ltr))\s*\)",
+                                re.IGNORECASE)
+_ALLERGEN_RE = re.compile(r"(?:allergens?|contains|may\s+contain)\s*(?:[:\-]\s*)?([^\n.;]+)", re.IGNORECASE)
+_GENERIC_HEADING_RE = re.compile(r"^(?:buy|adding to cart|out of stock|product details|shop)\b", re.IGNORECASE)
 
 
 def nutrient_key(label: str) -> Optional[str]:
@@ -100,7 +107,17 @@ def extract_html(html: str, url: str) -> dict:
     out = empty_extracted("html")
     og_title = soup.find("meta", property="og:title")
     h1 = soup.find("h1")
-    out["name"] = (h1.get_text(" ", strip=True) if h1 else None) or (og_title or {}).get("content")
+    heading = h1.get_text(" ", strip=True) if h1 else None
+    title = (og_title or {}).get("content")
+    out["name"] = heading if heading and not _GENERIC_HEADING_RE.search(heading) else (
+        title if title and not _GENERIC_HEADING_RE.search(title) else None)
+    for meta, source_name in ((soup.find("meta", property="og:image"), "open-graph"),
+                              (soup.find("meta", attrs={"name": "twitter:image"}), "twitter-card")):
+        if meta and meta.get("content"):
+            image_url = image_url_from_metadata(meta["content"], url)
+            if image_url:
+                out["image_url"], out["image_source"] = image_url, source_name
+                break
     for prop in ("product:price:amount", "og:price:amount"):
         tag = soup.find("meta", property=prop)
         if tag and tag.get("content"):
@@ -108,16 +125,39 @@ def extract_html(html: str, url: str) -> dict:
             cur = soup.find("meta", property=prop.replace("amount", "currency"))
             out["currency"] = cur.get("content") if cur else None
             break
+    for prop in ("product:original_price:amount", "product:price:standard_amount",
+                 "product:price:regular_amount", "og:price:standard_amount"):
+        tag = soup.find("meta", property=prop)
+        if tag and tag.get("content"):
+            out["mrp"] = tag["content"]
+            break
     if out["price"] is None:
         tag = soup.find(attrs={"itemprop": "price"})
         if tag:
             out["price"] = tag.get("content") or tag.get_text(strip=True)
+    mrp = soup.find(attrs={"itemprop": "highPrice"}) or soup.find(attrs={"data-testid": re.compile("mrp|list-price", re.I)})
+    if mrp:
+        out["mrp"] = mrp.get("content") or mrp.get_text(" ", strip=True)
+    availability = soup.find(attrs={"itemprop": "availability"})
+    if availability:
+        out["availability"] = availability.get("href") or availability.get("content") or availability.get_text(" ", strip=True)
     desc = soup.find("meta", attrs={"name": "description"})
     out["description"] = desc.get("content") if desc else None
     brand = soup.find(attrs={"itemprop": "brand"})
     out["brand"] = brand.get_text(" ", strip=True) if brand else None
+    variant = soup.find(attrs={"itemprop": "color"}) or soup.find(attrs={"itemprop": "model"})
+    if variant:
+        out["variant"] = variant.get("content") or variant.get_text(" ", strip=True)
 
     text = soup.get_text("\n", strip=False)
+    serving_size = _SERVING_SIZE_RE.search(text)
+    if not serving_size:
+        serving_size = _SERVING_HEADER_RE.search(text)
+    if serving_size:
+        out["serving_size_text"] = serving_size.group(1).strip()
+    allergens = [match.group(0).strip() for match in _ALLERGEN_RE.finditer(text)]
+    if allergens:
+        out["allergens_text"] = "; ".join(dict.fromkeys(allergens))
     m = _INGREDIENTS_RE.search(text)
     if m:
         out["ingredients_text"] = re.sub(r"\s+", " ", m.group(1)).strip(" .")

@@ -20,11 +20,11 @@ function IngredientRow({ item, depth = 0 }: { item: IngredientItem; depth?: numb
   const hasPercent = typeof item.percent === "number" && Number.isFinite(item.percent);
   return (
     <li className={`${depth > 0 ? "border-l-2 border-line pl-3" : ""}`}>
-      <div className={`rounded-xl p-3 ${uncertain ? "bg-amber-50/60" : "bg-slate-50"}`}>
+      <div className={`rounded-2xl border p-3.5 ${uncertain ? "border-[#f1d2a8] bg-[#fdf8f0]" : "border-line bg-white"}`}>
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="text-sm font-medium text-ink">
-              {depth === 0 ? <span className="mr-2 text-muted">{item.position}.</span> : null}
+              {depth === 0 ? <span className="mr-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-100 px-1 text-[11px] font-semibold text-muted">{item.position}</span> : null}
               <span>{item.text}</span>
               {hasPercent ? <span className="ml-2 text-xs font-normal text-slate-600">({formatNumber(item.percent!)}% declared)</span> : null}
             </p>
@@ -102,7 +102,7 @@ export function IngredientExplorer({ report }: { report: Report }) {
           }
         />
         {raw ? (
-          <details className="mb-4 rounded-xl border border-line p-3 text-sm">
+          <details className="mb-4 rounded-2xl border border-line bg-slate-50/60 p-3.5 text-sm">
             <summary className="cursor-pointer font-medium text-ink">Ingredient list as printed</summary>
             <p className="mt-2 text-slate-700">{raw}</p>
           </details>
@@ -117,10 +117,17 @@ export function IngredientExplorer({ report }: { report: Report }) {
           </ol>
         )}
 
-        <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-          <div>
-            <dt className="font-medium text-ink">Allergens detected</dt>
-            <dd className="text-slate-700">{allergens.length ? allergens.map(humanize).join(", ") : "None detected in the text"}</dd>
+        <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
+          <div className={`rounded-2xl border p-3.5 ${allergens.length ? "border-[#f2cbc7] bg-[#fdf3f2]" : "border-line bg-slate-50/60"}`}>
+            <dt className="font-semibold text-ink">Allergens detected</dt>
+            <dd className="mt-1.5 text-slate-700">
+              {allergens.length ? (
+                <span className="flex flex-wrap gap-1.5">
+                  {allergens.map((a) => <Badge key={a} tone="rose">{humanize(a)}</Badge>)}
+                </span>
+              ) : "None detected in the text"}
+              {allergens.length ? <span className="mt-1.5 block text-xs text-muted">Detected from the ingredient text; always check the pack if you have an allergy.</span> : null}
+            </dd>
           </div>
           {advisory.length ? (
             <div>
@@ -128,9 +135,9 @@ export function IngredientExplorer({ report }: { report: Report }) {
               <dd className="text-slate-700">{advisory.map(humanize).join(", ")}</dd>
             </div>
           ) : null}
-          <div>
-            <dt className="font-medium text-ink">INS codes</dt>
-            <dd className="text-slate-700">{ins.length ? ins.join(", ") : "None declared"}</dd>
+          <div className="rounded-2xl border border-line bg-slate-50/60 p-3.5">
+            <dt className="font-semibold text-ink">INS codes</dt>
+            <dd className="mt-1.5 text-slate-700">{ins.length ? <span className="flex flex-wrap gap-1.5">{ins.map((c) => <Badge key={c} tone="blue">INS {c}</Badge>)}</span> : "None declared"}</dd>
           </div>
           {unmatched.length ? (
             <div>

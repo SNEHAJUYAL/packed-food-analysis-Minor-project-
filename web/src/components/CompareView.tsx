@@ -6,14 +6,16 @@ import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AnalysisStatusBadge, ClaimStatusBadge, EvidenceBadge, GradeBadge, SyntheticBadge } from "./badges";
 import { CategorySelect, ProductRow, useCategories } from "./ProductsBrowser";
-import { Badge, Card, EmptyState, ErrorState, ExternalLink, LoadingState, SectionHeading } from "./ui";
+import { IconInfo } from "./icons";
+import { Badge, Card, EmptyState, ErrorState, ExternalLink, LoadingState, SectionHeading, buttonClass } from "./ui";
 import { api } from "@/lib/api";
 import { NUTRIENT_ORDER, basisLabel, formatInr, formatNumber, formatPercent, formatTimestamp, hostOf, humanize, nutrientUnit, safeHref } from "@/lib/format";
 import { DIMENSIONS } from "@/lib/labels";
 import { useApi } from "@/lib/useApi";
 import type { CompareProduct, CompareResult } from "@/lib/types";
 
-const SERIES_COLORS = ["#2f8f7f", "#4f86c6", "#8a6fc1", "#d29a3a", "#6b7a8f", "#c4708a"];
+// Categorical order validated for colour-vision deficiency (dataviz validator); the table below is the full view.
+const SERIES_COLORS = ["#1B7F5C", "#E0742F", "#2A78D6", "#D99A00", "#D9608F", "#6250D6"];
 
 const PICKS: { key: "best_match" | "lowest_price_per_100" | "best_nutrition"; label: string }[] = [
   { key: "best_match", label: "Best match" },
@@ -43,7 +45,7 @@ export function ComparePicker({ initial = [] }: { initial?: number[] }) {
           type="button"
           disabled={selected.length < 2}
           onClick={() => router.push(`/compare?ids=${selected.join(",")}`)}
-          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+          className={`${buttonClass.primary} disabled:!bg-slate-200 disabled:!text-slate-500`}
         >
           Compare {selected.length ? `(${selected.length})` : ""}
         </button>
@@ -55,7 +57,7 @@ export function ComparePicker({ initial = [] }: { initial?: number[] }) {
           state.data.products.length === 0 ? (
             <EmptyState title="No stored products in this category yet." />
           ) : (
-            <ul className="space-y-2">
+            <ul className="grid gap-2 xl:grid-cols-2">
               {state.data.products.map((p) => (
                 <ProductRow key={p.product_id} p={p} selected={selected.includes(p.product_id)} onToggle={toggle} disabled={selected.length >= 6} />
               ))}
@@ -87,13 +89,23 @@ export function CompareResultView({ data }: { data: CompareResult }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
-        <span>{data.category ? humanize(data.category) : "Category not stated"}</span>
-        <span aria-hidden="true">·</span>
-        <span>All values {basis}</span>
-        <span aria-hidden="true">·</span>
-        <span>Methodology v{data.methodology_version}</span>
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <Badge tone="green">{data.category ? humanize(data.category) : "Category not stated"}</Badge>
+        <Badge tone="slate">All values {basis}</Badge>
+        <Badge tone="slate">{products.length} products</Badge>
+        <span className="text-xs text-muted">Methodology v{data.methodology_version}</span>
       </div>
+
+      <details className="rounded-2xl border border-line bg-white p-4 text-sm">
+        <summary className="flex cursor-pointer items-center gap-2 font-medium text-ink">
+          <IconInfo className="h-4 w-4 text-brand-500" /> What this comparison covers
+        </summary>
+        <ul className="mt-3 grid gap-3 text-slate-700 md:grid-cols-3">
+          <li><span className="font-semibold text-ink">Different products, one category.</span> These are distinct stored products compared on a common basis. Variants and pack sizes stay separate records.</li>
+          <li><span className="font-semibold text-ink">Unit price, not pack price.</span> “Lowest price per 100” is the cheapest per 100 g/ml, which is not always the cheapest pack to buy.</li>
+          <li><span className="font-semibold text-ink">Not a cross-retailer price check.</span> The same product at different shops is not matched here; prices are those stored with each record, with their collection date.</li>
+        </ul>
+      </details>
 
       {data.picks ? (
         <section aria-labelledby="picks-heading">
@@ -102,8 +114,8 @@ export function CompareResultView({ data }: { data: CompareResult }) {
             {PICKS.map(({ key, label }) => {
               const pick = data.picks?.[key];
               return (
-                <Card key={key} className="!p-4">
-                  <p className="text-xs font-medium uppercase tracking-wide text-brand-700">{label}</p>
+                <Card key={key} className="!p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-500">{label}</p>
                   {pick ? (
                     <>
                       <Link href={`/products/${pick.product_id}`} className="mt-1 block font-medium text-ink hover:underline">
@@ -135,13 +147,13 @@ export function CompareResultView({ data }: { data: CompareResult }) {
         <div className="h-72 w-full" role="img" aria-label="Grouped bar chart of dimension scores per product">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 8, left: -16 }}>
-              <CartesianGrid vertical={false} stroke="#e3e7ec" />
-              <XAxis dataKey="dimension" tick={{ fontSize: 12, fill: "#1f2a37" }} interval={0} />
-              <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tick={{ fontSize: 12, fill: "#5b6676" }} />
-              <Tooltip contentStyle={{ borderRadius: 8, borderColor: "#e3e7ec", fontSize: 12 }} formatter={(v) => (v === null || v === undefined ? "not scored" : `${v} / 100`)} />
+              <CartesianGrid vertical={false} stroke="#eef1ea" />
+              <XAxis dataKey="dimension" tick={{ fontSize: 12, fill: "#202b25" }} interval={0} axisLine={{ stroke: "#cdd3ca" }} tickLine={false} />
+              <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tick={{ fontSize: 12, fill: "#5f6961" }} axisLine={false} tickLine={false} />
+              <Tooltip cursor={{ fill: "#eaf0e8" }} contentStyle={{ borderRadius: 12, borderColor: "#e5e8e1", fontSize: 12 }} formatter={(v) => (v === null || v === undefined ? "not scored" : `${v} / 100`)} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               {products.map((p, i) => (
-                <Bar key={p.product_id} dataKey={`p${p.product_id}`} name={shortName(p)} fill={SERIES_COLORS[i % SERIES_COLORS.length]} radius={[4, 4, 0, 0]} isAnimationActive={false} />
+                <Bar key={p.product_id} dataKey={`p${p.product_id}`} name={shortName(p)} fill={SERIES_COLORS[i % SERIES_COLORS.length]} radius={[4, 4, 0, 0]} maxBarSize={28} stroke="#ffffff" strokeWidth={2} isAnimationActive={false} />
               ))}
             </BarChart>
           </ResponsiveContainer>
@@ -156,10 +168,10 @@ export function CompareResultView({ data }: { data: CompareResult }) {
           <table className="w-full min-w-[640px] text-left text-sm">
             <caption className="sr-only">Product comparison table</caption>
             <thead>
-              <tr className="border-b border-line align-bottom">
-                <th scope="col" className="sticky left-0 z-10 w-40 bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted sm:pl-6">Attribute</th>
+              <tr className="border-b border-line bg-slate-50/70 align-bottom">
+                <th scope="col" className="sticky left-0 z-10 w-40 bg-slate-50 px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted sm:pl-6">Attribute</th>
                 {products.map((p) => (
-                  <th key={p.product_id} scope="col" className="px-4 py-2 font-medium text-ink">
+                  <th key={p.product_id} scope="col" className="min-w-[160px] px-4 py-3 font-semibold text-ink">
                     <Link href={`/products/${p.product_id}`} className="hover:underline">{shortName(p)}</Link>
                     {p.brand ? <span className="block text-xs font-normal text-muted">{p.brand}</span> : null}
                     {p.is_synthetic ? <span className="mt-1 block"><SyntheticBadge /></span> : null}
@@ -284,7 +296,7 @@ export function CompareResultView({ data }: { data: CompareResult }) {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <tr className="align-top">
-      <th scope="row" className="sticky left-0 z-10 bg-white px-4 py-2 font-medium text-slate-700 sm:pl-6">{label}</th>
+      <th scope="row" className="sticky left-0 z-10 bg-white px-4 py-2.5 font-medium text-slate-700 shadow-[1px_0_0_#e5e8e1] sm:pl-6">{label}</th>
       {children}
     </tr>
   );
@@ -305,7 +317,7 @@ export function CompareView({ ids }: { ids: number[] }) {
   return (
     <div className="space-y-4">
       <p className="text-sm">
-        <Link href="/compare" className="text-brand-700 hover:underline">Change products</Link>
+        <Link href="/compare" className={`${buttonClass.secondary} !py-2`}>Change products</Link>
       </p>
       {state.kind === "loading" ? <LoadingState label="Comparing products…" /> : null}
       {state.kind === "error" ? (

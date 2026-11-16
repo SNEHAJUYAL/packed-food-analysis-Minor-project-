@@ -34,8 +34,8 @@ describe("UploadForm", () => {
       return undefined;
     });
     render(<UploadForm />);
-    await userEvent.upload(screen.getByLabelText("Photo, screenshot or saved page"), png());
-    await userEvent.selectOptions(screen.getByRole("combobox"), "blinkit.com");
+    await userEvent.upload(screen.getByLabelText("Saved product page or packaging image"), png());
+    await userEvent.selectOptions(screen.getByLabelText("Shop"), "blinkit.com");
     await userEvent.type(screen.getByLabelText("Product name (optional)"), "Troovy Moong Dal Chips");
     await userEvent.click(screen.getByRole("button", { name: "Upload and analyse" }));
     await waitFor(() => expect(routerPush).toHaveBeenCalled());
@@ -49,10 +49,36 @@ describe("UploadForm", () => {
   it("shows the API's message when photos cannot be read", async () => {
     mockFetch(() => ({ status: 503, body: { detail: { code: "photo_reader_missing", message: "Reading photos needs the free Tesseract OCR program (on a Mac: brew install tesseract, then restart the API)." } } }));
     render(<UploadForm />);
-    await userEvent.upload(screen.getByLabelText("Photo, screenshot or saved page"), png());
+    await userEvent.upload(screen.getByLabelText("Saved product page or packaging image"), png());
     await userEvent.click(screen.getByRole("button", { name: "Upload and analyse" }));
     expect(await screen.findByText(/brew install tesseract/)).toBeInTheDocument();
     expect(routerPush).not.toHaveBeenCalled();
+  });
+
+  it("submits manual product details as explicitly unverified input", async () => {
+    let request: Record<string, unknown> | undefined;
+    mockFetch((url, init) => {
+      if (url.includes("categories")) return { body: { categories: [] } };
+      if (url.endsWith("/api/analyze-manual")) {
+        request = JSON.parse(init?.body as string) as Record<string, unknown>;
+        return { body: makeAnalysis({ product_id: 21 }) };
+      }
+      return undefined;
+    });
+    render(<UploadForm />);
+    await userEvent.type(screen.getByLabelText("Manual product name"), "Synthetic Manual Cereal");
+    await userEvent.type(screen.getByLabelText("Manual brand"), "Example Foods");
+    await userEvent.type(screen.getByLabelText("Manual pack size"), "300");
+    await userEvent.type(screen.getByLabelText("Manual ingredients"), "Oats, sugar");
+    await userEvent.selectOptions(screen.getByLabelText("Manual nutrition basis"), "per_100g");
+    await userEvent.type(screen.getByLabelText("Manual nutrition values"), "energy: 400 kcal{enter}protein: 10 g");
+    await userEvent.click(screen.getByRole("button", { name: "Save and analyse manual details" }));
+    await waitFor(() => expect(routerPush).toHaveBeenCalledWith("/products/21"));
+    expect(request).toMatchObject({
+      name: "Synthetic Manual Cereal", brand: "Example Foods", pack_size: 300, pack_unit: "g",
+      ingredients_text: "Oats, sugar", nutrition_basis: "per_100g",
+      nutrition: { energy: "400 kcal", protein: "10 g" },
+    });
   });
 });
 
@@ -79,9 +105,13 @@ describe("service problems", () => {
     expect(await screen.findByText(/cannot reach the database/)).toBeInTheDocument();
   });
 
-  it("adds the upload hint when a shop refuses the fetch", async () => {
+  it("shows the distinct robots restriction explanation without retailer wording", async () => {
     const { errorHint } = await import("@/components/AnalyzeForm");
-    expect(errorHint("fetch_failed")).toMatch(/Save the product page/);
+    expect(errorHint("robots_disallowed")).toMatch(/respect its access restrictions/);
+    expect(errorHint("robots_disallowed")).not.toMatch(/retailer/i);
+    expect(errorHint("unsupported_source")).toMatch(/retailer is not currently supported/i);
+    expect(errorHint("source_fetch_failed")).toMatch(/could not be retrieved/i);
+    expect(errorHint("product_extraction_failed")).toMatch(/information could not be extracted/i);
     expect(errorHint("blocked_destination")).toBeNull();
   });
 });

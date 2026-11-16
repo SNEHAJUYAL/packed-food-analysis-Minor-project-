@@ -1,0 +1,985 @@
+{
+  "fixture_only": true,
+  "synthetic_notice": "Fictional fixture output for implementation demonstration; not a real product or ground truth. No network request was made.",
+  "result": {
+    "status": "candidate",
+    "submitted_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+    "source_id": "synthetic_fixture_source",
+    "policy": {
+      "source_id": "synthetic_fixture_source",
+      "allowed": true,
+      "reason": "Registered source policy permits this acquisition.",
+      "requires_network": true,
+      "authorization_evidence": "Offline synthetic fixture only; no network access"
+    },
+    "candidate": {
+      "schema_version": "product-url-candidate/1",
+      "candidate_id": "urlcand_e36b9939f839451089454e87",
+      "source_id": "synthetic_fixture_source",
+      "source_attribution": "Synthetic test fixture",
+      "license": "fixture-only",
+      "status": "candidate",
+      "submitted_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+      "final_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+      "extracted_at": "2026-11-17T12:00:00Z",
+      "normalized_product": {
+        "product_id": "urlcand_e36b9939f839451089454e87",
+        "name": {
+          "value": "Choco Crunch Whole Grain Cereal - High Protein",
+          "label": "declared",
+          "source": "json-ld",
+          "note": null
+        },
+        "brand": {
+          "value": "Example Foods",
+          "label": "declared",
+          "source": "json-ld",
+          "note": null
+        },
+        "category": {
+          "value": "breakfast_cereals",
+          "label": "interpreted",
+          "source": "category_keywords.csv",
+          "note": "keyword baseline from name/category text"
+        },
+        "variant": {
+          "value": null,
+          "label": "unknown",
+          "source": null,
+          "note": null
+        },
+        "pack_size": {
+          "value": 375.0,
+          "label": "declared",
+          "source": "json-ld",
+          "note": null
+        },
+        "pack_unit": {
+          "value": "g",
+          "label": "declared",
+          "source": "json-ld",
+          "note": null
+        },
+        "price_inr": {
+          "value": 180.0,
+          "label": "declared",
+          "source": "json-ld",
+          "note": null
+        },
+        "image_url": {
+          "value": null,
+          "label": "unknown",
+          "source": null,
+          "note": null
+        },
+        "mrp_inr": {
+          "value": null,
+          "label": "unknown",
+          "source": null,
+          "note": null
+        },
+        "discount_percent": {
+          "value": null,
+          "label": "unknown",
+          "source": null,
+          "note": null
+        },
+        "availability": {
+          "value": null,
+          "label": "unknown",
+          "source": null,
+          "note": null
+        },
+        "multipack_count": {
+          "value": null,
+          "label": "unknown",
+          "source": null,
+          "note": null
+        },
+        "retailer": {
+          "value": null,
+          "label": "unknown",
+          "source": null,
+          "note": null
+        },
+        "nutrition_basis": "per_100g",
+        "nutrition": {
+          "energy": {
+            "value": 410.0,
+            "label": "declared",
+            "source": "json-ld",
+            "note": null
+          },
+          "protein": {
+            "value": 7.0,
+            "label": "declared",
+            "source": "json-ld",
+            "note": null
+          },
+          "carbohydrate": {
+            "value": 72.0,
+            "label": "declared",
+            "source": "json-ld",
+            "note": null
+          },
+          "total_sugars": {
+            "value": 28.0,
+            "label": "declared",
+            "source": "json-ld",
+            "note": null
+          },
+          "added_sugars": {
+            "value": null,
+            "label": "unknown",
+            "source": null,
+            "note": null
+          },
+          "total_fat": {
+            "value": 10.0,
+            "label": "declared",
+            "source": "json-ld",
+            "note": null
+          },
+          "saturated_fat": {
+            "value": 5.0,
+            "label": "declared",
+            "source": "json-ld",
+            "note": null
+          },
+          "trans_fat": {
+            "value": null,
+            "label": "unknown",
+            "source": null,
+            "note": null
+          },
+          "fibre": {
+            "value": 4.0,
+            "label": "declared",
+            "source": "json-ld",
+            "note": null
+          },
+          "sodium": {
+            "value": 400.0,
+            "label": "declared",
+            "source": "json-ld",
+            "note": null
+          }
+        },
+        "nutrition_original": {
+          "energy": {
+            "value": "410 kcal",
+            "basis_text": "100 g",
+            "source": "json-ld"
+          },
+          "protein": {
+            "value": "7 g",
+            "basis_text": "100 g",
+            "source": "json-ld"
+          },
+          "carbohydrate": {
+            "value": "72 g",
+            "basis_text": "100 g",
+            "source": "json-ld"
+          },
+          "total_sugars": {
+            "value": "28 g",
+            "basis_text": "100 g",
+            "source": "json-ld"
+          },
+          "total_fat": {
+            "value": "10 g",
+            "basis_text": "100 g",
+            "source": "json-ld"
+          },
+          "saturated_fat": {
+            "value": "5 g",
+            "basis_text": "100 g",
+            "source": "json-ld"
+          },
+          "fibre": {
+            "value": "4 g",
+            "basis_text": "100 g",
+            "source": "json-ld"
+          },
+          "sodium": {
+            "value": "400 mg",
+            "basis_text": "100 g",
+            "source": "json-ld"
+          }
+        },
+        "ingredients_raw": {
+          "value": "Whole Grain Wheat (62%), Sugar, Cocoa Solids (6%), Edible Vegetable Oil, Emulsifier, Flavouring",
+          "label": "declared",
+          "source": "json-ld",
+          "note": null
+        },
+        "ingredients_normalised": [
+          {
+            "position": 1,
+            "text": "Whole Grain Wheat (62%)",
+            "name": "whole grain wheat",
+            "term": "whole grain wheat",
+            "match": "exact",
+            "match_score": 100.0,
+            "status": "matched",
+            "percent": 62.0,
+            "functional_category": "Grain (whole)",
+            "explanation": "A whole-grain cereal ingredient as named on the label. When it is the first ingredient the ingredient score gets a bonus (methodology, ingredient_deductions).",
+            "reference_source": "Team definition (methodology v0.1.0); term list in ingredient_terms.csv",
+            "classes": [
+              "whole_grain"
+            ],
+            "additives": [],
+            "sub_ingredients": []
+          },
+          {
+            "position": 2,
+            "text": "Sugar",
+            "name": "sugar",
+            "term": "sugar",
+            "match": "exact",
+            "match_score": 100.0,
+            "status": "matched",
+            "percent": null,
+            "functional_category": "Sweetener (sugar)",
+            "explanation": "A sugar-type ingredient added to the product. It counts toward total sugars and is the class checked for a 'no added sugar' claim (FSSAI reg. 6(1)).",
+            "reference_source": "FSS (Advertising and Claims) Regulations 2018 reg. 6(1)(a)(i) lists sugar types",
+            "classes": [
+              "added_sugar"
+            ],
+            "additives": [],
+            "sub_ingredients": []
+          },
+          {
+            "position": 3,
+            "text": "Cocoa Solids (6%)",
+            "name": "cocoa solids",
+            "term": "cocoa solids",
+            "match": "exact",
+            "match_score": 100.0,
+            "status": "matched",
+            "percent": 6.0,
+            "functional_category": "Cocoa",
+            "explanation": "A cocoa ingredient such as cocoa solids or cocoa powder.",
+            "reference_source": "Team definition (methodology v0.1.0)",
+            "classes": [
+              "cocoa"
+            ],
+            "additives": [],
+            "sub_ingredients": []
+          },
+          {
+            "position": 4,
+            "text": "Edible Vegetable Oil",
+            "name": "edible vegetable oil",
+            "term": "edible vegetable oil",
+            "match": "exact",
+            "match_score": 100.0,
+            "status": "matched",
+            "percent": null,
+            "functional_category": "Fat or oil (source not named)",
+            "explanation": "An oil declared without naming its source, such as 'edible vegetable oil'. The transparency score loses points because the source is not disclosed.",
+            "reference_source": "Team definition (methodology v0.1.0)",
+            "classes": [
+              "oil_unspecified"
+            ],
+            "additives": [],
+            "sub_ingredients": []
+          },
+          {
+            "position": 5,
+            "text": "Emulsifier",
+            "name": "emulsifier",
+            "term": "emulsifier",
+            "match": "exact",
+            "match_score": 100.0,
+            "status": "matched",
+            "percent": null,
+            "functional_category": "Additive (class only)",
+            "explanation": "An additive class named without its INS number, so the exact substance is not disclosed.",
+            "reference_source": "Team definition (methodology v0.1.0)",
+            "classes": [
+              "generic_additive"
+            ],
+            "additives": [],
+            "sub_ingredients": []
+          },
+          {
+            "position": 6,
+            "text": "Flavouring",
+            "name": "flavouring",
+            "term": "flavouring",
+            "match": "exact",
+            "match_score": 100.0,
+            "status": "matched",
+            "percent": null,
+            "functional_category": "Flavouring",
+            "explanation": "A flavouring named without saying whether it is natural, nature-identical or artificial.",
+            "reference_source": "FSS (Labelling and Display) Regulations 2020 flavour declaration categories",
+            "classes": [
+              "flavouring"
+            ],
+            "additives": [],
+            "sub_ingredients": []
+          }
+        ],
+        "additives_ins": [],
+        "allergens": [
+          "gluten_cereals"
+        ],
+        "claims_raw": [
+          "Choco Crunch Whole Grain Cereal - High Protein",
+          "Crunchy whole grain wheat flakes with cocoa. High Protein."
+        ],
+        "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+        "collected_at": "2026-11-17T12:00:00+00:00",
+        "last_verified_at": null,
+        "conflict_flag": false,
+        "conflicts": [],
+        "warnings": []
+      },
+      "acquisition_record": {
+        "schema_version": "acquisition-record/1",
+        "source_id": "synthetic_fixture_source",
+        "record_id": "urlcand_e36b9939f839451089454e87:product",
+        "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+        "source_license": "fixture-only",
+        "source_attribution": "Synthetic test fixture",
+        "collected_at": "2026-11-17T12:00:00Z",
+        "adapter_version": "product-url-extraction/1.0",
+        "verification_status": "candidate",
+        "product_identity": {
+          "source_product_id": {
+            "value": "urlcand_e36b9939f839451089454e87",
+            "unit": null,
+            "provenance": {
+              "source_id": "synthetic_fixture_source",
+              "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#candidate_identity/candidate_id",
+              "extraction_method": "candidate_identity",
+              "collected_at": "2026-11-17T12:00:00Z",
+              "raw_value": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "evidence_state": "interpreted"
+            }
+          },
+          "gtin": {
+            "value": null,
+            "unit": null,
+            "provenance": null
+          },
+          "name": {
+            "value": "Choco Crunch Whole Grain Cereal - High Protein",
+            "unit": null,
+            "provenance": {
+              "source_id": "synthetic_fixture_source",
+              "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/name",
+              "extraction_method": "json-ld",
+              "collected_at": "2026-11-17T12:00:00Z",
+              "raw_value": "Choco Crunch Whole Grain Cereal - High Protein",
+              "evidence_state": "declared"
+            }
+          },
+          "brand": {
+            "value": "Example Foods",
+            "unit": null,
+            "provenance": {
+              "source_id": "synthetic_fixture_source",
+              "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/brand",
+              "extraction_method": "json-ld",
+              "collected_at": "2026-11-17T12:00:00Z",
+              "raw_value": "Example Foods",
+              "evidence_state": "declared"
+            }
+          },
+          "category": {
+            "value": "breakfast_cereals",
+            "unit": null,
+            "provenance": {
+              "source_id": "synthetic_fixture_source",
+              "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/category_hint",
+              "extraction_method": "json-ld",
+              "collected_at": "2026-11-17T12:00:00Z",
+              "raw_value": "Breakfast Cereals",
+              "evidence_state": "declared"
+            }
+          },
+          "variant": {
+            "value": null,
+            "unit": null,
+            "provenance": null
+          },
+          "pack_quantity": {
+            "value": "375.0",
+            "unit": null,
+            "provenance": {
+              "source_id": "synthetic_fixture_source",
+              "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/pack_size_text",
+              "extraction_method": "json-ld",
+              "collected_at": "2026-11-17T12:00:00Z",
+              "raw_value": "375 g",
+              "evidence_state": "interpreted"
+            }
+          },
+          "pack_unit": {
+            "value": "g",
+            "unit": null,
+            "provenance": {
+              "source_id": "synthetic_fixture_source",
+              "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/pack_size_text",
+              "extraction_method": "json-ld",
+              "collected_at": "2026-11-17T12:00:00Z",
+              "raw_value": "375 g",
+              "evidence_state": "interpreted"
+            }
+          },
+          "multipack_count": {
+            "value": null,
+            "unit": null,
+            "provenance": null
+          }
+        },
+        "listing": {
+          "retailer_id": {
+            "value": null,
+            "unit": null,
+            "provenance": null
+          },
+          "retailer_name": {
+            "value": null,
+            "unit": null,
+            "provenance": null
+          },
+          "listing_id": {
+            "value": null,
+            "unit": null,
+            "provenance": null
+          },
+          "listing_url": {
+            "value": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "unit": null,
+            "provenance": {
+              "source_id": "synthetic_fixture_source",
+              "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#user_submitted_url/submitted_url",
+              "extraction_method": "user_submitted_url",
+              "collected_at": "2026-11-17T12:00:00Z",
+              "raw_value": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "evidence_state": "declared"
+            }
+          },
+          "listing_name": {
+            "value": "Choco Crunch Whole Grain Cereal - High Protein",
+            "unit": null,
+            "provenance": {
+              "source_id": "synthetic_fixture_source",
+              "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/name",
+              "extraction_method": "json-ld",
+              "collected_at": "2026-11-17T12:00:00Z",
+              "raw_value": "Choco Crunch Whole Grain Cereal - High Protein",
+              "evidence_state": "declared"
+            }
+          },
+          "image_refs": []
+        },
+        "observation": {
+          "observed_at": "2026-11-17T12:00:00Z",
+          "observed_at_provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#page_retrieval/observed_at",
+            "extraction_method": "page_retrieval",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "2026-11-17T12:00:00Z",
+            "evidence_state": "derived"
+          },
+          "observed_date": null,
+          "observed_date_provenance": null,
+          "selling_price": {
+            "value": "180.00",
+            "unit": "INR",
+            "provenance": {
+              "source_id": "synthetic_fixture_source",
+              "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+              "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/price",
+              "extraction_method": "json-ld",
+              "collected_at": "2026-11-17T12:00:00Z",
+              "raw_value": "180.00",
+              "evidence_state": "declared"
+            }
+          },
+          "currency": "INR",
+          "currency_provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/currency",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "INR",
+            "evidence_state": "declared"
+          },
+          "mrp": {
+            "value": null,
+            "unit": "INR",
+            "provenance": null
+          },
+          "discount_percent": {
+            "value": null,
+            "unit": null,
+            "provenance": null
+          },
+          "availability": {
+            "value": null,
+            "unit": null,
+            "provenance": null
+          },
+          "location": {
+            "country": "IN",
+            "pin_code": null,
+            "provenance": null
+          }
+        },
+        "raw_record_ref": {
+          "payload_sha256": "ca53249d5216b6c81bce9a6ad6ec5d85ba62519bfcd787787b30112883c4212b",
+          "record_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001"
+        }
+      },
+      "field_evidence": [
+        {
+          "field_path": "name",
+          "original_value": "Choco Crunch Whole Grain Cereal - High Protein",
+          "normalized_value": "Choco Crunch Whole Grain Cereal - High Protein",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/name",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "Choco Crunch Whole Grain Cereal - High Protein",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "brand",
+          "original_value": "Example Foods",
+          "normalized_value": "Example Foods",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/brand",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "Example Foods",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "description",
+          "original_value": "Crunchy whole grain wheat flakes with cocoa. High Protein.",
+          "normalized_value": "Crunchy whole grain wheat flakes with cocoa. High Protein.",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/description",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "Crunchy whole grain wheat flakes with cocoa. High Protein.",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "category_hint",
+          "original_value": "Breakfast Cereals",
+          "normalized_value": "breakfast_cereals",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/category_hint",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "Breakfast Cereals",
+            "evidence_state": "interpreted"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "pack_size_text",
+          "original_value": "375 g",
+          "normalized_value": {
+            "quantity": 375.0,
+            "unit": "g",
+            "multipack_count": null
+          },
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/pack_size_text",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "375 g",
+            "evidence_state": "interpreted"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "ingredients_text",
+          "original_value": "Whole Grain Wheat (62%), Sugar, Cocoa Solids (6%), Edible Vegetable Oil, Emulsifier, Flavouring",
+          "normalized_value": "Whole Grain Wheat (62%), Sugar, Cocoa Solids (6%), Edible Vegetable Oil, Emulsifier, Flavouring",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/ingredients_text",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "Whole Grain Wheat (62%), Sugar, Cocoa Solids (6%), Edible Vegetable Oil, Emulsifier, Flavouring",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "nutrition_basis_text",
+          "original_value": "100 g",
+          "normalized_value": "100 g",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/nutrition_basis_text",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "100 g",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "serving_size_text",
+          "original_value": "100 g",
+          "normalized_value": {
+            "amount": 100.0,
+            "unit": "g"
+          },
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/serving_size_text",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "100 g",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "nutrition.energy",
+          "original_value": "410 kcal",
+          "normalized_value": 410.0,
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/nutrition.energy",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "410 kcal",
+            "evidence_state": "interpreted"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "nutrition.protein",
+          "original_value": "7 g",
+          "normalized_value": 7.0,
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/nutrition.protein",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "7 g",
+            "evidence_state": "interpreted"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "nutrition.carbohydrate",
+          "original_value": "72 g",
+          "normalized_value": 72.0,
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/nutrition.carbohydrate",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "72 g",
+            "evidence_state": "interpreted"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "nutrition.total_sugars",
+          "original_value": "28 g",
+          "normalized_value": 28.0,
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/nutrition.total_sugars",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "28 g",
+            "evidence_state": "interpreted"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "nutrition.total_fat",
+          "original_value": "10 g",
+          "normalized_value": 10.0,
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/nutrition.total_fat",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "10 g",
+            "evidence_state": "interpreted"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "nutrition.saturated_fat",
+          "original_value": "5 g",
+          "normalized_value": 5.0,
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/nutrition.saturated_fat",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "5 g",
+            "evidence_state": "interpreted"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "nutrition.fibre",
+          "original_value": "4 g",
+          "normalized_value": 4.0,
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/nutrition.fibre",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "4 g",
+            "evidence_state": "interpreted"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "nutrition.sodium",
+          "original_value": "400 mg",
+          "normalized_value": 400.0,
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/nutrition.sodium",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "400 mg",
+            "evidence_state": "interpreted"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "claims_text[0]",
+          "original_value": "Choco Crunch Whole Grain Cereal - High Protein",
+          "normalized_value": "Choco Crunch Whole Grain Cereal - High Protein",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/claims_text[0]",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "Choco Crunch Whole Grain Cereal - High Protein",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "claims_text[1]",
+          "original_value": "Crunchy whole grain wheat flakes with cocoa. High Protein.",
+          "normalized_value": "Crunchy whole grain wheat flakes with cocoa. High Protein.",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/claims_text[1]",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "Crunchy whole grain wheat flakes with cocoa. High Protein.",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "price",
+          "original_value": "180.00",
+          "normalized_value": 180.0,
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/price",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "180.00",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "currency",
+          "original_value": "INR",
+          "normalized_value": "INR",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#json-ld/currency",
+            "extraction_method": "json-ld",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "INR",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "name",
+          "original_value": "Choco Crunch Whole Grain Cereal - High Protein",
+          "normalized_value": "Choco Crunch Whole Grain Cereal - High Protein",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#html/name",
+            "extraction_method": "html",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "Choco Crunch Whole Grain Cereal - High Protein",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        },
+        {
+          "field_path": "claims_text[0]",
+          "original_value": "Choco Crunch Whole Grain Cereal - High Protein",
+          "normalized_value": "Choco Crunch Whole Grain Cereal - High Protein",
+          "provenance": {
+            "source_id": "synthetic_fixture_source",
+            "source_url": "https://catalog.synthetic.example.test/SYN-FIXTURE-001",
+            "input_locator": "https://catalog.synthetic.example.test/SYN-FIXTURE-001#html/claims_text[0]",
+            "extraction_method": "html",
+            "collected_at": "2026-11-17T12:00:00Z",
+            "raw_value": "Choco Crunch Whole Grain Cereal - High Protein",
+            "evidence_state": "declared"
+          },
+          "validation_status": "candidate"
+        }
+      ],
+      "images": [],
+      "additional_product_candidates": [],
+      "issues": [
+        {
+          "code": "missing_extracted_field",
+          "field_path": "variant",
+          "message": "No variant value was present; the field remains null.",
+          "severity": "warning",
+          "record_id": null
+        },
+        {
+          "code": "missing_extracted_field",
+          "field_path": "gtin",
+          "message": "No gtin value was present; the field remains null.",
+          "severity": "warning",
+          "record_id": null
+        },
+        {
+          "code": "missing_extracted_field",
+          "field_path": "allergens_text",
+          "message": "No allergens_text value was present; the field remains null.",
+          "severity": "info",
+          "record_id": null
+        },
+        {
+          "code": "missing_extracted_field",
+          "field_path": "mrp",
+          "message": "No mrp value was present; the field remains null.",
+          "severity": "info",
+          "record_id": null
+        },
+        {
+          "code": "missing_extracted_field",
+          "field_path": "availability",
+          "message": "No availability value was present; the field remains null.",
+          "severity": "info",
+          "record_id": null
+        },
+        {
+          "code": "missing_extracted_field",
+          "field_path": "image_url",
+          "message": "No image_url value was present; the field remains null.",
+          "severity": "info",
+          "record_id": null
+        }
+      ]
+    },
+    "issues": [
+      {
+        "code": "missing_extracted_field",
+        "field_path": "variant",
+        "message": "No variant value was present; the field remains null.",
+        "severity": "warning",
+        "record_id": null
+      },
+      {
+        "code": "missing_extracted_field",
+        "field_path": "gtin",
+        "message": "No gtin value was present; the field remains null.",
+        "severity": "warning",
+        "record_id": null
+      },
+      {
+        "code": "missing_extracted_field",
+        "field_path": "allergens_text",
+        "message": "No allergens_text value was present; the field remains null.",
+        "severity": "info",
+        "record_id": null
+      },
+      {
+        "code": "missing_extracted_field",
+        "field_path": "mrp",
+        "message": "No mrp value was present; the field remains null.",
+        "severity": "info",
+        "record_id": null
+      },
+      {
+        "code": "missing_extracted_field",
+        "field_path": "availability",
+        "message": "No availability value was present; the field remains null.",
+        "severity": "info",
+        "record_id": null
+      },
+      {
+        "code": "missing_extracted_field",
+        "field_path": "image_url",
+        "message": "No image_url value was present; the field remains null.",
+        "severity": "info",
+        "record_id": null
+      }
+    ],
+    "error_code": null,
+    "message": null
+  }
+}

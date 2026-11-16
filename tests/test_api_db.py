@@ -16,9 +16,10 @@ from sqlalchemy.pool import StaticPool
 
 import api.main as api_main
 import services
+from acquisition.registry import DEFAULT_SOURCE_REGISTRY, SourceRegistration, SourceRegistry
 from database import repository as repo
 from database.ingest import ingest_records, read_jsonl, to_extraction
-from extract.fetch import validate_url
+from extract.fetch import FetchBlocked, FetchError, validate_url
 from database.models import Base, NutrientValue, ProductRow, Recommendation, RegulatoryRule
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,10 +55,21 @@ def engine():
 def client(engine):
     factory = sessionmaker(bind=engine, expire_on_commit=False)
     pages = {f"https://shop.example/{p.stem}": p.read_text(encoding="utf-8") for p in FIX.glob("*.html")}
+    off_fixture_url = "https://world.openfoodfacts.org/product/SYN-FIXTURE-001"
+    pages[off_fixture_url] = (FIX / "cereal_jsonld.html").read_text(encoding="utf-8")
+    test_registry = SourceRegistry([
+        *DEFAULT_SOURCE_REGISTRY.all(),
+        SourceRegistration(source_id="synthetic_test_shop", source_type="user_submitted_url",
+                           authorization_status="permitted", enabled=True, network_acquisition=True,
+                           authorization_evidence="Synthetic test fixture only; no real source authorization.",
+                           permitted_fields=frozenset({"product_name"}),
+                           allowed_domains=frozenset({"shop.example"})),
+    ])
     with pytest.MonkeyPatch.context() as mp:
         mp.setattr(api_main, "session_factory", lambda *a, **k: factory)
         mp.setattr(api_main, "RATE_LIMIT", 1000)
-        mp.setattr(services, "fetch", lambda url, use_cache=True: pages[url])
+        mp.setattr(services, "URL_SOURCE_REGISTRY", test_registry)
+        mp.setattr(services, "fetch", lambda url, use_cache=True, **kwargs: pages[url])
         # shop.example resolves to a public address; everything else goes through the real checks
         mp.setattr(services, "validate_url", lambda url: validate_url(url, lambda host: ["93.184.216.34"]))
         yield TestClient(api_main.app)
@@ -114,6 +126,123 @@ def test_analyze_url_stores_traceable_record(client, engine):
         assert row.claims[0].applicable_rule_id is not None
 
 
+def test_analyze_url_accepts_registered_open_food_facts_source_through_mock_fetch(client, monkeypatch):
+    requested = []
+    original_fetch = services.fetch
+
+    def record_fetch(url, **kwargs):
+        requested.append((url, kwargs.get("allowed_hosts")))
+        return original_fetch(url, **kwargs)
+
+    monkeypatch.setattr(services, "fetch", record_fetch)
+    response = client.post("/api/analyze-url", json={
+        "url": "https://world.openfoodfacts.org/product/SYN-FIXTURE-001"
+    })
+    assert response.status_code == 200, response.text
+    assert requested == [("https://world.openfoodfacts.org/product/SYN-FIXTURE-001",
+                          frozenset({"openfoodfacts.org"}))]
+
+
+def test_analyze_url_fetches_unregistered_public_page_as_user_submitted(client, monkeypatch):
+    from acquisition.registry import DEFAULT_SOURCE_REGISTRY
+
+    calls = []
+    monkeypatch.setattr(services, "URL_SOURCE_REGISTRY", DEFAULT_SOURCE_REGISTRY)
+    monkeypatch.setattr(services, "validate_url", lambda url: calls.append(("validate", url)))
+
+    def fake_fetch(url, **kwargs):
+        calls.append(("fetch", url, kwargs.get("allowed_hosts")))
+        from extract.fetch import FetchBlocked
+        raise FetchBlocked("robots says no")
+
+    monkeypatch.setattr(services, "fetch", fake_fetch)
+    response = client.post("/api/analyze-url", json={"url": "https://retailer.unregistered.example/p/1"})
+    # Not blocked by the registry: validated, then fetched (robots.txt still decides).
+    assert calls == [("validate", "https://retailer.unregistered.example/p/1"),
+                     ("fetch", "https://retailer.unregistered.example/p/1", None)]
+    assert response.json()["detail"]["code"] == "robots_disallowed"
+
+
+def test_analyze_url_blocks_registered_but_disabled_source(client, monkeypatch):
+    from acquisition.registry import SourceRegistration, SourceRegistry
+
+    calls = []
+    monkeypatch.setattr(services, "URL_SOURCE_REGISTRY", SourceRegistry([SourceRegistration(
+        source_id="disabled_shop", source_type="authorized_feed", enabled=False, network_acquisition=True,
+        allowed_domains=frozenset({"disabled.example"}))]))
+    monkeypatch.setattr(services, "fetch", lambda *args, **kwargs: calls.append(args[0]))
+    response = client.post("/api/analyze-url", json={"url": "https://disabled.example/p/1"})
+    assert response.status_code == 403
+    assert response.json()["detail"]["code"] == "unsupported_source"
+    assert calls == []
+
+
+def test_analyze_url_reports_robots_restriction_without_retry(client, monkeypatch):
+    calls = []
+
+    def disallow(url, **kwargs):
+        calls.append(url)
+        raise FetchBlocked("robots fixture disallow")
+
+    monkeypatch.setattr(services, "fetch", disallow)
+    response = client.post("/api/analyze-url", json={
+        "url": "https://world.openfoodfacts.org/product/SYN-ROBOTS-001"
+    })
+    assert response.status_code == 403
+    assert response.json()["detail"]["code"] == "robots_disallowed"
+    assert "We respect its access restrictions" in response.json()["detail"]["message"]
+    assert calls == ["https://world.openfoodfacts.org/product/SYN-ROBOTS-001"]
+
+
+def test_analyze_url_reports_network_failure_with_stable_code(client, monkeypatch):
+    monkeypatch.setattr(services, "fetch", lambda *args, **kwargs: (_ for _ in ()).throw(
+        FetchError("timeout", "internal timeout detail", 504)))
+    response = client.post("/api/analyze-url", json={
+        "url": "https://world.openfoodfacts.org/product/SYN-TIMEOUT-001"
+    })
+    assert response.status_code == 502
+    assert response.json()["detail"]["code"] == "source_fetch_failed"
+    assert response.json()["detail"]["message"] == \
+        "The product page could not be retrieved. Please upload a saved page or product screenshots."
+
+
+def test_analyze_url_extraction_failure_does_not_persist_empty_product(client, engine, monkeypatch):
+    from extract import llm_fallback
+
+    monkeypatch.setattr(services, "fetch", lambda *args, **kwargs:
+                        "<!doctype html><html><body>synthetic empty extraction fixture</body></html>")
+    monkeypatch.setattr(llm_fallback, "available", lambda: False)
+    with sessionmaker(bind=engine)() as s:
+        before = repo.count_products(s)
+    response = client.post("/api/analyze-url", json={"url": "https://world.openfoodfacts.org/empty"})
+    assert response.status_code == 422
+    assert response.json()["detail"]["code"] == "product_extraction_failed"
+    with sessionmaker(bind=engine)() as s:
+        assert repo.count_products(s) == before
+
+
+def test_image_and_commercial_evidence_survive_database_round_trip(engine):
+    from core.schema import Evidence, Product
+
+    product = Product(source_url="https://www.blinkit.com/product/roundtrip")
+    product.name = Evidence.declared("Round Trip Oats", "json-ld")
+    product.image_url = Evidence.declared("https://cdn.example.test/oats.webp", "json-ld")
+    product.price_inr = Evidence.declared(180.0, "json-ld")
+    product.mrp_inr = Evidence.declared(200.0, "json-ld")
+    product.discount_percent = Evidence.derived(10.0, "json-ld + json-ld")
+    product.retailer = Evidence.declared("Blinkit", "product URL host")
+    with sessionmaker(bind=engine)() as s:
+        row = repo.save_product(s, product, source_type="url", extraction_method="json-ld")
+        product_id = row.id
+        restored = repo.to_product(repo.get_row(s, product_id))
+        assert restored.image_url.value == "https://cdn.example.test/oats.webp"
+        assert restored.image_url.source == "json-ld"
+        assert restored.mrp_inr.value == 200
+        assert restored.discount_percent.value == 10
+        assert restored.retailer.value == "Blinkit"
+        s.rollback()
+
+
 def test_get_product_matches_stored_and_is_deterministic(client):
     pid = client.post("/api/analyze-url", json={"url": "https://shop.example/biscuit_html_only"}).json()["product_id"]
     a = client.get(f"/api/products/{pid}").json()
@@ -131,10 +260,10 @@ def test_per_serving_panel_is_partial_and_derived(client):
 
 
 def test_unstructured_page_returns_insufficient_data(client):
-    d = client.post("/api/analyze-url", json={"url": "https://shop.example/beverage_unstructured"}).json()
-    assert d["status"] == "insufficient_data" and d["report"]["overall"]["score"] is None
-    llm = next(s for s in d["extraction_log"] if s["step"] == "llm-fallback")
-    assert llm["outcome"] == "skipped"
+    r = client.post("/api/analyze-url", json={"url": "https://shop.example/beverage_unstructured"})
+    assert r.status_code == 422
+    assert r.json()["detail"]["code"] == "product_extraction_failed"
+    assert "could not be extracted" in r.json()["detail"]["message"]
 
 
 @pytest.mark.parametrize("url,code", [
@@ -145,7 +274,7 @@ def test_unstructured_page_returns_insufficient_data(client):
 ])
 def test_analyze_url_refuses_unsafe_destinations(client, url, code):
     r = client.post("/api/analyze-url", json={"url": url})
-    assert r.status_code in (400, 422)
+    assert r.status_code in (400, 403, 422)
     assert r.json()["detail"]["code"] == code
 
 

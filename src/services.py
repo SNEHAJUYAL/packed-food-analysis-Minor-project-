@@ -8,6 +8,7 @@ and time per field -> flag missing and conflicting data -> partial result if nee
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import re
 from typing import Optional
@@ -17,9 +18,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from core.config import scoring_config
+from acquisition.product_url import authorize_product_url
+from acquisition.registry import DEFAULT_SOURCE_REGISTRY, SourceRegistry
 from database import repository as repo
 from database.models import ProductRow, ProductSource
-from extract.fetch import fetch, validate_url
+from extract.fetch import FetchError, fetch, public_source_fetch_error, validate_url
 from extract.html_parser import extract_html
 from extract.jsonld import extract_jsonld
 from extract import label_image, label_ocr, llm_fallback
@@ -28,12 +31,15 @@ from pipeline import analyse_product
 
 log = logging.getLogger("fdi.services")
 OFF_MATCH_CUTOFF = 85
+# Central source policy for every server-side product URL acquisition path.
+# Tests may replace this with an explicit synthetic registration.
+URL_SOURCE_REGISTRY: SourceRegistry = DEFAULT_SOURCE_REGISTRY
 
 
 def _filled(ex: Optional[dict]) -> list[str]:
     if not ex:
         return []
-    keys = [k for k in ("name", "brand", "price", "pack_size_text", "ingredients_text") if ex.get(k)]
+    keys = [k for k in ("name", "brand", "price", "pack_size_text", "ingredients_text", "image_url") if ex.get(k)]
     if ex.get("nutrition"):
         keys.append(f"nutrition ({len(ex['nutrition'])} values)")
     if ex.get("claims_text"):
@@ -41,7 +47,7 @@ def _filled(ex: Optional[dict]) -> list[str]:
     return keys
 
 
-def run_extraction(html: str, url: str) -> tuple[list[dict], list[dict], str]:
+def run_extraction(html: str, url: str, *, allow_llm: bool = True) -> tuple[list[dict], list[dict], str]:
     """Run the extractors in order. Returns (extractions, log, method summary)."""
     steps, found = [], []
     for name, fn in (("json-ld", extract_jsonld), ("html", extract_html)):
@@ -54,6 +60,9 @@ def run_extraction(html: str, url: str) -> tuple[list[dict], list[dict], str]:
     if any(f.get("nutrition") or f.get("ingredients_text") for f in found):
         steps.append({"step": "llm-fallback", "outcome": "skipped",
                       "detail": "structured data or a nutrition table was found"})
+    elif not allow_llm:
+        steps.append({"step": "llm-fallback", "outcome": "skipped",
+                      "detail": "disabled for user-supplied saved pages; the file is parsed locally"})
     elif not llm_fallback.available():
         steps.append({"step": "llm-fallback", "outcome": "skipped",
                       "detail": "no ANTHROPIC_API_KEY set; deterministic extractors only"})
@@ -107,15 +116,55 @@ def payload(row: ProductRow, report: dict) -> dict:
     log_steps = row.sources[-1].extraction_log if row.sources else []
     return {"product_id": row.id, "status": report["status"], "is_synthetic": repo.is_synthetic(row),
             "source": src, "missing_fields": report["missing_fields"], "conflicts": report["product"]["conflicts"],
-            "extraction_log": log_steps, "methodology_version": report["methodology_version"], "report": report}
+            "extraction_log": log_steps, "methodology_version": report["methodology_version"], "report": report,
+            "extras": extras(row)}
+
+
+def extras(row: ProductRow) -> dict:
+    """Stored facts that are shown but not scored: minerals and vitamins, image reference, OFF Nutri-Score."""
+    ev = row.field_evidence or {}
+    return {"micronutrients": ev.get("micronutrients") or {},
+            "image_url": (ev.get("image_url") or {}).get("value"),
+            "off_nutriscore_grade": (ev.get("off_nutriscore_grade") or {}).get("value"),
+            "price_observation_count": len(row.prices)}
 
 
 def analyze_url(s: Session, url: str, category: Optional[str] = None, refresh: bool = False) -> dict:
-    validate_url(url)
-    html = fetch(url, use_cache=not refresh)
+    # Registered sources (e.g. Open Food Facts) follow their registry policy and keep
+    # redirects on their own hosts. Any other public page is analysed as a single
+    # user-submitted page, fetched only on the user's request: SSRF checks, robots.txt,
+    # timeout, size limit and per-host pacing still apply (docs/data_sources.md).
+    # Bulk crawling of unregistered sites is not done anywhere.
+    # An Open Food Facts product page: read the product through the Open Food Facts API instead of parsing
+    # its HTML, which gives the full nutrition table, ingredients and minerals.
+    off = re.match(r"^https?://(?:[a-z]{2,3}\.|world\.)openfoodfacts\.org/product/(\d{4,14})(?:[/?#]|$)", url.strip(), re.I)
+    if off:
+        import catalog
+        try:
+            return catalog.import_off(s, off.group(1))
+        except catalog.CatalogError as exc:
+            raise FetchError(exc.code, exc.message, exc.status) from exc
+    registration, decision, _ = authorize_product_url(url, URL_SOURCE_REGISTRY)
+    if registration is not None and (decision is None or not decision.allowed):
+        message = ("This source is not currently supported for automated product extraction. You can upload a saved "
+                   "product page or packaging screenshots instead.")
+        raise FetchError("unsupported_source", message, 403)
+    allowed_hosts = registration.allowed_domains if registration is not None else None
+
+    try:
+        validate_url(url)
+        html = fetch(url, use_cache=not refresh, allowed_hosts=allowed_hosts)
+    except FetchError as exc:
+        code, message, status = public_source_fetch_error(exc)
+        raise FetchError(code, message, status) from exc
     steps = [{"step": "fetch", "outcome": "ok", "detail": "SSRF checks, robots.txt and size limit passed"}]
     found, ex_steps, method = run_extraction(html, url)
     steps += ex_steps
+    if not any(ex.get(key) for ex in found for key in
+               ("name", "ingredients_text", "nutrition", "pack_size_text")):
+        raise FetchError("product_extraction_failed",
+                         "The page was retrieved, but the required product information could not be extracted. "
+                         "Upload packaging images or enter the product details manually.", 422)
     product = build_product(found, url=url, category_override=category)
     match = match_open_food_facts(s, product.name.value, product.brand.value, product.category.value)
     steps.append({"step": "open-food-facts-match",
@@ -181,9 +230,43 @@ def image_media_type(filename: str, content_type: Optional[str]) -> str:
         else "image/gif" if name.endswith(".gif") else "image/jpeg"
 
 
+_NUTRIENT_INPUT_NAMES = {
+    "energy": "energy", "protein": "protein", "carbohydrate": "carbohydrate",
+    "total carbohydrates": "carbohydrate", "total sugars": "total_sugars",
+    "sugars": "total_sugars", "added sugars": "added_sugars", "total fat": "total_fat",
+    "fat": "total_fat", "saturated fat": "saturated_fat", "trans fat": "trans_fat",
+    "fibre": "fibre", "fiber": "fibre", "sodium": "sodium",
+}
+
+
+def _manual_correction_extraction(corrections: dict) -> dict:
+    extraction = {"source": "user-correction"}
+    for key in ("name", "brand", "variant", "pack_size_text", "ingredients_text"):
+        value = corrections.get(key)
+        if value is not None and str(value).strip():
+            extraction[key] = str(value).strip()
+    basis = corrections.get("nutrition_basis_text")
+    if basis in {"per_100g", "per_100ml"}:
+        extraction["nutrition_basis_text"] = "per 100 g" if basis == "per_100g" else "per 100 ml"
+    elif basis:
+        extraction["nutrition_basis_text"] = str(basis).strip()
+    nutrition: dict[str, str] = {}
+    for line in str(corrections.get("nutrition_text") or "").splitlines():
+        match = re.match(r"\s*([^:=]+)\s*[:=]\s*(.+?)\s*$", line)
+        if not match:
+            continue
+        nutrient = _NUTRIENT_INPUT_NAMES.get(match.group(1).strip().lower())
+        if nutrient:
+            nutrition[nutrient] = match.group(2).strip()
+    if nutrition:
+        extraction["nutrition"] = nutrition
+    return extraction
+
+
 def analyze_upload(s: Session, data: bytes, filename: str, content_type: Optional[str],
                    page_url: Optional[str] = None, site: Optional[str] = None,
-                   category: Optional[str] = None, client=None, name: Optional[str] = None) -> dict:
+                   category: Optional[str] = None, client=None, name: Optional[str] = None,
+                   corrections: Optional[dict] = None) -> dict:
     """Analyse a pack photo, an app screenshot, or a product page saved from the browser.
 
     Nothing is fetched: a saved page is read as it was saved, a photo is read by the vision model.
@@ -242,7 +325,7 @@ def analyze_upload(s: Session, data: bytes, filename: str, content_type: Optiona
         steps = [{"step": "upload", "outcome": "ok",
                   "detail": f"saved page ({len(data) // 1024} KB), read as saved; nothing fetched"
                             + (f"; page address from the file: {stated}" if stated and page_url == stated else "")}]
-        found, ex_steps, method = run_extraction(html, page_url or "")
+        found, ex_steps, method = run_extraction(html, page_url or "", allow_llm=False)
         steps += ex_steps
         source_type = "saved_page"
         external_id = repo.external_id_for_url(page_url) if page_url else f"page:{digest}"
@@ -250,10 +333,15 @@ def analyze_upload(s: Session, data: bytes, filename: str, content_type: Optiona
         raise UploadError(415, "unsupported_type",
                           "Upload a photo or screenshot (JPEG, PNG, WebP, GIF) or a saved web page (.html).")
 
+    correction = {key: value for key, value in (corrections or {}).items()
+                  if value is not None and str(value).strip()}
     if name and name.strip():
-        typed = dict(label_ocr.empty_extracted("entered-by-user"), name=name.strip()[:200])
-        found = [typed] + found  # the person's own name for the product wins over a guess from the image
-        steps.append({"step": "name", "outcome": "ok", "detail": "product name typed by the person uploading"})
+        correction["name"] = name.strip()[:200]
+    if correction:
+        corrected = _manual_correction_extraction(correction)
+        found = [corrected] + found  # explicit user corrections take precedence over OCR/page values
+        steps.append({"step": "manual-correction", "outcome": "ok",
+                      "detail": "user-supplied corrections take precedence; original upload/OCR transcript is retained"})
     product = build_product(found, url=page_url, category_override=category)
     match = match_open_food_facts(s, product.name.value, product.brand.value, product.category.value)
     steps.append({"step": "open-food-facts-match", "outcome": "ok" if match else "no match",
@@ -267,6 +355,45 @@ def analyze_upload(s: Session, data: bytes, filename: str, content_type: Optiona
                             site=_clean_site(site) or repo.site_of(page_url))
     report = analyse_row(s, row)
     log.info("analysed upload kind=%s product_id=%s status=%s method=%s", kind, row.id, report["status"], method)
+    return payload(row, report)
+
+
+def analyze_manual(s: Session, values: dict) -> dict:
+    """Save and analyse details explicitly entered by the user, retaining manual provenance."""
+    extraction = {"source": "manual-entry", "name": values["name"].strip()}
+    for key in ("brand", "variant", "ingredients_text"):
+        value = values.get(key)
+        if value is not None and str(value).strip():
+            extraction[key] = str(value).strip()
+    if values.get("pack_size") is not None and values.get("pack_unit"):
+        extraction["pack_size_text"] = f"{values['pack_size']} {values['pack_unit']}"
+    if values.get("nutrition_basis"):
+        extraction["nutrition_basis_text"] = ("per 100 g" if values["nutrition_basis"] == "per_100g"
+                                               else "per 100 ml")
+    if values.get("nutrition"):
+        extraction["nutrition"] = {key: str(value) for key, value in values["nutrition"].items()
+                                   if value not in (None, "")}
+    if values.get("price_inr") is not None:
+        extraction["price"] = f"INR {values['price_inr']}"
+
+    product = build_product([extraction], category_override=values.get("category"))
+    product.warnings.append("User-entered information; not independently verified against package evidence.")
+    identity_payload = {key: values.get(key) for key in
+                        ("name", "brand", "category", "variant", "pack_size", "pack_unit",
+                         "ingredients_text", "nutrition_basis", "nutrition", "price_inr")}
+    digest = hashlib.sha256(json.dumps(identity_payload, sort_keys=True, ensure_ascii=False,
+                                       separators=(",", ":"), default=str).encode()).hexdigest()[:32]
+    external_id = f"manual:{digest}"
+    steps = [{"step": "manual-entry", "outcome": "ok",
+              "detail": "product details supplied by the user; values are unverified"}]
+    match = match_open_food_facts(s, product.name.value, product.brand.value, product.category.value)
+    steps.append({"step": "open-food-facts-match", "outcome": "ok" if match else "no match",
+                  "detail": (f"stored record #{match['product_id']} ({match['brand']} {match['name']}), "
+                             f"similarity {match['score']}; reference only, values not merged")
+                  if match else "no stored Open Food Facts record above the similarity cutoff"})
+    row = repo.save_product(s, product, source_type="manual", external_id=external_id,
+                            extraction_method="manual-entry", extraction_log=steps)
+    report = analyse_row(s, row)
     return payload(row, report)
 
 

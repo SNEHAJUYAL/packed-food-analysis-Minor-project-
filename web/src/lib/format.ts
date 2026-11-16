@@ -103,3 +103,12 @@ export function parseIds(raw: string | null | undefined): number[] {
   }
   return out.slice(0, 6);
 }
+
+/** Colour for a 0–100 score (shared by server and client components). */
+export function scoreColor(score: number | null | undefined): string {
+  if (score === null || score === undefined) return "#cdd3ca";
+  if (score >= 70) return "#234b39";
+  if (score >= 50) return "#6f9a63";
+  if (score >= 35) return "#e9a65b";
+  return "#d96b63";
+}

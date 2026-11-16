@@ -64,25 +64,25 @@ export function SyntheticBadge() {
 }
 
 const GRADE_CLASSES: Record<Grade, string> = {
-  A: "bg-teal-700 text-white",
-  B: "bg-teal-500 text-white",
-  C: "bg-sky-500 text-white",
-  D: "bg-amber-400 text-amber-950",
-  E: "bg-orange-300 text-orange-950",
+  A: "bg-forest text-white",
+  B: "bg-[#3b6e55] text-white",
+  C: "bg-[#a9c08f] text-deep",
+  D: "bg-warn text-[#3d2508]",
+  E: "bg-danger text-[#2e0f0c]",
 };
 
 export function GradeBadge({ grade, size = "md" }: { grade: Grade | null | undefined; size?: "sm" | "md" | "lg" }) {
   const dims = size === "lg" ? "h-14 w-14 text-2xl" : size === "sm" ? "h-6 w-6 text-xs" : "h-9 w-9 text-base";
   if (!grade) {
     return (
-      <span className={`inline-flex items-center justify-center rounded-xl bg-slate-200 font-semibold text-slate-600 ${dims}`} aria-label="No grade">
+      <span className={`inline-flex shrink-0 items-center justify-center rounded-xl bg-slate-200 font-semibold text-slate-600 ${dims}`} aria-label="No grade">
         –
       </span>
     );
   }
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-xl font-bold ${GRADE_CLASSES[grade]} ${dims}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-xl font-display font-bold ${GRADE_CLASSES[grade]} ${dims}`}
       aria-label={`Grade ${grade}`}
     >
       {grade}
@@ -91,9 +91,9 @@ export function GradeBadge({ grade, size = "md" }: { grade: Grade | null | undef
 }
 
 const LIGHT_DOT: Record<string, string> = {
-  green: "bg-emerald-500",
-  yellow: "bg-amber-400",
-  red: "bg-rose-400",
+  green: "bg-[#3b8a5c]",
+  yellow: "bg-warn",
+  red: "bg-danger",
 };
 
 export function TrafficLight({ light }: { light: string | null | undefined }) {

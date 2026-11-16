@@ -1,6 +1,7 @@
 """Nutrition analysis: traffic lights, sub-scores and the nutrition score N."""
 from __future__ import annotations
 
+from core.config import scoring_config
 from core.schema import NUTRIENTS, Product
 from score.category_rules import subscore, traffic_light, weights_for
 from score.scorer import nutrition_score
@@ -29,11 +30,17 @@ def analyse_nutrition(product: Product) -> dict:
 
     weights = weights_for(category)
     explanation = []
+    generic = False
     if not weights:
-        explanation.append(f"No category weights for '{category}'; nutrition score not computed. "
-                           "Set a category from data/reference/category_weights.csv.")
-        return {"basis": basis, "facts": facts, "traffic_lights": lights, "subscores": {},
-                "score": None, "detail": None, "explanation": explanation}
+        weights = {k: v for k, v in scoring_config().get("generic_category_weights", {}).items()
+                   if not k.startswith("_")}
+        generic = True
+        if not weights:
+            explanation.append(f"No category weights for '{category}'; nutrition score not computed.")
+            return {"basis": basis, "facts": facts, "traffic_lights": lights, "subscores": {},
+                    "score": None, "detail": None, "explanation": explanation}
+        explanation.append("This product is outside the five scored categories, so generic equal weights over "
+                           "sugars, saturated fat, sodium, fibre and protein were used (prototype).")
 
     subs = {k: subscore(k, product.nutrient(k), category, basis) for k in weights}
     detail = nutrition_score({k: v["subscore"] for k, v in subs.items()}, weights)
@@ -53,4 +60,5 @@ def analyse_nutrition(product: Product) -> dict:
             "subscores": {k: {"subscore": v["subscore"], "reason": v["reason"],
                               "benchmark_source": (v["benchmark"] or {}).get("source")}
                           for k, v in subs.items()},
-            "score": detail["score"], "detail": detail, "explanation": explanation}
+            "score": detail["score"], "detail": detail, "explanation": explanation,
+            "weights": "generic" if generic else "category"}
