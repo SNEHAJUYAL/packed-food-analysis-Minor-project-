@@ -2,7 +2,7 @@
 
 import { GradeBadge } from "./badges";
 import { DimensionChart } from "./DimensionChart";
-import { BulletList, Card, InfoTip, SectionHeading } from "./ui";
+import { BulletList, Card, InfoTip, ScoreRing, SectionHeading } from "./ui";
 import { DIMENSIONS, DIMENSION_INFO } from "@/lib/labels";
 import { formatPercent, humanize } from "@/lib/format";
 import type { Report } from "@/lib/types";
@@ -37,7 +37,7 @@ export function ScoreSummary({ report }: { report: Report }) {
             <div>
               {overall.score !== null && overall.score !== undefined ? (
                 <>
-                  <p className="text-3xl font-semibold text-ink">
+                  <p className="font-display text-4xl font-bold text-ink">
                     {overall.score}
                     <span className="text-base font-normal text-muted"> / 100</span>
                   </p>
@@ -71,9 +71,16 @@ export function ScoreSummary({ report }: { report: Report }) {
           if (!dim) return null;
           const row = weightOf(d);
           return (
-            <Card key={d} className="!p-4">
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="flex items-center gap-1.5 font-medium text-ink">
+            <Card key={d} className="!p-5">
+              <div className="flex items-start gap-4">
+                <ScoreRing
+                  score={dim.score}
+                  size={60}
+                  stroke={6}
+                  label={dim.score !== null && dim.score !== undefined ? `${humanize(d)} score ${Math.round(dim.score)} out of 100` : `${humanize(d)} not scored`}
+                />
+                <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
+                <h3 className="flex items-center gap-1.5 font-semibold text-ink">
                   {humanize(d)}
                   <InfoTip label={`About the ${d} dimension`}>{DIMENSION_INFO[d]}</InfoTip>
                 </h3>
@@ -90,8 +97,14 @@ export function ScoreSummary({ report }: { report: Report }) {
                     </span>
                   ) : null}
                 </p>
+                </div>
               </div>
-              <BulletList className="mt-2" items={dim.explanation} />
+              {dim.explanation?.length ? (
+                <details className="group mt-3" open>
+                  <summary className="cursor-pointer text-xs font-medium text-forest">How this was calculated</summary>
+                  <BulletList className="mt-2" items={dim.explanation} />
+                </details>
+              ) : null}
             </Card>
           );
         })}

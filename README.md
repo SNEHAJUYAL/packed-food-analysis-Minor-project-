@@ -13,7 +13,12 @@ ingredients, transparency, claims and value with explanations, checks front-of-p
 conditions, and suggests alternatives from stored products only, from the same shop (for example Blinkit)
 when the product came from one.
 
-> Status (17 Oct 2026): URL-first V1 with photo and saved-page upload. Consumer decision support, not a
+> Status (checked 16 Nov 2026): URL-first prototype with an unsaved **candidate preview**, photo and saved-page
+> upload with user corrections, and manual entry. Product URLs pass a central source-authorization registry
+> first; Open Food Facts is the only enabled external product source. **No machine-learning model has been
+> trained**: scoring is rule-based and explainable, similarity is TF-IDF + kNN, photos use Tesseract OCR
+> ([docs/AI_ML_METHODOLOGY.md](docs/AI_ML_METHODOLOGY.md)). Tests on 16 Nov 2026: 242 Python and 47 frontend
+> tests passed, TypeScript and ESLint clean. Earlier status (17 Oct 2026): URL-first V1 with photo and saved-page upload. Consumer decision support, not a
 > medical or clinical score. Photos are read offline with free Tesseract OCR (`brew install tesseract`),
 > or by Claude's vision model when `ANTHROPIC_API_KEY` is set (then values are kept only if they appear in
 > its transcript of the label). Photo-reading accuracy has not been measured. Barcode scanning, cross-source validation, personalisation, basket optimisation and lab
@@ -47,9 +52,34 @@ extract (2,692 records) is reproducible with `./run.sh off-export`. See [data/sa
 | Alternatives | Balanced, nutrition, lower unit price or transparency; stored records only, from the same shop when known (falls back to all stored products and says so); says so when none qualify |
 | Methodology (`/methodology`) | Weights, thresholds and claim rules with sources, missing-data rules, limitations, data licences |
 
-API: `POST /api/analyze-url`, `POST /api/analyze-upload`, `GET /api/products`, `GET /api/products/{id}`, `POST /api/products/compare`,
+Upload and manual entry also live on the landing page: **Preview candidate (not saved)** shows an
+unverified, unscored candidate with field provenance; the upload form accepts corrections (brand, variant,
+pack size, ingredients, nutrition); **Enter product details manually** saves an unverified manual record.
+
+API: `POST /api/product-candidates/from-url`, `POST /api/analyze-url`, `POST /api/analyze-upload`,
+`POST /api/analyze-manual`, `GET /api/products`, `GET /api/products/{id}`, `POST /api/products/compare`,
 `GET /api/products/{id}/alternatives`, `GET /api/reference/categories`, `GET /api/reference/methodology`,
 `GET /api/health`. See [docs/api.md](docs/api.md).
+
+## Documentation
+
+Start with [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md). Then:
+[architecture](docs/SYSTEM_ARCHITECTURE.md) ·
+[AI/ML status](docs/AI_ML_METHODOLOGY.md) ·
+[datasets](docs/DATASET_AND_DATA_ENGINEERING.md) ·
+[data acquisition](docs/PRODUCT_DATA_ACQUISITION.md) ·
+[scoring](docs/FOOD_INTELLIGENCE_AND_SCORING.md) ·
+[comparison and recommendations](docs/PRODUCT_COMPARISON_AND_RECOMMENDATIONS.md) ·
+[database and API](docs/DATABASE_AND_API.md) ·
+[user guide](docs/USER_INTERFACE_AND_USER_GUIDE.md) ·
+[installation](docs/INSTALLATION_AND_EXECUTION.md) ·
+[demo script](docs/END_TO_END_DEMONSTRATION.md) ·
+[testing](docs/TESTING_AND_TROUBLESHOOTING.md) ·
+[status and future scope](docs/PROJECT_STATUS_AND_FUTURE_SCOPE.md) ·
+[resource register](docs/RESEARCH_RESOURCES_AND_DATA_SOURCES.md).
+Reports: [consolidation](reports/COMPLETE_REPOSITORY_CONSOLIDATION_REPORT.md) ·
+[documentation audit](reports/COMPLETE_DOCUMENTATION_AUDIT.md) ·
+[readiness](reports/FINAL_PROJECT_READINESS_REPORT.md).
 
 ## Never invent data
 
@@ -65,9 +95,11 @@ values that appear verbatim on the page, and is never the authority on a claim.
 ```
 config/scoring.json        weights, grade bands, curves (methodology v0.1.0)
 data/reference/            thresholds, FSSAI claim rules, INS codes, ingredient terms and classes, OFF category map
-data/sample/               synthetic demo records (labelled)          data/verified/  evaluation labels
+data/sample/               OFF India subset + synthetic demo records   data/verified/  evaluation labels, pack-check and price sheets
+data/annotation/           annotation schema and unverified candidate records (not loaded into the database)
 migrations/                Alembic migrations                         scripts/        OFF download, sample generator
-src/extract/               SSRF-safe fetch, JSON-LD, HTML, LLM fallback
+src/acquisition/           source registry, provenance models, validation, URL candidates, workbook importer
+src/extract/               SSRF-safe fetch, JSON-LD, HTML, OCR, LLM fallback
 src/normalise/             units, ingredients, product builder        src/analyse/    the five dimensions
 src/score/                 scoring and grades                         src/recommend/  similarity, alternatives, compare
 src/database/              models, repository, ingestion              src/api/        FastAPI app
@@ -85,7 +117,7 @@ docs/                      architecture, methodology, data sources, regulatory r
    India records in these categories cannot be graded.
 3. **Front-of-pack warning thresholds** (`fop_warning.csv`) stay TODO until FSSAI publishes them; the red
    bounds in `thresholds.csv` are UK FSA 2016 placeholders.
-4. Verify `ins_codes.csv` and `allergens.csv` (status `seed_verify`), and the FSSAI regulation's
+4. Verify `ins_codes.csv` (64 codes) and `allergens.csv` (status `seed_verify`), and the FSSAI regulation's
    commencement date (blank in `fssai_claims.csv`).
 5. Code licence not chosen yet (MIT or AGPL-3.0, doc section 13.7).
 

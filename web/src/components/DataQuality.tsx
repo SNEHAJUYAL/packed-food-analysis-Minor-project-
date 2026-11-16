@@ -39,7 +39,7 @@ export function DataQuality({ analysis }: { analysis: ProductAnalysis }) {
             <h3 className="text-sm font-medium text-ink">Evidence status of fields</h3>
             <ul className="mt-2 space-y-1.5">
               {EVIDENCE_ORDER.filter((l) => counts[l]).map((l) => (
-                <li key={l} className="flex items-center justify-between gap-2 text-sm">
+                <li key={l} className="flex items-center justify-between gap-2 rounded-xl bg-slate-50/70 px-3 py-2 text-sm">
                   <EvidenceBadge label={l} />
                   <span className="tabular-nums text-slate-700">{counts[l]}</span>
                 </li>

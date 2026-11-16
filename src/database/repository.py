@@ -15,7 +15,7 @@ from database.models import (AnalysisResult, Ingredient, NutrientValue, PriceObs
                              ProductIngredient, ProductRow, ProductSource, Recommendation, RegulatoryRule)
 from normalise.units import price_per_100
 
-SCALAR_FIELDS = ("name", "brand", "category", "variant", "pack_size", "pack_unit", "ingredients_raw")
+SCALAR_FIELDS = ("name", "brand", "category", "variant", "pack_size", "pack_unit", "ingredients_raw", "image_url")
 RELIABILITY = {"url": "brand_or_retailer_page", "open_food_facts": "open_food_facts_crowdsourced",
                "synthetic_sample": "synthetic", "manual": "manual_entry",
                "photo": "label_photo_read_by_model", "saved_page": "brand_or_retailer_page"}
@@ -129,8 +129,11 @@ def save_product(s: Session, p: Product, *, source_type: str, external_id: Optio
     row.pack_size, row.pack_unit = p.pack_size.value, p.pack_unit.value
     row.nutrition_basis = p.nutrition_basis
     row.ingredients_text = p.ingredients_raw.value
-    row.field_evidence = {f: {"label": getattr(p, f).label.value, "source": getattr(p, f).source,
-                              "note": getattr(p, f).note} for f in SCALAR_FIELDS + ("price_inr",)}
+    evidence_fields = SCALAR_FIELDS + ("price_inr", "mrp_inr", "discount_percent", "availability",
+                                       "multipack_count", "retailer")
+    row.field_evidence = {f: {"value": getattr(p, f).value, "label": getattr(p, f).label.value,
+                              "source": getattr(p, f).source, "note": getattr(p, f).note}
+                          for f in evidence_fields}
     row.additives_ins, row.allergens, row.claims_text = list(p.additives_ins), list(p.allergens), list(p.claims_raw)
     row.conflicts, row.warnings = list(p.conflicts), list(p.warnings)
     row.updated_at = datetime.now(timezone.utc)
@@ -219,6 +222,12 @@ def to_product(row: ProductRow) -> Product:
                             note=f"observed {_iso(price.observed_at)}") if price else Evidence()),
         nutrition_basis=row.nutrition_basis,
         ingredients_raw=evidence("ingredients_raw", row.ingredients_text),
+        image_url=evidence("image_url", (ev.get("image_url") or {}).get("value")),
+        mrp_inr=evidence("mrp_inr", (ev.get("mrp_inr") or {}).get("value")),
+        discount_percent=evidence("discount_percent", (ev.get("discount_percent") or {}).get("value")),
+        availability=evidence("availability", (ev.get("availability") or {}).get("value")),
+        multipack_count=evidence("multipack_count", (ev.get("multipack_count") or {}).get("value")),
+        retailer=evidence("retailer", (ev.get("retailer") or {}).get("value")),
         ingredients_normalised=[pi.detail for pi in row.ingredients],
         additives_ins=row.additives_ins or [], allergens=row.allergens or [], claims_raw=row.claims_text or [],
         source_url=latest_source.source_url if latest_source else None,
@@ -284,7 +293,7 @@ def latest_analyses(s: Session, category: Optional[str] = None,
     q = (select(ProductRow, AnalysisResult)
          .join(newest, newest.c.product_id == ProductRow.id)
          .join(AnalysisResult, AnalysisResult.id == newest.c.aid)
-         .options(selectinload(ProductRow.sources)))
+         .options(selectinload(ProductRow.sources), selectinload(ProductRow.prices)))
     if category:
         q = q.where(ProductRow.category == category)
     return list(s.execute(q.order_by(ProductRow.id)).all())

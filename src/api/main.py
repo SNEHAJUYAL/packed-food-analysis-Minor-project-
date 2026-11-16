@@ -2,24 +2,27 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 import os
 import time
 from collections import defaultdict, deque
 from typing import Any, Literal, Optional
 
-from fastapi import Depends, FastAPI, File, Form, HTTPException, Query, Request, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Query, Request, Response, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.exc import OperationalError
 
+import catalog
 import services
 from core.config import claim_rules, read_csv, scoring_config, thresholds
-from core.schema import CATEGORIES
+from core.schema import CATEGORIES, NUTRIENTS
+from acquisition.product_url import ProductURLExtractionService, ProductURLResult
 from database import repository as repo
 from database.session import DatabaseNotConfigured, session_factory
-from extract.fetch import FetchError
+from extract.fetch import FetchError, public_source_fetch_error
 from recommend.alternatives import PREFERENCES, alternatives, compare_stored
 
 logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"),
@@ -57,7 +60,8 @@ async def _validation(request: Request, exc: RequestValidationError):
 @app.exception_handler(FetchError)
 async def _fetch_error(request: Request, exc: FetchError):
     log.info("fetch refused code=%s message=%s", exc.code, exc.message)
-    return JSONResponse(status_code=exc.http_status, content={"detail": {"code": exc.code, "message": exc.message}})
+    code, message, status = public_source_fetch_error(exc)
+    return JSONResponse(status_code=status, content={"detail": {"code": code, "message": message}})
 
 
 @app.exception_handler(DatabaseNotConfigured)
@@ -135,6 +139,24 @@ class AnalyzeUrlRequest(BaseModel):
     refresh: bool = Field(False, description="Fetch again instead of using the cached page")
 
 
+class ProductURLCandidateRequest(BaseModel):
+    url: str = Field(..., min_length=8, max_length=2048,
+                     examples=["https://world.openfoodfacts.org/product/..."])
+
+
+class ManualProductRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+    brand: Optional[str] = Field(None, max_length=200)
+    category: Optional[Category] = None
+    variant: Optional[str] = Field(None, max_length=200)
+    pack_size: Optional[float] = Field(None, gt=0)
+    pack_unit: Optional[Literal["g", "ml"]] = None
+    ingredients_text: Optional[str] = Field(None, max_length=20000)
+    nutrition_basis: Optional[Literal["per_100g", "per_100ml"]] = None
+    nutrition: dict[str, str] = Field(default_factory=dict)
+    price_inr: Optional[float] = Field(None, gt=0)
+
+
 class SourceInfo(BaseModel):
     source_type: str
     source_url: Optional[str]
@@ -161,6 +183,8 @@ class ProductAnalysis(BaseModel):
     extraction_log: list[LogStep]
     methodology_version: str
     report: dict[str, Any] = Field(description="Full explainable report; see docs/api.md")
+    extras: dict[str, Any] = Field(default_factory=dict,
+                                   description="Shown but not scored: micronutrients, image reference, barcode")
 
 
 class ProductSummary(BaseModel):
@@ -257,6 +281,77 @@ class Health(BaseModel):
 
 # ------------------------------------------------------------------ endpoints
 
+@app.post("/api/product-candidates/from-url", response_model=ProductURLResult, tags=["acquisition"],
+          dependencies=[Depends(rate_limited)])
+def extract_product_candidate(req: ProductURLCandidateRequest, response: Response):
+    """Return a source-policy-gated candidate without database or scoring work."""
+    result = ProductURLExtractionService().acquire(req.url.strip())
+    response.status_code = (422 if result.error_code == "product_extraction_failed" else
+                            {"candidate": 200, "invalid": 422, "blocked": 403, "failed": 502}[result.status])
+    return result.model_dump(mode="json")
+
+
+@app.post("/api/analyze-manual", response_model=ProductAnalysis, tags=["analysis"])
+def analyze_manual(req: ManualProductRequest, s=Depends(db)) -> dict:
+    """Persist and score explicitly user-entered product details as unverified manual evidence."""
+    if not req.name.strip():
+        raise error(422, "validation_error", "Enter the product name.")
+    if req.pack_size is not None and req.pack_unit is None:
+        raise error(422, "validation_error", "Choose g or ml for the entered pack size.")
+    if req.nutrition and req.nutrition_basis is None:
+        raise error(422, "validation_error", "Choose the nutrition basis before entering nutrient values.")
+    unknown_nutrients = sorted(set(req.nutrition) - set(NUTRIENTS))
+    if unknown_nutrients:
+        raise error(422, "validation_error", "Unknown nutrition fields: " + ", ".join(unknown_nutrients))
+    return services.analyze_manual(s, req.model_dump())
+
+class ImportOffRequest(BaseModel):
+    barcode: str = Field(..., min_length=4, max_length=14, pattern=r"^\d+$")
+
+
+class PriceEntryRequest(BaseModel):
+    retailer: str = Field(..., max_length=40)
+    price_inr: float = Field(..., gt=0, le=100000)
+    pack_size_text: Optional[str] = Field(None, max_length=50)
+    observed_at: Optional[datetime] = None
+    place: Optional[str] = Field(None, max_length=60, description="City or PIN code where the price was seen")
+    listing_url: Optional[str] = Field(None, max_length=2048)
+
+
+@app.exception_handler(catalog.CatalogError)
+async def _catalog_error(request: Request, exc: catalog.CatalogError):
+    return JSONResponse(status_code=exc.status, content={"detail": {"code": exc.code, "message": exc.message}})
+
+
+@app.get("/api/search", tags=["products"])
+def search_products(q: str = Query(..., min_length=2, max_length=100), online: bool = True,
+                    limit: int = Query(20, ge=1, le=50), s=Depends(db)) -> dict:
+    """Stored products matching the text, plus Open Food Facts results not analysed yet."""
+    return catalog.search(s, q, include_online=online, limit=limit)
+
+
+@app.post("/api/products/import-off", response_model=ProductAnalysis, tags=["analysis"],
+          dependencies=[Depends(rate_limited)])
+def import_off(req: ImportOffRequest, s=Depends(db)) -> dict:
+    """Fetch one product from Open Food Facts by barcode, store it with minerals and vitamins, and score it."""
+    return catalog.import_off(s, req.barcode)
+
+
+@app.get("/api/products/{product_id}/prices", tags=["prices"])
+def get_prices(product_id: int, s=Depends(db)) -> dict:
+    """Every price observation by shop and date, cheapest shop, price spread and change over time."""
+    out = catalog.price_summary(s, product_id)
+    if out is None:
+        raise error(404, "not_found", f"No stored product with id {product_id}.")
+    return out
+
+
+@app.post("/api/products/{product_id}/prices", tags=["prices"])
+def post_price(product_id: int, req: PriceEntryRequest, s=Depends(db)) -> dict:
+    """Record a price a person saw (shop, date, place). Stored as a hand-entered observation, then rescored."""
+    return catalog.add_price(s, product_id, req.model_dump())
+
+
 @app.get("/api/health", response_model=Health, tags=["reference"])
 def health() -> dict:
     try:
@@ -288,6 +383,12 @@ async def analyze_upload(file: UploadFile = File(..., description="Pack photo, a
                          category: Optional[Category] = Form(None),
                          name: Optional[str] = Form(None, max_length=200,
                                                     description="Product name, if the image does not show it"),
+                         brand: Optional[str] = Form(None, max_length=200),
+                         variant: Optional[str] = Form(None, max_length=200),
+                         pack_size_text: Optional[str] = Form(None, max_length=100),
+                         ingredients_text: Optional[str] = Form(None, max_length=20000),
+                         nutrition_basis: Optional[Literal["per_100g", "per_100ml"]] = Form(None),
+                         nutrition_text: Optional[str] = Form(None, max_length=4000),
                          s=Depends(db)) -> dict:
     """Read a photo or a saved page (nothing is fetched), then normalise, store and score it like a URL."""
     data = await file.read(MAX_UPLOAD_BYTES + 1)
@@ -295,7 +396,12 @@ async def analyze_upload(file: UploadFile = File(..., description="Pack photo, a
         raise error(413, "too_large", f"File over {MAX_UPLOAD_BYTES} bytes.")
     try:
         return services.analyze_upload(s, data, file.filename or "", file.content_type, page_url or None,
-                                       site or None, category, name=name or None)
+                                       site or None, category, name=name or None,
+                                       corrections={"brand": brand, "variant": variant,
+                                                    "pack_size_text": pack_size_text,
+                                                    "ingredients_text": ingredients_text,
+                                                    "nutrition_basis_text": nutrition_basis,
+                                                    "nutrition_text": nutrition_text})
     except services.UploadError as e:
         raise error(e.status, e.code, e.message)
 

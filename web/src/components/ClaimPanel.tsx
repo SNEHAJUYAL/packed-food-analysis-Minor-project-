@@ -3,18 +3,20 @@
 import { ClaimStatusBadge } from "./badges";
 import { BulletList, Card, EmptyState, ExternalLink, SectionHeading } from "./ui";
 import { safeHref } from "@/lib/format";
-import { CLAIM_STATUSES } from "@/lib/labels";
+import { CLAIM_STATUSES, claimStatusInfo } from "@/lib/labels";
 import type { ClaimResult, Report } from "@/lib/types";
 
 function ClaimCard({ claim }: { claim: ClaimResult }) {
   const href = safeHref(claim.source_url);
   const missing = claim.missing_information ?? [];
+  const tone = claimStatusInfo(claim.status).tone;
+  const accent = tone === "amber" ? "border-l-warn" : tone === "teal" ? "border-l-forest" : tone === "blue" ? "border-l-[#5b7fa6]" : "border-l-slate-300";
   return (
-    <li className="rounded-xl border border-line p-4">
+    <li className={`rounded-2xl border border-l-4 border-line p-4 sm:p-5 ${accent}`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="text-xs uppercase tracking-wide text-muted">Claim as printed</p>
-          <p className="text-base font-semibold text-ink">“{claim.matched_text || claim.claim}”</p>
+          <p className="font-display text-lg font-bold text-ink">“{claim.matched_text || claim.claim}”</p>
         </div>
         <ClaimStatusBadge status={claim.status} />
       </div>

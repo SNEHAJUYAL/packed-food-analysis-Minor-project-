@@ -53,3 +53,16 @@ def test_off_matcher_with_canned_candidates():
     m = best_match("Demo Masala Instant Noodles", "Demo Brand", cands)
     assert m["code"] == "1"
     assert best_match("Choco Crunch", None, cands) is None
+
+
+def test_image_probe_failure_does_not_fail_product_extraction(monkeypatch):
+    import pipeline
+
+    monkeypatch.setattr(pipeline, "probe_image_content_type", lambda image_url: False)
+    extracted = pipeline.extract_all(
+        '''<script type="application/ld+json">{"@type":"Product","name":"Example",
+        "image":"https://cdn.example/image.jpg"}</script>''',
+        "https://shop.example/product")
+    assert extracted[0]["name"] == "Example"
+    assert extracted[0]["image_url"] is None
+    assert "image MIME type" in extracted[0]["warnings"][0]

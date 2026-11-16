@@ -21,6 +21,14 @@
     "zero_multiple": 2.0
   },
   "min_nutrition_coverage": 0.5,
+  "generic_category_weights": {
+    "_note": "Used only when a product is outside the five categories (for example dairy, spreads, staples). Equal prototype weights over the nutrients with sourced benchmarks; the report says the generic weights were used.",
+    "total_sugars": 0.2,
+    "saturated_fat": 0.2,
+    "sodium": 0.2,
+    "fibre": 0.2,
+    "protein": 0.2
+  },
   "ingredient_deductions": {
     "_note": "Points removed from 100 for each class present. Signals of processing and disclosure, not safety judgements.",
     "added_sugar_in_top3": 15,

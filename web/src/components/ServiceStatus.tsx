@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { IconAlert } from "./icons";
 import { ApiError, BACKEND_DOWN, api } from "@/lib/api";
 
 const DB_DOWN =
@@ -26,9 +27,12 @@ export function ServiceStatus() {
 
   if (!problem) return null;
   return (
-    <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
-      <p className="font-semibold">The app cannot analyse anything right now</p>
-      <p className="mt-1">{problem}</p>
+    <div role="alert" className="flex gap-3 rounded-2xl border border-[#f1d2a8] bg-[#fdf6ec] p-4 text-sm text-[#5c3a10]">
+      <IconAlert className="mt-0.5 h-5 w-5 shrink-0 text-[#b87422]" />
+      <div>
+        <p className="font-semibold text-[#4a2e0b]">The app cannot analyse anything right now</p>
+        <p className="mt-1">{problem}</p>
+      </div>
     </div>
   );
 }

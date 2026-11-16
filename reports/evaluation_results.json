@@ -188,6 +188,141 @@
       }
     }
   },
+  "ocr": {
+    "status": "complete",
+    "data": "reproducible rendered label fixture; not a camera photograph",
+    "bytes": 20306,
+    "latency_ms": 3631.95,
+    "cer": 0.0081,
+    "wer": 0.0,
+    "expected_text": "TEST SNACKS SPICED OKRA CRISPS\nNet Wt. 60 g\nMRP Rs. 99.00\nIngredients: Okra (62%), Rice Bran Oil, Gram Flour, Spices, Salt.",
+    "predicted_text": "TEST SNACKS SPICED OKRA CRISPS\nNet Wt. 60 g\nMRP Rs. 99.00\n\nIngredients: Okra (62%), Rice Bran Oil, Gram Flour, Spices, Salt."
+  },
+  "ingredient_sample": {
+    "status": "complete",
+    "data": "six-item ingredient sample supplied for the audit",
+    "n_records": 6,
+    "record_precision": 1.0,
+    "record_recall": 1.0,
+    "record_f1": 1.0,
+    "dictionary_matched": 5,
+    "uncertain": 1,
+    "unmatched": [
+      "Soy Lecithin"
+    ],
+    "allergens": [
+      "gluten_cereals",
+      "soy"
+    ],
+    "items": [
+      {
+        "position": 1,
+        "text": "Whole Wheat Flour",
+        "name": "whole wheat flour",
+        "term": "whole wheat flour",
+        "match": "exact",
+        "match_score": 100.0,
+        "status": "matched",
+        "percent": null,
+        "functional_category": "Grain (whole)",
+        "explanation": "A whole-grain cereal ingredient as named on the label. When it is the first ingredient the ingredient score gets a bonus (methodology, ingredient_deductions).",
+        "reference_source": "Team definition (methodology v0.1.0); term list in ingredient_terms.csv",
+        "classes": [
+          "whole_grain"
+        ],
+        "additives": [],
+        "sub_ingredients": []
+      },
+      {
+        "position": 2,
+        "text": "Sugar",
+        "name": "sugar",
+        "term": "sugar",
+        "match": "exact",
+        "match_score": 100.0,
+        "status": "matched",
+        "percent": null,
+        "functional_category": "Sweetener (sugar)",
+        "explanation": "A sugar-type ingredient added to the product. It counts toward total sugars and is the class checked for a 'no added sugar' claim (FSSAI reg. 6(1)).",
+        "reference_source": "FSS (Advertising and Claims) Regulations 2018 reg. 6(1)(a)(i) lists sugar types",
+        "classes": [
+          "added_sugar"
+        ],
+        "additives": [],
+        "sub_ingredients": []
+      },
+      {
+        "position": 3,
+        "text": "Maltodextrin",
+        "name": "maltodextrin",
+        "term": "maltodextrin",
+        "match": "exact",
+        "match_score": 100.0,
+        "status": "matched",
+        "percent": null,
+        "functional_category": "Carbohydrate ingredient",
+        "explanation": "A processed carbohydrate such as maltodextrin.",
+        "reference_source": "Team definition (methodology v0.1.0)",
+        "classes": [
+          "carbohydrate_additive"
+        ],
+        "additives": [],
+        "sub_ingredients": []
+      },
+      {
+        "position": 4,
+        "text": "Soy Lecithin",
+        "name": "soy lecithin",
+        "term": null,
+        "match": "none",
+        "match_score": null,
+        "status": "uncertain",
+        "percent": null,
+        "functional_category": null,
+        "explanation": "Not in the ingredient dictionary or INS table, so it is not classified.",
+        "reference_source": null,
+        "classes": [],
+        "additives": [],
+        "sub_ingredients": []
+      },
+      {
+        "position": 5,
+        "text": "Salt",
+        "name": "salt",
+        "term": "salt",
+        "match": "exact",
+        "match_score": 100.0,
+        "status": "matched",
+        "percent": null,
+        "functional_category": "Salt",
+        "explanation": "Common salt or iodised salt as an ingredient. Its amount is assessed through the sodium value, not here.",
+        "reference_source": "Team definition (methodology v0.1.0)",
+        "classes": [
+          "salt"
+        ],
+        "additives": [],
+        "sub_ingredients": []
+      },
+      {
+        "position": 6,
+        "text": "Permitted Flavouring",
+        "name": "permitted flavouring",
+        "term": "flavouring",
+        "match": "contains",
+        "match_score": 100.0,
+        "status": "matched",
+        "percent": null,
+        "functional_category": "Flavouring",
+        "explanation": "A flavouring named without saying whether it is natural, nature-identical or artificial.",
+        "reference_source": "FSS (Labelling and Display) Regulations 2020 flavour declaration categories",
+        "classes": [
+          "flavouring"
+        ],
+        "additives": [],
+        "sub_ingredients": []
+      }
+    ]
+  },
   "ingredients": {
     "data": "team-labelled ingredient phrases (data/verified/eval/ingredient_gold.csv)",
     "n_items": 57,
@@ -248,49 +383,49 @@
   },
   "scoring_vs_nutriscore": {
     "status": "run",
-    "data": "data/raw/off_india.jsonl",
+    "data": "data/sample/off_india_subset.jsonl",
     "n_products": 339,
     "spearman_nutrition_vs_nutriscore": 0.763103463040788
   },
   "real_data_coverage": {
     "status": "run",
-    "data": "Open Food Facts India records (ODbL) from the official CSV export: data/raw/off_india.jsonl",
-    "n_products": 2692,
+    "data": "Open Food Facts India records (ODbL) from the official CSV export: data/sample/off_india_subset.jsonl",
+    "n_products": 466,
     "by_category": {
-      "beverages": 1172,
-      "breakfast_cereals": 250,
-      "biscuits_cookies": 735,
-      "namkeen_chips": 400,
-      "instant_noodles": 135
+      "breakfast_cereals": 55,
+      "namkeen_chips": 80,
+      "beverages": 197,
+      "biscuits_cookies": 99,
+      "instant_noodles": 35
     },
     "report_status": {
-      "insufficient_data": 2284,
-      "partial": 408
+      "partial": 405,
+      "insufficient_data": 61
     },
     "share_missing_by_field": {
       "price_inr": 1.0,
-      "trans_fat": 0.953,
-      "fibre": 0.921,
-      "saturated_fat": 0.86,
-      "added_sugars": 0.856,
-      "sodium": 0.85,
-      "total_sugars": 0.847,
-      "protein": 0.844,
-      "carbohydrate": 0.844,
-      "total_fat": 0.844,
-      "energy": 0.842,
-      "ingredients_raw": 0.436,
-      "pack_size": 0.408,
-      "brand": 0.071
+      "trans_fat": 0.727,
+      "fibre": 0.549,
+      "pack_size": 0.382,
+      "ingredients_raw": 0.251,
+      "added_sugars": 0.247,
+      "saturated_fat": 0.193,
+      "sodium": 0.142,
+      "total_sugars": 0.12,
+      "protein": 0.118,
+      "carbohydrate": 0.116,
+      "energy": 0.112,
+      "total_fat": 0.112,
+      "brand": 0.06
     },
-    "products_with_ingredient_list": 1519,
-    "ingredient_items": 11461,
-    "share_ingredients_uncertain": 0.145,
+    "products_with_ingredient_list": 349,
+    "ingredient_items": 2544,
+    "share_ingredients_uncertain": 0.176,
     "claim_statuses": {
-      "potential inconsistency for review": 15,
-      "consistent with available evidence": 31,
-      "cannot be verified from available information": 78,
-      "requires context": 15
+      "potential inconsistency for review": 6,
+      "requires context": 13,
+      "consistent with available evidence": 16,
+      "cannot be verified from available information": 5
     }
   },
   "expert_ranking": {

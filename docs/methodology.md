@@ -13,7 +13,7 @@ assessment, not a medical or clinical score.
 | Category nutrient weights | `data/reference/category_weights.csv` | Cereals: doc worked example. Others: equal weights over the nutrients the doc lists |
 | Claim conditions | `data/reference/fssai_claims.csv` | 18 claims with values and clause numbers from the FSSAI compendium (14-12-2022): Schedule I (nutrient content), reg. 6(1) (no added sugar), reg. 9(2) + Schedule V ("natural"). Checked 12 Oct 2026 |
 | FSSAI front-of-pack warning (draft) | `data/reference/fop_warning.csv` | **TODO** until the rule is final |
-| INS codes | `data/reference/ins_codes.csv` | 66 common codes, seed list to verify against Codex CXG 36-1989 and FSSAI additive regulations |
+| INS codes | `data/reference/ins_codes.csv` | 64 common codes (recounted 16 Nov 2026), seed list to verify against Codex CXG 36-1989 and FSSAI additive regulations |
 | Ingredient dictionary | `data/reference/ingredient_terms.csv` | Seed list; align with the Open Food Facts taxonomy |
 | Allergens | `data/reference/allergens.csv` | FSSAI Labelling and Display Regulations 2020 groups; verify wording |
 

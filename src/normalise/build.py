@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 from typing import Optional
+from urllib.parse import urlparse
 
 from core.config import read_csv
 from core.schema import NUTRIENTS, Evidence, EvidenceLabel, Product
@@ -26,7 +27,8 @@ def _price(text: Optional[str]) -> Optional[float]:
     if text is None:
         return None
     m = re.search(r"\d[\d,]*(?:\.\d+)?", str(text))
-    return float(m.group(0).replace(",", "")) if m else None
+    value = float(m.group(0).replace(",", "")) if m else None
+    return value if value is not None and value > 0 else None
 
 
 def _basis(text: Optional[str]) -> tuple[Optional[str], Optional[float]]:
@@ -105,6 +107,8 @@ def build_product(extractions: list[dict], url: Optional[str] = None,
     """Merge extractions in priority order (first wins) and flag disagreements."""
     p = Product(source_url=url)
     extractions = [e for e in extractions if e]
+    for ex in extractions:
+        p.warnings.extend(ex.get("warnings") or [])
 
     def take(field: str, key: str, parse=lambda x: x, compare_numeric=False):
         chosen = None
@@ -132,6 +136,40 @@ def build_product(extractions: list[dict], url: Optional[str] = None,
             p.name.value = trimmed
     take("brand", "brand")
     take("price_inr", "price", _price, compare_numeric=True)
+    take("mrp_inr", "mrp", _price)
+    take("availability", "availability")
+    take("variant", "variant")
+    for ex in extractions:
+        count = ex.get("multipack_count")
+        pack_text = ex.get("pack_size_text") or ""
+        match = re.search(r"\b(\d+)\s*[x×]", pack_text)
+        if count is None and match:
+            count = match.group(1)
+        if count is not None:
+            number = re.search(r"\d+", str(count))
+            if number and int(number.group()) > 0:
+                p.multipack_count = Evidence.declared(int(number.group()), ex["source"])
+                break
+    if p.price_inr.known and p.mrp_inr.known and p.mrp_inr.value > 0:
+        p.discount_percent = Evidence.derived(
+            round(max(0.0, (p.mrp_inr.value - p.price_inr.value) * 100 / p.mrp_inr.value), 2),
+            f"{p.price_inr.source} + {p.mrp_inr.source}", "calculated from selling price and MRP")
+    if url:
+        host = (urlparse(url).hostname or "").lower().removeprefix("www.")
+        retailer = next((name for domain, name in (
+            ("blinkit.com", "Blinkit"), ("zeptonow.com", "Zepto"), ("swiggy.com", "Swiggy Instamart"),
+            ("amazon.in", "Amazon India"), ("bigbasket.com", "BigBasket"), ("jiomart.com", "JioMart"))
+            if host == domain or host.endswith("." + domain)), None)
+        if retailer:
+            p.retailer = Evidence.declared(retailer, "product URL host")
+    if p.availability.known:
+        raw_status = str(p.availability.value)
+        status = raw_status.rsplit("/", 1)[-1].strip().lower().replace(" ", "")
+        if status in {"instock", "outofstock", "limitedavailability", "preorder", "discontinued"}:
+            p.availability.value = status
+    image = next((ex for ex in extractions if ex.get("image_url")), None)
+    if image:
+        p.image_url = Evidence.declared(image["image_url"], image.get("image_source") or image["source"])
     take("ingredients_raw", "ingredients_text")
     for ex in extractions:
         if ex.get("currency") and ex["currency"].upper() != "INR":

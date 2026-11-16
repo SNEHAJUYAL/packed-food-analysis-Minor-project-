@@ -1,0 +1,34 @@
+{
+  "manifest_version": "1.0",
+  "source_id": "complete_product_catalog",
+  "importer_version": "complete-product-catalog/1.2",
+  "run_id": "74c94a16-5b56-4409-be4e-3d0b27beab7a",
+  "imported_at": "2026-11-16T13:41:32.592116+00:00",
+  "input_workbook": "Complete_Product_Catalog_With_JSON_Photos.xlsx",
+  "input_sha256": "66b23c65bad489ff3ac4ee150d14c578e949d708ef580f6d4883a8a9a6b5712f",
+  "candidate_annotation_records": 25,
+  "product_listing_records": 25,
+  "price_candidate_records": 75,
+  "populated_unverified_price_observations": 75,
+  "missing_price_placeholders": 0,
+  "invalid_price_placeholders": 0,
+  "acquisition_record_count": 100,
+  "image_reference_records": 125,
+  "source_workbook_rows": 45,
+  "candidate_status": "unverified; isolated candidate source; excluded from verified training data",
+  "outputs": [
+    "candidate_annotations.jsonl",
+    "acquisition_observations.jsonl",
+    "image_references.jsonl",
+    "source_workbook_rows.jsonl",
+    "data_quality_report.json",
+    "annotation_validation_report.json"
+  ],
+  "policy_decision": {
+    "source_id": "complete_product_catalog",
+    "allowed": true,
+    "reason": "Registered source policy permits this acquisition.",
+    "requires_network": false,
+    "authorization_evidence": "User supplied Complete_Product_Catalog_With_JSON_Photos.xlsx and authorized candidate audit/import in this task"
+  }
+}

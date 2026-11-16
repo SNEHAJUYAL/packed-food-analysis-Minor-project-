@@ -85,6 +85,12 @@ class Product(BaseModel):
     pack_size: Evidence = Field(default_factory=_unknown)   # number, in pack_unit
     pack_unit: Evidence = Field(default_factory=_unknown)   # "g" or "ml"
     price_inr: Evidence = Field(default_factory=_unknown)
+    image_url: Evidence = Field(default_factory=_unknown)
+    mrp_inr: Evidence = Field(default_factory=_unknown)
+    discount_percent: Evidence = Field(default_factory=_unknown)
+    availability: Evidence = Field(default_factory=_unknown)
+    multipack_count: Evidence = Field(default_factory=_unknown)
+    retailer: Evidence = Field(default_factory=_unknown)
 
     # "per_100g" or "per_100ml"; None until a basis is established.
     nutrition_basis: Optional[str] = None

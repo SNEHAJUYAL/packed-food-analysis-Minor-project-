@@ -69,6 +69,22 @@ class FetchBlocked(FetchError):
         super().__init__(code, message, http_status)
 
 
+def public_source_fetch_error(exc: FetchError) -> tuple[str, str, int]:
+    """Stable user-facing error classification for policy-controlled URL flows."""
+    if exc.code == "robots_disallowed":
+        return ("robots_disallowed",
+                "This source does not permit automated access to this page. We respect its access restrictions. "
+                "You can upload a saved copy of the product page or product screenshots.", 403)
+    if exc.code == "source_redirect_blocked":
+        return ("unsupported_source",
+                "This source is not currently supported for automated product extraction. You can upload a saved "
+                "product page or packaging screenshots instead.", 403)
+    if exc.code in {"fetch_failed", "timeout", "unsupported_content"}:
+        return ("source_fetch_failed",
+                "The product page could not be retrieved. Please upload a saved page or product screenshots.", 502)
+    return exc.code, exc.message, exc.http_status
+
+
 def _blocked_ip(ip) -> bool:
     if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped:
         ip = ip.ipv4_mapped
@@ -89,6 +105,14 @@ def _is_ip(host: str) -> bool:
         return True
     except ValueError:
         return False
+
+
+def _host_allowed(host: str, allowed_hosts: set[str] | frozenset[str] | None) -> bool:
+    if allowed_hosts is None:
+        return True
+    host = host.rstrip(".").lower()
+    return any(host == domain.rstrip(".").lower()
+               or host.endswith("." + domain.rstrip(".").lower()) for domain in allowed_hosts)
 
 
 def validate_url(url: str, resolver=resolve) -> str:
@@ -138,7 +162,8 @@ def _space_out(host: str) -> None:
 
 
 def safe_get(url: str, client: Optional[httpx.Client] = None, accept_html_only: bool = True,
-             resolver=resolve) -> tuple[str, str]:
+             resolver=resolve,
+             allowed_hosts: set[str] | frozenset[str] | None = None) -> tuple[str, str]:
     """GET with per-hop validation, timeout and size limit. Returns (final_url, text)."""
     own = client is None
     client = client or httpx.Client(timeout=TIMEOUT, follow_redirects=False,
@@ -146,6 +171,10 @@ def safe_get(url: str, client: Optional[httpx.Client] = None, accept_html_only: 
     try:
         current = url
         for _ in range(MAX_REDIRECTS + 1):
+            current_host = urlparse(current).hostname or ""
+            if not _host_allowed(current_host, allowed_hosts):
+                raise FetchBlocked("The page redirected outside the source's registered host allowlist.",
+                                   code="source_redirect_blocked")
             validate_url(current, resolver)
             _space_out(urlparse(current).hostname or "")
             try:
@@ -180,17 +209,21 @@ def safe_get(url: str, client: Optional[httpx.Client] = None, accept_html_only: 
             client.close()
 
 
-def _cache_path(url: str) -> Path:
-    return CACHE_DIR / (hashlib.sha256(url.encode()).hexdigest()[:24] + ".html")
+def _cache_path(url: str, allowed_hosts: set[str] | frozenset[str] | None = None) -> Path:
+    policy_key = "" if allowed_hosts is None else "\0allowed:" + ",".join(sorted(
+        host.rstrip(".").lower() for host in allowed_hosts))
+    return CACHE_DIR / (hashlib.sha256((url + policy_key).encode()).hexdigest()[:24] + ".html")
 
 
-def allowed_by_robots(url: str, client: Optional[httpx.Client] = None, resolver=resolve) -> bool:
+def allowed_by_robots(url: str, client: Optional[httpx.Client] = None, resolver=resolve,
+                      allowed_hosts: set[str] | frozenset[str] | None = None) -> bool:
     parts = urlparse(url)
     robots_url = f"{parts.scheme}://{parts.netloc}/robots.txt"
     try:
-        _, text = safe_get(robots_url, client, accept_html_only=False, resolver=resolver)
+        _, text = safe_get(robots_url, client, accept_html_only=False, resolver=resolver,
+                           allowed_hosts=allowed_hosts)
     except FetchError as e:
-        if e.code == "blocked_destination":
+        if e.code in {"blocked_destination", "source_redirect_blocked"}:
             raise
         return True  # robots.txt missing or unreachable: no stated restriction
     rp = urllib.robotparser.RobotFileParser()
@@ -198,15 +231,40 @@ def allowed_by_robots(url: str, client: Optional[httpx.Client] = None, resolver=
     return rp.can_fetch(USER_AGENT, url)
 
 
-def fetch(url: str, use_cache: bool = True, client: Optional[httpx.Client] = None, resolver=resolve) -> str:
+def fetch(url: str, use_cache: bool = True, client: Optional[httpx.Client] = None, resolver=resolve,
+          allowed_hosts: set[str] | frozenset[str] | None = None) -> str:
+    if allowed_hosts is not None and not _host_allowed(urlparse(url).hostname or "", allowed_hosts):
+        raise FetchBlocked("The URL host is outside the source's registered host allowlist.",
+                           code="source_redirect_blocked")
     validate_url(url, resolver)
-    path = _cache_path(url)
+    # A restricted source request must not reuse HTML cached by the older,
+    # unrestricted fetch path, where a redirect may have crossed domains.
+    path = _cache_path(url, allowed_hosts)
     if use_cache and path.exists():
         return path.read_text(encoding="utf-8")
-    if not allowed_by_robots(url, client, resolver):
+    if not allowed_by_robots(url, client, resolver, allowed_hosts=allowed_hosts):
         raise FetchBlocked("The site's robots.txt does not allow automated access to this page, so it "
                            "was not fetched.")
-    _, text = safe_get(url, client, resolver=resolver)
+    _, text = safe_get(url, client, resolver=resolver, allowed_hosts=allowed_hosts)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
     return text
+
+
+def fetch_page(url: str, client: Optional[httpx.Client] = None, resolver=resolve,
+               allowed_hosts: set[str] | frozenset[str] | None = None) -> tuple[str, str]:
+    """Robots-aware fetch returning the final URL, optionally source-host confined.
+
+    This variant is intended for source-aware acquisition adapters that need
+    final-URL provenance. It uses the same destination checks, timeout, size,
+    redirect, robots and pacing controls as ``fetch`` and deliberately does
+    not read or write the shared HTML cache.
+    """
+    if allowed_hosts is not None and not _host_allowed(urlparse(url).hostname or "", allowed_hosts):
+        raise FetchBlocked("The URL host is outside the source's registered host allowlist.",
+                           code="source_redirect_blocked")
+    validate_url(url, resolver)
+    if not allowed_by_robots(url, client, resolver, allowed_hosts=allowed_hosts):
+        raise FetchBlocked("The site's robots.txt does not allow automated access to this page, so it "
+                           "was not fetched.")
+    return safe_get(url, client, resolver=resolver, allowed_hosts=allowed_hosts)

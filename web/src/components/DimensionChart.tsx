@@ -2,6 +2,7 @@
 
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { humanize } from "@/lib/format";
+import { scoreColor } from "./ui";
 
 export interface DimensionDatum {
   name: string;
@@ -18,19 +19,19 @@ export function DimensionChart({ data, height = 220 }: { data: DimensionDatum[];
         <div style={{ height }} className="w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={scored.map((d) => ({ ...d, score: Math.round(d.score as number), label: humanize(d.name) }))} layout="vertical" margin={{ top: 4, right: 36, bottom: 4, left: 8 }}>
-              <CartesianGrid horizontal={false} stroke="#e3e7ec" />
-              <XAxis type="number" domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tick={{ fontSize: 12, fill: "#5b6676" }} />
-              <YAxis type="category" dataKey="label" width={96} tick={{ fontSize: 12, fill: "#1f2a37" }} />
+              <CartesianGrid horizontal={false} stroke="#eef1ea" />
+              <XAxis type="number" domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tick={{ fontSize: 12, fill: "#5f6961" }} />
+              <YAxis type="category" dataKey="label" width={96} tick={{ fontSize: 12, fill: "#202b25" }} />
               <Tooltip
-                cursor={{ fill: "#eef7f5" }}
+                cursor={{ fill: "#eaf0e8" }}
                 formatter={(v) => [`${v} / 100`, "Score"]}
-                contentStyle={{ borderRadius: 8, borderColor: "#e3e7ec", fontSize: 12 }}
+                contentStyle={{ borderRadius: 12, borderColor: "#e5e8e1", fontSize: 12 }}
               />
-              <Bar dataKey="score" radius={[0, 6, 6, 0]} isAnimationActive={false} barSize={18}>
+              <Bar dataKey="score" radius={[0, 4, 4, 0]} isAnimationActive={false} barSize={16}>
                 {scored.map((d) => (
-                  <Cell key={d.name} fill="#2f8f7f" />
+                  <Cell key={d.name} fill={scoreColor(d.score)} />
                 ))}
-                <LabelList dataKey="score" position="right" style={{ fontSize: 12, fill: "#1f2a37" }} />
+                <LabelList dataKey="score" position="right" style={{ fontSize: 12, fill: "#202b25" }} />
               </Bar>
             </BarChart>
           </ResponsiveContainer>

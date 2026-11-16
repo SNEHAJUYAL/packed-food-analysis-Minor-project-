@@ -1,0 +1,22 @@
+invoice_date,platform,place,product_name,brand,pack_size,mrp_inr,paid_inr,qty,invoice_ref
+2026-10-07,zepto,Delhi,Crax Peri Peri Ragi Chips,Crax,80 g,50.00,45.00,1,zepto-2026-10-07-a
+2026-10-07,zepto,Delhi,Kurkure Playz Puffcorn Yummy Cheese,Kurkure,52 g,20.00,20.00,1,zepto-2026-10-07-a
+2026-10-07,zepto,Delhi,Daadi's Coconut Ghee Burfi,Daadi's,200 g,190.00,158.00,1,zepto-2026-10-07-a
+2026-10-20,zepto,Delhi,Huber & Holly Hazelnut Mudslide Cone,Huber & Holly,5 x 40 ml,250.00,175.00,1,zepto-2026-10-20-a
+2026-10-20,zepto,Delhi,Wonderland Foods Flax Seeds,Wonderland Foods,100 g,75.00,29.00,1,zepto-2026-10-20-a
+2026-10-20,zepto,Delhi,RAW Pressery Iced Green Tea Peach,RAW Pressery,250 ml,53.00,48.00,1,zepto-2026-10-20-a
+2026-10-22,zepto,Delhi,Chheda's Long Masala Banana Chips,Chheda's,170 g,95.00,81.00,1,zepto-2026-10-22-a
+2026-10-22,zepto,Delhi,Chheda's Kachori,Chheda's,170 g,65.00,48.00,1,zepto-2026-10-22-a
+2026-10-22,zepto,Delhi,Paper Boat Swing Pomegranate Fruit Juice,Paper Boat,600 ml,40.00,40.00,1,zepto-2026-10-22-a
+2026-10-22,zepto,Delhi,Nestle KitKat 4 Fingers,Nestle,38.5 g,30.00,30.00,1,zepto-2026-10-22-a
+2026-11-01,zepto,Delhi,Kurkure Playz Puffcorn Yummy Cheese,Kurkure,52 g,20.00,20.00,1,zepto-2026-11-01-a
+2026-11-01,zepto,Delhi,Crax Peri Peri Ragi Chips,Crax,80 g,50.00,35.00,1,zepto-2026-11-01-a
+2026-11-01,zepto,Delhi,Sweet Karam Coffee Classic Tapioca Chips,Sweet Karam Coffee,65 g,69.00,61.00,1,zepto-2026-11-01-a
+2026-11-05,zepto,Delhi,Orika Magic Masala,Orika,72 g,60.00,49.00,1,zepto-2026-11-05-a
+2026-11-05,zepto,Delhi,Amul Salted Butter,Amul,100 g,66.00,66.00,1,zepto-2026-11-05-a
+2026-11-05,zepto,Delhi,Vimal Wellness Extra Virgin Olive Oil,Vimal Wellness,30 ml,50.00,38.00,1,zepto-2026-11-05-a
+2026-11-05,zepto,Delhi,Desi Farms Low Fat Dahi,Desi Farms,400 g,34.00,33.00,1,zepto-2026-11-05-a
+2026-11-05,zepto,Delhi,Frubon Paneer,Frubon,180 g,95.00,80.00,1,zepto-2026-11-05-a
+2026-11-14,zepto,Delhi,Om Sweets Ajwain Cookies,Om Sweets,350 g,120.00,120.00,1,zepto-2026-11-14-a
+2026-11-14,zepto,Delhi,Modern Kitchen Spicy Murukku,Modern Kitchen,150 g,75.00,62.00,1,zepto-2026-11-14-a
+2026-11-14,zepto,Delhi,The Health Factory Mini Cakes Berry Blast,The Health Factory,70 g,70.00,49.00,1,zepto-2026-11-14-a

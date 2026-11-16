@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/food-annotation/schema_v1.json",
+  "title": "Packaged food annotation record",
+  "description": "Local research schema. The example.invalid ID is a placeholder, not a hosted schema endpoint.",
+  "type": "object",
+  "required": ["schema_version", "record_type", "record_id", "dataset_version", "taxonomy_version", "identity", "label", "evidence", "verification", "review", "revision"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "record_type": {"enum": ["annotation", "template", "synthetic_fixture"]},
+    "record_id": {"type": ["string", "null"]},
+    "dataset_version": {"type": "string"},
+    "taxonomy_version": {"type": "string"},
+    "identity": {"type": "object"},
+    "label": {"type": "object"},
+    "evidence": {"type": "object"},
+    "verification": {"type": "object"},
+    "review": {"type": "object"},
+    "revision": {"type": "object"}
+  }
+}

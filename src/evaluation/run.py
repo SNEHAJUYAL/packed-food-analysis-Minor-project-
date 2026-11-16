@@ -19,6 +19,7 @@ from core.config import ROOT, scoring_config
 from core.schema import Evidence, EvidenceLabel
 from database.ingest import category_for, read_jsonl, to_extraction
 from evaluation.metrics import binary_rates, field_scores, label_prf, spearman
+from evaluation.ocr_nlp import evaluate_ingredient_sample, evaluate_ocr
 from analyse.claims import INCONSISTENT, check_claim, extract_claims
 from analyse.ingredients import analyse_ingredients
 from normalise.build import build_product
@@ -309,6 +310,8 @@ def run_all(write: bool = True) -> dict:
     results = {
         "methodology_version": scoring_config()["methodology_version"],
         "extraction": evaluate_extraction(),
+        "ocr": evaluate_ocr(),
+        "ingredient_sample": evaluate_ingredient_sample(),
         "ingredients": evaluate_ingredients(),
         "claims": evaluate_claims(),
         "product_matching": evaluate_matching(),

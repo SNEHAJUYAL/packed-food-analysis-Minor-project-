@@ -1,0 +1,118 @@
+{
+  "data": "Permitted public product URLs audited with the existing safe fetcher.",
+  "extractors": [
+    "json-ld",
+    "html"
+  ],
+  "retailers": [
+    {
+      "retailer": "blinkit",
+      "url": "https://blinkit.com/prn/pran-potata-biscuit/prid/483702",
+      "robots_allowed": true,
+      "status": "fetched",
+      "final_url": "https://blinkit.com/prn/pran-potata-biscuit/prid/483702",
+      "response_bytes": 459390,
+      "jsonld": {
+        "name": "Pran Potata Biscuit",
+        "brand": "Pran",
+        "price": null,
+        "currency": "INR",
+        "pack_size_text": null,
+        "ingredients_text": null,
+        "nutrition_basis_text": null
+      },
+      "html": {
+        "name": "Buy Pran Potata Biscuit Online",
+        "brand": null,
+        "price": null,
+        "currency": null,
+        "pack_size_text": "75 g",
+        "ingredients_text": null,
+        "nutrition_basis_text": null
+      }
+    },
+    {
+      "retailer": "zepto",
+      "url": "https://www.zeptonow.com/pn/bonn-digestive-high-fiber-biscuits-healthy-and-high-fiber-cookies/pvid/55bf4658-d4b7-4d70-8bf7-0650e5b266d2",
+      "robots_allowed": true,
+      "status": "fetched",
+      "final_url": "https://www.zeptonow.com/pn/bonn-digestive-high-fiber-biscuits-healthy-and-high-fiber-cookies/pvid/55bf4658-d4b7-4d70-8bf7-0650e5b266d2",
+      "response_bytes": 0,
+      "jsonld": {
+        "name": null,
+        "brand": null,
+        "price": null,
+        "currency": null,
+        "pack_size_text": null,
+        "ingredients_text": null,
+        "nutrition_basis_text": null
+      },
+      "html": {
+        "name": null,
+        "brand": null,
+        "price": null,
+        "currency": null,
+        "pack_size_text": null,
+        "ingredients_text": null,
+        "nutrition_basis_text": null
+      }
+    },
+    {
+      "retailer": "swiggy_instamart",
+      "url": "https://www.swiggy.com/instamart/p/britannia-milk-bikis-biscuits-100-atta-730AM6ZNMK",
+      "robots_allowed": true,
+      "status": "fetched",
+      "final_url": "https://www.swiggy.com/instamart/p/britannia-milk-bikis-biscuits-100-atta-730AM6ZNMK",
+      "response_bytes": 0,
+      "jsonld": {
+        "name": null,
+        "brand": null,
+        "price": null,
+        "currency": null,
+        "pack_size_text": null,
+        "ingredients_text": null,
+        "nutrition_basis_text": null
+      },
+      "html": {
+        "name": null,
+        "brand": null,
+        "price": null,
+        "currency": null,
+        "pack_size_text": null,
+        "ingredients_text": null,
+        "nutrition_basis_text": null
+      }
+    },
+    {
+      "retailer": "amazon_india",
+      "url": "https://www.amazon.in/dp/B0HLKTTP9Z",
+      "robots_allowed": true,
+      "status": "fetched",
+      "final_url": "https://www.amazon.in/dp/B0HLKTTP9Z",
+      "response_bytes": 1007393,
+      "jsonld": {
+        "name": null,
+        "brand": null,
+        "price": null,
+        "currency": null,
+        "pack_size_text": null,
+        "ingredients_text": null,
+        "nutrition_basis_text": null
+      },
+      "html": {
+        "name": "Adding to Cart...",
+        "brand": null,
+        "price": null,
+        "currency": null,
+        "pack_size_text": null,
+        "ingredients_text": "Oats, wheat, barley, millets, jaggery",
+        "nutrition_basis_text": null
+      }
+    }
+  ],
+  "limitations": [
+    "Results are time-, location-, cookie-, and bot-response dependent.",
+    "A successful HTTP fetch does not prove product identity or field accuracy.",
+    "No retailer internal APIs, browser-extension APIs, or access restrictions were bypassed."
+  ]
+}

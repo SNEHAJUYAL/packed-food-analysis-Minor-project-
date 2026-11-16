@@ -13,6 +13,7 @@ from core.config import scoring_config
 from core.schema import Product
 from extract.fetch import fetch
 from extract.html_parser import extract_html
+from extract.image_validation import probe_image_content_type
 from extract.jsonld import extract_jsonld
 from extract.llm_fallback import extract_llm
 from normalise.build import build_product
@@ -28,7 +29,18 @@ def extract_all(html: str, url: str) -> list[dict]:
     found = [extract_jsonld(html, url), extract_html(html, url)]
     if not any(f and (f.get("nutrition") or f.get("ingredients_text")) for f in found):
         found.append(extract_llm(html, url))
-    return [f for f in found if f]
+    found = [f for f in found if f]
+    image_checks: dict[str, bool] = {}
+    for extraction in found:
+        image_url = extraction.get("image_url")
+        if image_url and image_url not in image_checks:
+            image_checks[image_url] = probe_image_content_type(image_url)
+        if image_url and not image_checks[image_url]:
+            extraction["image_url"] = None
+            extraction["image_source"] = None
+            extraction.setdefault("warnings", []).append(
+                "Product image was omitted because its HTTPS URL was inaccessible or did not return an image MIME type.")
+    return found
 
 
 def data_status(product: Product, overall: dict) -> tuple[str, list[str]]:

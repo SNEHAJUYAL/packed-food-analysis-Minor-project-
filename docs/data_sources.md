@@ -11,7 +11,7 @@
 | **FSSAI (Advertising and Claims) Regulations, 2018**, compendium dated 14-12-2022 | Government publication | Claim conditions (`data/reference/fssai_claims.csv`, `regulatory_rule` table) | Copied and checked 12 Oct 2026; see [regulatory_rules.md](regulatory_rules.md) |
 | **ICMR-NIN Nutrient Requirements for Indians, 2020** | Government publication | Protein RDA (54 g/day) used to turn "% of RDA" claim conditions into grams | Team choice of reference adult; to be confirmed by the guides |
 | **UK DH/FSA front-of-pack guidance (2016)** | Open Government Licence | Placeholder "high" (red) bounds for traffic lights until FSSAI publishes final cut-offs | Labelled provisional in `thresholds.csv` |
-| **Codex CXG 36-1989** (INS) | Codex Alimentarius | INS codes and functional classes (`ins_codes.csv`, `ingredient_classes.csv`) | Seed list of 66 codes, status `seed_verify` |
+| **Codex CXG 36-1989** (INS) | Codex Alimentarius | INS codes and functional classes (`ins_codes.csv`, `ingredient_classes.csv`) | Seed list of 64 codes (recounted 16 Nov 2026), status `seed_verify` |
 
 ## Freshness
 

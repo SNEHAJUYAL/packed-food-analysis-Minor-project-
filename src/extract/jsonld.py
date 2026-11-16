@@ -6,8 +6,10 @@ unit conversion happens in normalise/.
 from __future__ import annotations
 
 from typing import Any, Optional
+from urllib.parse import urlparse
 
 import extruct
+from extract.image_validation import image_url_from_metadata
 
 # schema.org NutritionInformation property -> schema nutrient key
 SCHEMA_NUTRITION = {
@@ -28,6 +30,9 @@ UNIT_CODES = {"GRM": "g", "KGM": "kg", "MGM": "mg", "MLT": "ml", "LTR": "l", "CL
 def empty_extracted(source: str) -> dict:
     return {"source": source, "name": None, "brand": None, "description": None, "category_hint": None,
             "price": None, "currency": None, "pack_size_text": None, "ingredients_text": None,
+            "serving_size_text": None, "allergens_text": None,
+            "image_url": None, "image_source": None,
+            "mrp": None, "availability": None, "variant": None, "multipack_count": None,
             "nutrition": {}, "nutrition_basis_text": None, "claims_text": [], "gtin": None}
 
 
@@ -68,15 +73,36 @@ def _quantity_text(v: Any) -> Optional[str]:
     return _text(v)
 
 
-def _offer(offers: Any) -> tuple[Optional[str], Optional[str]]:
+def _image_url(v: Any, base_url: str) -> Optional[str]:
+    if isinstance(v, list):
+        return _image_url(v[0], base_url) if v else None
+    if isinstance(v, dict):
+        return _image_url(v.get("url") or v.get("contentUrl") or v.get("@id"), base_url)
+    value = _text(v)
+    if not value:
+        return None
+    return image_url_from_metadata(value, base_url)
+
+
+def _offer(offers: Any) -> tuple[Optional[str], Optional[str], Optional[str], Optional[str]]:
     if isinstance(offers, list):
         offers = offers[0] if offers else None
     if not isinstance(offers, dict):
-        return None, None
+        return None, None, None, None
     price = offers.get("price") or offers.get("lowPrice")
-    if price is None and isinstance(offers.get("priceSpecification"), dict):
-        price = offers["priceSpecification"].get("price")
-    return (_text(price), _text(offers.get("priceCurrency")))
+    specifications = offers.get("priceSpecification") or []
+    specifications = specifications if isinstance(specifications, list) else [specifications]
+    mrp = None
+    for specification in specifications:
+        if not isinstance(specification, dict):
+            continue
+        price_type = str(specification.get("priceType") or "").lower()
+        if "listprice" in price_type or "referenceprice" in price_type or "mrp" in price_type:
+            mrp = _text(specification.get("price"))
+        elif price is None:
+            price = specification.get("price")
+    return (_text(price), _text(offers.get("priceCurrency")), mrp,
+            _text(offers.get("availability")))
 
 
 def find_products(html: str, url: str) -> list[dict]:
@@ -89,16 +115,19 @@ def find_products(html: str, url: str) -> list[dict]:
     return products
 
 
-def parse_product(item: dict) -> dict:
+def parse_product(item: dict, url: str = "") -> dict:
     out = empty_extracted("json-ld")
     out["name"] = _text(item.get("name"))
     out["brand"] = _text(item.get("brand"))
     out["description"] = _text(item.get("description"))
     out["category_hint"] = _text(item.get("category"))
     out["gtin"] = _text(item.get("gtin13") or item.get("gtin") or item.get("gtin8"))
-    out["price"], out["currency"] = _offer(item.get("offers"))
+    out["image_url"] = _image_url(item.get("image") or item.get("photo"), url)
+    out["image_source"] = "json-ld" if out["image_url"] else None
+    out["price"], out["currency"], out["mrp"], out["availability"] = _offer(item.get("offers"))
     out["pack_size_text"] = _quantity_text(item.get("weight") or item.get("size"))
     out["ingredients_text"] = _text(item.get("ingredients") or item.get("hasIngredient"))
+    out["allergens_text"] = _text(item.get("allergens") or item.get("allergen") or item.get("contains"))
 
     for prop in item.get("additionalProperty") or []:
         if not isinstance(prop, dict):
@@ -112,6 +141,12 @@ def parse_product(item: dict) -> dict:
         elif any(k in name for k in ("net weight", "net quantity", "net qty", "net wt", "weight")) \
                 and not out["pack_size_text"]:
             out["pack_size_text"] = value
+        elif any(k in name for k in ("flavour", "flavor", "variant")) and not out["variant"]:
+            out["variant"] = value
+        elif any(k in name for k in ("pack of", "pack count", "multipack", "units per pack")):
+            out["multipack_count"] = value
+        elif "allergen" in name and not out["allergens_text"]:
+            out["allergens_text"] = value
         elif "claim" in name or "feature" in name or "highlight" in name:
             out["claims_text"].append(value)
 
@@ -120,6 +155,7 @@ def parse_product(item: dict) -> dict:
         nut = nut[0] if nut else None
     if isinstance(nut, dict):
         out["nutrition_basis_text"] = _text(nut.get("servingSize"))
+        out["serving_size_text"] = _text(nut.get("servingSize"))
         for prop, key in SCHEMA_NUTRITION.items():
             raw = _text(nut.get(prop))
             if raw is not None:
@@ -133,7 +169,7 @@ def parse_product(item: dict) -> dict:
 
 def extract_jsonld(html: str, url: str) -> Optional[dict]:
     """Best Product entity on the page (the one with the most fields), or None."""
-    products = [parse_product(p) for p in find_products(html, url)]
+    products = [parse_product(p, url) for p in find_products(html, url)]
     if not products:
         return None
 
