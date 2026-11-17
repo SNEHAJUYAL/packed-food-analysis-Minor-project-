@@ -360,6 +360,8 @@ export interface Micronutrient {
 export interface ProductExtras {
   micronutrients?: Record<string, Micronutrient>;
   image_url?: string | null;
+  image_local?: string | null;
+  image_source?: string | null;
   off_nutriscore_grade?: string | null;
   price_observation_count?: number;
 }
@@ -573,4 +575,40 @@ export interface Methodology {
   limitations?: string[];
   missing_data?: string[] | string | null;
   freshness?: string[] | string | null;
+}
+
+export interface AskAnswer {
+  kind: "evidence" | "ai_estimate" | "not_found";
+  query: string;
+  verdict: string;
+  basis: string;
+  notes: string[];
+  product_id: number | null;
+  found_via?: "stored" | "open_food_facts";
+  name?: string;
+  grade?: Grade | null;
+  score?: number | null;
+  status?: AnalysisStatus;
+  good?: string[];
+  watch?: string[];
+  category_rank?: { rank: number; of: number; category: string; better_than_percent: number } | null;
+  dimensions?: Record<string, number | null>;
+  alternatives?: { product_id: number; name: string; grade: Grade | null; overall: number | null; reason: string }[];
+  alternatives_message?: string | null;
+  prices?: { cheapest: string | null; spread: PriceSummary["spread"]; retailers: { retailer: string; price_inr: number; price_per_100: number | null; evidence: PriceEvidence }[] };
+  is_synthetic?: boolean;
+  estimate?: AiEstimate;
+  ai_estimate?: AiEstimate | null;
+  next_steps?: string[];
+}
+
+export interface AiEstimate {
+  product: string;
+  likely_category?: string | null;
+  quality_summary: string;
+  watch_out_for: string[];
+  healthier_alternatives: string[];
+  confidence: string;
+  provider?: string | null;
+  web_sources?: { title: string; url: string }[];
 }

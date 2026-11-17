@@ -3,7 +3,7 @@
 ## Option A: Docker Compose (one command)
 
 ```bash
-cp .env.example .env          # set POSTGRES_PASSWORD; ANTHROPIC_API_KEY is optional
+cp .env.example .env          # set POSTGRES_PASSWORD; ANTHROPIC_API_KEY and GEMINI_API_KEY are optional
 docker compose up --build
 ```
 
@@ -32,6 +32,9 @@ cp .env.example .env           # set DATABASE_URL
 once (macOS with Homebrew: `brew install tesseract`; Ubuntu: `sudo apt install tesseract-ocr`), run
 `./run.sh setup` for the Python package, and restart the API. Setting `ANTHROPIC_API_KEY` in `.env` switches
 photo reading to Claude, which copes better with curved or shiny packs.
+Setting `GEMINI_API_KEY` enables the optional Google Search-grounded AI answer for product queries that are not
+found in the stored catalogue or Open Food Facts. Gemini answers remain labelled as unverified and are not stored
+as product evidence.
 
 **PostgreSQL without Docker** (for example Postgres.app or Homebrew on a Mac). `./run.sh migrate` needs a
 role and database matching `DATABASE_URL`; "password authentication failed for user fdi" means they do not

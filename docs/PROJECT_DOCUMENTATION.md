@@ -52,7 +52,7 @@ missing instead of being silently converted to zero.
 | Persistence | PostgreSQL, SQLAlchemy, Alembic | Products, sources, analyses, prices, evidence, and migrations |
 | Extraction | JSON-LD, HTML parser, Open Graph, Twitter metadata | Product identity, nutrition, ingredients, price, availability, and image evidence |
 | OCR | Tesseract 5.5, pytesseract, Pillow | Offline text extraction from package photographs and screenshots |
-| Optional AI | Anthropic Claude Vision/text | Fallback for difficult images or unstructured content when configured |
+| Optional AI | Anthropic Claude Vision/text, Google Gemini | Fallback for difficult content and Google Search-grounded answers when configured |
 | NLP | Deterministic parsers, dictionaries, INS codes, RapidFuzz | Ingredient matching, additives, allergens, claims, and uncertainty detection |
 | Similarity and ranking | TF-IDF, cosine similarity, rule-based ranking | Product matching, comparisons, and explainable alternatives |
 | Configuration | JSON scoring and reference files, environment variables | Score weights, grade bands, dictionaries, and local deployment settings |
@@ -265,6 +265,7 @@ Do not use:
 | Tesseract | Pretrained OCR engine | No | Read label text |
 | Claude Vision | Optional hosted pretrained model | No | Transcribe difficult label images |
 | Claude text fallback | Optional hosted pretrained model | No | Locate fields on unstructured pages |
+| Gemini + Google Search | Optional hosted pretrained model with search grounding | No | Answer unknown product queries and return web source links |
 | RapidFuzz | Fuzzy string matching | No | Ingredient and reference matching |
 | TF-IDF + kNN | Unsupervised information retrieval | No | Product similarity and tie-breaking |
 | Ingredient dictionaries | Rule-based NLP | No | Ingredient classes, additives, allergens |
@@ -279,6 +280,8 @@ Do not use:
 |---|---:|---|---|---|---|
 | `DATABASE_URL` | Yes for persistence | PostgreSQL connection | Configured locally | `.env` only | Must never be committed |
 | `ANTHROPIC_API_KEY` | No | Optional Claude page/photo fallback | Empty locally; deterministic path works | `.env` only | Paid hosted inference; do not expose in frontend |
+| `GEMINI_API_KEY` | No | Optional Gemini AI responses and Google Search grounding | Empty unless configured | `.env` only | Paid/quota-limited hosted inference; do not expose in frontend |
+| `GEMINI_MODEL` | No | Selects the Gemini model | Defaults to `gemini-3.8-flash` | `.env` only | Use a model enabled for the configured API key |
 | Tesseract binary | Yes for offline photo OCR | Local OCR | Installed locally | System package | Free/open source; unavailable by default on Vercel |
 | Open Food Facts API | No key | Product search/import/reference | Working with source attribution | Backend only | Rate limits and crowdsourced quality |
 | BuyHatke API | No | Price intelligence | Not integrated | No key available | Requires authorised commercial agreement |
@@ -307,7 +310,7 @@ Do not use:
 ## Security and governance
 
 - API keys stay server-side in environment variables.
-- The frontend must never receive `ANTHROPIC_API_KEY` or database credentials.
+- The frontend must never receive `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, or database credentials.
 - URL fetches apply scheme, SSRF, DNS, redirect, robots, timeout, size, and rate controls.
 - Unknown acquisition sources fail closed in the candidate workflow.
 - Retailer access restrictions are not bypassed.

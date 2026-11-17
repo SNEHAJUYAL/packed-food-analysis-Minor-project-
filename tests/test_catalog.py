@@ -146,3 +146,32 @@ def test_synthetic_products_refuse_real_prices_and_are_labelled(client):
     assert all(o["evidence"] == "synthetic" for o in summary["observations"])
     r = client.post(f"/api/products/{syn['product_id']}/prices", json={"retailer": "zepto", "price_inr": 10})
     assert r.status_code == 422
+
+
+def test_ask_answers_from_evidence_for_a_stored_product(client):
+    client.post("/api/products/import-off", json={"barcode": OFF_PRODUCT["code"]})
+    body = client.post("/api/ask", json={"q": "test ragi biscuits"}).json()
+    assert body["kind"] == "evidence"
+    assert body["grade"] in "ABCDE" and body["score"] is not None
+    assert "grade" in body["verdict"]
+    assert any("sugar" in w.lower() or "palm" in w.lower() for w in body["watch"])
+    assert "no AI model" in body["basis"]
+
+
+def test_ask_unknown_product_is_not_found_without_ai_key(client, monkeypatch):
+    import answer
+    monkeypatch.setattr(answer, "ai_available", lambda: False)
+    body = client.post("/api/ask", json={"q": "qqqq zzzz"}).json()
+    assert body["kind"] == "not_found" and body["product_id"] is None
+    assert "API_KEY" in body["basis"]
+
+
+def test_ask_ai_estimate_is_labelled_and_never_scored(client, monkeypatch):
+    import answer
+
+    monkeypatch.setattr(answer, "ai_estimate", lambda q, client=None: answer.AiEstimate(
+        product="Qqqq snack", quality_summary="Typically fried and salty.", watch_out_for=["salt"],
+        healthier_alternatives=["roasted chana"], confidence="low").model_dump())
+    body = client.post("/api/ask", json={"q": "qqqq zzzz"}).json()
+    assert body["kind"] == "ai_estimate"
+    assert "AI-generated" in body["basis"] and "grade" not in body and "score" not in body

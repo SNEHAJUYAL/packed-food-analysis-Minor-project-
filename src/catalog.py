@@ -144,7 +144,8 @@ def _stored_matches(s: Session, q: str, limit: int) -> list[dict]:
                         "source_url": row.sources[-1].source_url if row.sources else None,
                         "collected_at": row.sources[-1].collected_at.isoformat() if row.sources else None,
                         "is_synthetic": repo.is_synthetic(row), "stored": True,
-                        "image_url": ((row.field_evidence or {}).get("image_url") or {}).get("value")})
+                        "image_url": ((row.field_evidence or {}).get("image_local") or {}).get("value")
+                        or ((row.field_evidence or {}).get("image_url") or {}).get("value")})
             if len(out) >= limit:
                 break
     return out

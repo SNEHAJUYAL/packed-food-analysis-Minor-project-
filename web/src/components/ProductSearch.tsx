@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { GradeBadge, SyntheticBadge } from "./badges";
 import { IconArrowRight, IconSearch } from "./icons";
 import { Badge, Card, EmptyState, Note, Spinner, buttonClass, inputClass } from "./ui";
 import { ApiError, api } from "@/lib/api";
 import { formatInr, formatNumber, humanize } from "@/lib/format";
-import type { SearchResult } from "@/lib/types";
+import type { AskAnswer, SearchResult } from "@/lib/types";
+import { AnswerCard } from "./AnswerCard";
 
 /**
  * Find any packaged product by name or brand. Stored products open straight away; Open Food Facts
@@ -21,16 +22,24 @@ export function ProductSearch({ initialQuery = "" }: { initialQuery?: string }) 
   const [result, setResult] = useState<SearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [importing, setImporting] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<AskAnswer | null>(null);
+  const [answering, setAnswering] = useState(false);
 
-  async function onSubmit(e: FormEvent) {
-    e.preventDefault();
-    const value = text.trim();
+  async function run(raw: string) {
+    const value = raw.trim();
     if (value.length < 2) {
       setError("Type at least two letters of a product name or brand.");
       return;
     }
     setBusy(true);
     setError(null);
+    setAnswer(null);
+    setAnswering(true);
+    // The direct answer runs alongside the list search; it may import the best Open Food Facts match.
+    api.ask(value)
+      .then(setAnswer)
+      .catch(() => setAnswer(null))
+      .finally(() => setAnswering(false));
     try {
       setResult(await api.search(value));
     } catch (err) {
@@ -39,6 +48,19 @@ export function ProductSearch({ initialQuery = "" }: { initialQuery?: string }) 
       setBusy(false);
     }
   }
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    await run(text);
+  }
+
+  // Arriving from a failed link (/analyze?q=...) runs the search straight away.
+  const started = useRef(false);
+  useEffect(() => {
+    if (started.current || initialQuery.trim().length < 2) return;
+    started.current = true;
+    void run(initialQuery);
+  }, [initialQuery]);
 
   async function analyse(code: string) {
     setImporting(code);
@@ -87,6 +109,10 @@ export function ProductSearch({ initialQuery = "" }: { initialQuery?: string }) 
         </form>
       </div>
 
+      {answering ? (
+        <p role="status" className="flex items-center gap-2 text-sm text-muted"><Spinner className="h-4 w-4" /> Preparing a direct answer…</p>
+      ) : null}
+      {answer ? <AnswerCard answer={answer} /> : null}
       {error ? <p role="alert" className="rounded-xl bg-[#fdf6ec] px-4 py-3 text-sm text-[#5c3a10]">{error}</p> : null}
       {result?.notes.map((n) => <Note key={n} tone="warn">{n}</Note>)}
       {nothing ? (
@@ -112,7 +138,15 @@ export function ProductSearch({ initialQuery = "" }: { initialQuery?: string }) 
           <ul className="mt-3 divide-y divide-line">
             {result.stored.map((p) => (
               <li key={p.product_id} className="flex items-center justify-between gap-3 py-3">
-                <div className="min-w-0">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-50">
+                  {p.image_url && /^(https:\/\/|\/product-images\/)/.test(p.image_url) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.image_url} alt="" className="h-full w-full object-contain" referrerPolicy="no-referrer" loading="lazy" />
+                  ) : (
+                    <IconSearch className="h-5 w-5 text-slate-300" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
                   <Link href={`/products/${p.product_id}`} className="font-medium text-ink hover:text-forest hover:underline">
                     {p.brand && !(p.name ?? "").toLowerCase().startsWith(p.brand.toLowerCase()) ? `${p.brand} ` : ""}{p.name ?? "Unnamed product"}
                   </Link>

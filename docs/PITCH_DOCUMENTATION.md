@@ -96,7 +96,8 @@ only after a verified food-label benchmark shows measurable improvement.
 
 - Open Food Facts: currently usable reference source; no key required.
 - Tesseract: local, free OCR; no API key.
-- Claude: optional key, server-side only, not enabled in recorded evaluations.
+- Claude and Gemini: optional keys, server-side only, not enabled in recorded evaluations. Gemini can use
+  Google Search grounding for clearly labelled AI estimates when a key is configured.
 - BuyHatke and Flash: no authorised India food-price API was verified; no integration is claimed.
 - Retailer APIs: future partnership-only integration, subject to written authorization.
 

@@ -330,6 +330,17 @@ def search_products(q: str = Query(..., min_length=2, max_length=100), online: b
     return catalog.search(s, q, include_online=online, limit=limit)
 
 
+class AskRequest(BaseModel):
+    q: str = Field(..., min_length=2, max_length=120)
+
+
+@app.post("/api/ask", tags=["analysis"], dependencies=[Depends(rate_limited)])
+def ask(req: AskRequest, s=Depends(db)) -> dict:
+    """Type a product name and get a direct answer: grade, quality, comparison, alternatives and prices."""
+    import answer
+    return answer.ask(s, req.q)
+
+
 @app.post("/api/products/import-off", response_model=ProductAnalysis, tags=["analysis"],
           dependencies=[Depends(rate_limited)])
 def import_off(req: ImportOffRequest, s=Depends(db)) -> dict:

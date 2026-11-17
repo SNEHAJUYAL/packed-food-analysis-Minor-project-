@@ -16,6 +16,7 @@ import type {
   PriceSummary,
   ProductURLCandidateResult,
   SearchResult,
+  AskAnswer,
 } from "./types";
 
 /**
@@ -163,6 +164,9 @@ export const api = {
     ),
   categories: (signal?: AbortSignal) => request<{ categories: Category[] }>("/api/reference/categories", { signal }),
   methodology: (signal?: AbortSignal) => request<Methodology>("/api/reference/methodology", { signal }),
+  /** Type a product name, get a direct answer: grade, quality, comparison, alternatives, prices. */
+  ask: (text: string, signal?: AbortSignal) =>
+    request<AskAnswer>("/api/ask", { method: "POST", body: JSON.stringify({ q: text }), signal }),
   /** Stored products plus Open Food Facts results that have not been analysed yet. */
   search: (text: string, signal?: AbortSignal) =>
     request<SearchResult>(`/api/search${q({ q: text, limit: 20 })}`, { signal }),

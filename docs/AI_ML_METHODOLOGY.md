@@ -10,7 +10,7 @@ system's intelligence comes from:
 
 * deterministic extraction (JSON-LD, HTML table parsing, regular expressions);
 * OCR with the pretrained open-source Tesseract engine;
-* optional pretrained large language and vision models (Anthropic Claude) used only to *locate* text that
+* optional pretrained large language and vision models (Anthropic Claude and Google Gemini) used only to *locate* text that
   already exists on a page or photo;
 * dictionary- and rule-based ingredient classification with fuzzy string matching;
 * rule-based, sourced nutrition benchmarks and a weighted scoring formula;
@@ -29,6 +29,7 @@ not a validated or medical model.
 | Unit normalisation | `normalise/units.py`, `normalise/build.py` | Deterministic rules (kJ ÷ 4.184, sodium = salt ÷ 2.5, per-serving scaling) | No training |
 | Pack-photo OCR | `extract/label_ocr.py` | Pretrained OCR (Tesseract via `pytesseract`) + regex rules for ingredients, nutrient rows, net quantity, price | Not trained here |
 | Vision label reading (optional) | `extract/label_image.py` | Pretrained multimodal LLM (Anthropic Claude); transcript first, then schema; value kept only if in transcript | Not trained here; off unless `ANTHROPIC_API_KEY` is set |
+| Search-grounded AI answer (optional) | `answer.py` | Google Gemini with Google Search grounding; source links are returned separately from stored evidence | Not trained here; off unless `GEMINI_API_KEY` is set |
 | Text fallback for unstructured pages (optional) | `extract/llm_fallback.py` | Pretrained LLM with schema-constrained output; values must appear verbatim in page text | Not trained here; off unless key set; disabled for uploaded HTML |
 | Ingredient splitting and classification | `normalise/ingredients.py` + `data/reference/ingredient_terms.csv` (219 terms), `ingredient_classes.csv` (36 classes), `ins_codes.csv` (64 codes), `allergens.csv` (9 groups) | Dictionary lookup, then RapidFuzz `ratio` with cutoff 90; otherwise *uncertain* | No training |
 | Category assignment | `normalise/build.py: categorise` + `category_keywords.csv`; OFF tags via `off_category_map.csv` | Keyword rules | No training (the CSV notes a TF-IDF classifier as a future replacement) |
@@ -67,6 +68,17 @@ not a validated or medical model.
 | Dataset / training | None by the project |
 | Evaluation | Not measured; disabled in all recorded test runs (no key) |
 | Inference | Set `ANTHROPIC_API_KEY` in `.env`; the code chooses it automatically |
+
+### 3.3 Google Gemini with Google Search grounding (optional)
+
+| Purpose | Answer an unknown product query with current web discovery while keeping the result clearly labelled as an
+unverified AI estimate |
+|---|---|
+| SDK | `google-genai` |
+| Default model | `gemini-3.8-flash`, configurable with `GEMINI_MODEL` |
+| Grounding | `GoogleSearch` tool; returned web source links are shown in the answer card |
+| Inference | Set `GEMINI_API_KEY` in `.env`; the key remains server-side |
+| Data boundary | Gemini output is never persisted as product nutrition, price, grade, or verified identity |
 | Model file | Hosted; nothing stored |
 
 ### 3.3 TF-IDF + kNN similarity
